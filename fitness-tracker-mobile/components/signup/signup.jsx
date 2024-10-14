@@ -12,7 +12,7 @@ import Login from '../login/login';
 import styles from "./signup.style";
 
 const Signup = () => {
-    const defaultProfilePicture = require('../../assets/default-profile-picture.jpg');
+    const defaultProfilePicture = require('../../assets/images/default-profile-picture.jpg');
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");

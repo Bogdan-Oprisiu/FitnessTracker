@@ -19,8 +19,8 @@ const Login = () => {
     const [password, setPassword] = useState('');
     const [showSignup, setShowSignup] = useState(false);
     const loginFadeAnim = useRef(new Animated.Value(1)).current;
-    const googleIcon = require('../../assets/google-icon.webp');
-    const appleIcon = require('../../assets/apple-icon.png');
+    const googleIcon = require('../../assets/images/google-icon.webp');
+    const appleIcon = require('../../assets/images/apple-icon.png');
 
     const loginWithCredentials = async () => {
         if (emailOrUsername === '' || password === '') {
