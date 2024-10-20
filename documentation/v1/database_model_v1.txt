@@ -1,0 +1,49 @@
+### 1. **Exercise Entity**
+The `Exercise` class represents an exercise and has the following attributes:
+- `id`, `name`, `description`, `duration`, `sets`, `reps`, `breaks`, `intensityLevel`, and `explanation` — Basic information about each exercise.
+- `exerciseType` and `muscleGroup` are represented with relationships to `ExerciseType` and `MuscleGroup` entities.
+- `equipment` is a `ManyToMany` relationship.
+
+### Corresponding Tables and Relationships
+- **Table: exercises**
+  - Columns: `id`, `name`, `description`, `duration`, `sets`, `reps`, `breaks`, `intensity_level`, `explanation`
+  - Foreign Keys: `exercise_type_id` (references `exercise_types`), `muscle_group_id` (references `muscle_groups`)
+  - Relationship Tables:
+    - **exercise_equipment** (to represent the `ManyToMany` relationship between `exercises` and `equipment`)
+    
+### 2. **ExerciseType Entity**
+The `ExerciseType` class is quite straightforward and represents categories such as "Cardio" or "Strength".
+- **Table: exercise_types**
+  - Columns: `id`, `name`
+
+### 3. **MuscleGroup Entity**
+This entity represents the primary muscle groups targeted by the exercise, such as "Chest" or "Back".
+- **Table: muscle_groups**
+  - Columns: `id`, `name`
+
+### 4. **Equipment Entity**
+The `Equipment` entity represents the different types of equipment that can be used, such as "Dumbbell" or "Treadmill".
+- **Table: equipment**
+  - Columns: `id`, `name`
+
+### 5. **User Entity**
+The `User` entity represents the users of the fitness app and their basic information.
+- **Table: users**
+  - Columns: `id`, `username`, `email`, `password`, `age`, `gender`
+
+### 6. **WorkoutLog Entity**
+The `WorkoutLog` entity represents the tracking of user progress, including exercises performed and metrics for each session.
+- **Table: workout_logs**
+  - Columns: `id`, `user_id` (references `users`), `exercise_id` (references `exercises`), `date`, `duration`, `sets`, `reps`, `notes`
+
+### Database Diagram and Relationships
+- **Exercises** (1) --- (Many) **ExerciseTypes**
+  - Relationship: One `ExerciseType` can be associated with many `Exercises`.
+- **Exercises** (1) --- (Many) **MuscleGroups**
+  - Relationship: One `MuscleGroup` can be associated with many `Exercises`.
+- **Exercises** (Many) --- (Many) **Equipment**
+  - Relationship: The `exercise_equipment` join table will hold `exercise_id` and `equipment_id` to manage this relationship.
+- **Users** (1) --- (Many) **WorkoutLogs**
+  - Relationship: One `User` can have many `WorkoutLogs`.
+- **Exercises** (1) --- (Many) **WorkoutLogs**
+  - Relationship: One `Exercise` can be part of many `WorkoutLogs`.
