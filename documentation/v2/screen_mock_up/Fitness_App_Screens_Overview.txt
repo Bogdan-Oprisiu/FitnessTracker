@@ -27,3 +27,11 @@ It includes fields for entering the username and password, along with options to
 The sign-up screen allows new users to create an account by providing their username, email, password, and confirming the password.
 
 The screen features a user icon that can be customized, making the onboarding process more engaging. The design ensures ease of use and accessibility for new users.
+
+6. Heart Rate Monitor Screen
+
+The heart rate monitor screen is designed to connect with a Polar Sensor and display the user's current heart rate in real-time.
+
+It features a graph that shows heart rate data over the last five minutes, providing users with insights into their cardiovascular performance.
+
+The "Connect to Polar Sensor" button enables users to pair their heart rate sensor with the app, allowing for continuous heart rate monitoring during workouts.
