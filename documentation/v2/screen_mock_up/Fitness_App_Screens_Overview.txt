@@ -20,4 +20,10 @@ The screen features a chatbot icon and a messaging interface, making communicati
 
 The login screen follows a minimalist design, emphasizing simplicity and user-friendliness.
 
-It includes fields for entering the username and password, along with options to sign in using social media accounts or create a new account if needed.
+It includes fields for entering the username and password, along with options to sign in using Google or Apple accounts, or to create a new account if needed.
+
+5. Sign-Up Screen
+
+The sign-up screen allows new users to create an account by providing their username, email, password, and confirming the password.
+
+The screen features a user icon that can be customized, making the onboarding process more engaging. The design ensures ease of use and accessibility for new users.
