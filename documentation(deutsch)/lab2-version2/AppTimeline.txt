@@ -1,0 +1,46 @@
+# Zeitleiste der Fitness Tracker App
+
+Das Projekt folgt einer umfassenden Zeitleiste für die Entwicklung, das Testen und die Bereitstellung, wobei die Verantwortlichkeiten klar zwischen Bogdan (Backend & AI) und Adi (Frontend) aufgeteilt sind. Im Folgenden ist die aktualisierte Zeitleiste dargestellt:
+
+## Oktober: Initialisierung von Backend und Frontend
+- **Backend-Entwicklung (Bogdan)**:
+  - **API-Entwicklung**: Entwicklung der Kern-APIs für Übungen, Nutzer und Logs.
+  - **Datenbankeinrichtung**: Einrichtung der Datenbank und Aufbau der erforderlichen Verbindungen.
+- **Frontend-Entwicklung (Adi)**:
+  - **UI-Einrichtung**: Entwurf und Implementierung grundlegender Bildschirme (z. B. Login, Dashboard, Übungsliste).
+  - **Navigation**: Implementierung der Bildschirmnavigation für eine reibungslose Benutzererfahrung.
+- **Erste Demo (Ende Oktober)**: Präsentation eines funktionierenden Prototyps, der die teilweise Integration von Backend und Frontend zeigt.
+
+## November: Integration und Funktionsfertigstellung
+- **Prototyp fertigstellen (Adi & Bogdan)**:
+  - **Backend (Bogdan)**: Erweiterung der API-Funktionalitäten zur Unterstützung zusätzlicher Funktionen.
+  - **Frontend (Adi)**: Integration des Frontends mit den Backend-APIs.
+  - **AI-Entwicklung (Bogdan)**: Beginn der Integration von AI-gesteuerten Trainingsempfehlungen.
+- **Uhrenintegration (Beide)**:
+  - **Frontend (Adi)**: Entwicklung der Benutzeroberfläche für die Synchronisation mit Smartwatches.
+  - **Backend (Bogdan)**: Erstellung von API-Endpunkten zur Verarbeitung von Smartwatch-Daten.
+
+## Dezember: Testen und Debugging
+- **Testbeginn**:
+  - **Unit-Tests (Beide)**:
+    - **Backend (Bogdan)**: Testen von API-Endpunkten und Sicherstellung der Datenintegrität.
+    - **Frontend (Adi)**: Testen von UI-Komponenten und Interaktionen.
+- **Integrationstests und Debugging**:
+  - **Integrationstests (Beide)**: Testen der Kommunikation zwischen den Frontend- und Backend-Komponenten.
+  - **Uhrenfunktionalität**: Validierung der Integration von Smartwatch-Funktionen mit Benutzerprofilen.
+  - **Debugging-Sitzungen**: Zuweisung von Aufgaben zur Behebung von Fehlern, die während des Testens entdeckt wurden.
+
+## Januar: Fertigstellung und Dokumentation
+- **Dokumentation (Beide)**:
+  - **Benutzerhandbuch (Adi)**: Verfassen eines Benutzerhandbuchs, das die UI-Funktionen abdeckt.
+  - **Technische Dokumentation (Bogdan)**: Dokumentation der Backend-Architektur, der AI-Funktionalitäten und der API-Nutzung.
+- **Letzte Vorbereitungen**:
+  - **Google Play Store-Konformität**: Sicherstellen, dass die App alle Anforderungen für den Google Play Store erfüllt.
+  - **Abschließende Tests**: Durchführung von Stresstests, um Stabilität und Benutzerfreundlichkeit zu gewährleisten.
+- **Fertigstellung der App (Ende Januar)**: Die App sollte fertiggestellt sein und zur Veröffentlichung im Google Play Store bereit sein.
+
+## Zusammenfassung der Entwicklerverantwortlichkeiten
+- **Bogdan**: Backend-Entwicklung, AI-Integration, API-Management und technische Dokumentation.
+- **Adi**: Frontend-Entwicklung, UI/UX-Design, Uhrenintegration und Benutzerdokumentation.
+- **Beide**: Integrationstests, Debugging, abschließende Tests und Dokumentation.
+

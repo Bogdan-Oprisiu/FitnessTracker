@@ -1,0 +1,13 @@
+Vergleich der Fitness Tracker App
+
+Dieses Projekt umfasst einen Vergleich zwischen der Fitness Tracker App und mehreren beliebten Fitness-Apps wie FitTrack, MyFitnessPal, Strava, Nike Training Club und Fitbit. Hier ist eine kurze Zusammenfassung, wie sich unsere App hervorhebt:
+
+Workout-Planer: Unsere App bietet einen robusten und benutzerfreundlichen Workout-Planer, mit dem es einfach ist, Trainingsroutinen zu erstellen und anzupassen.
+
+AI-Workout-Planung: Im Gegensatz zu den meisten Wettbewerbern integriert unsere App AI, um personalisierte Trainingspläne anzubieten, die auf individuelle Nutzerpräferenzen und Fitnessziele zugeschnitten sind.
+
+Uhrenintegration: Die App verfügt über eine vollständige Integration von Smartwatches, die es den Nutzern ermöglicht, ihre Workouts nahtlos in Echtzeit zu überwachen.
+
+Detaillierte Statistiken: Unsere App bietet detaillierte und aufschlussreiche Statistiken, die den Nutzern helfen, ihren Fortschritt zu verfolgen und fundierte Entscheidungen über ihren Fitnessweg zu treffen.
+
+Für ausführlichere Informationen sehen Sie sich die Datei Fitness_App_Comparison.csv im Dokumentationsordner an.

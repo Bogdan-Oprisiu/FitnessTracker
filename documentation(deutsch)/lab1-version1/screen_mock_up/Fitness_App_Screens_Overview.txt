@@ -1,0 +1,20 @@
+Statistik-Bildschirm
+Der Statistik-Bildschirm bietet einen detaillierten Überblick über den Fortschritt des Nutzers beim Training und zeigt wichtige Metriken wie verbrannte Kalorien, Trainingshäufigkeit und Trainingsdauer an.
+
+Er enthält mehrere Diagramme und visuelle Datenrepräsentationen, die den Nutzern helfen, ihren Fortschritt leicht zu interpretieren und zu analysieren.
+
+Gewichtstracking-Bildschirm
+Der Gewichtstracking-Bildschirm zeigt sowohl das aktuelle als auch das Zielgewicht des Nutzers in einem ansprechenden Diagrammformat an.
+
+Er enthält einen Journalsektor, in dem Nutzer ihr Gewicht regelmäßig protokollieren und ihren Fortschritt im Laufe der Zeit überwachen können. Der "Gewicht aktualisieren"-Button ermöglicht eine effiziente Eingabe neuer Gewichtseinträge.
+
+AI-Chatbot-Bildschirm
+Der AI-Chatbot-Bildschirm bietet eine interaktive Plattform, auf der Nutzer fitnessbezogene Fragen stellen und in Echtzeit Antworten erhalten können.
+
+Der Bildschirm zeigt ein Chatbot-Symbol und eine Nachrichtenoberfläche, die die Kommunikation nahtlos und intuitiv gestaltet. Dies hilft den Nutzern, personalisierte Trainingsvorschläge und allgemeine Fitnessanleitungen zu erhalten.
+
+Login-Bildschirm
+Der Login-Bildschirm folgt einem minimalistischen Design, das Einfachheit und Benutzerfreundlichkeit betont.
+
+Er enthält Felder zur Eingabe von Benutzername und Passwort sowie Optionen zur Anmeldung über soziale Medien oder zur Erstellung eines neuen Kontos, falls erforderlich.
+
