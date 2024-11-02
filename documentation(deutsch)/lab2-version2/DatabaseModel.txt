@@ -1,0 +1,46 @@
+### 1. **Übungseinheit (Exercise Entity)**
+Die `Exercise`-Klasse repräsentiert eine Übung und verfügt über folgende Attribute:
+
+- `exerciseID`, `name`, `description`, `duration`, `sets`, `reps`, `breaks`, `intensityLevel`, `explanation` — Basisinformationen zu jeder Übung.
+- `categoryID` wird durch eine Beziehung zur `ExerciseCategory`-Entität dargestellt.
+- `equipmentID` wird durch eine Beziehung zur `Equipment`-Entität dargestellt.
+
+### Entsprechende Tabellen und Beziehungen
+- **Table: exercises**
+  - Spalten: `exerciseID`, `name`, `description`, `duration`, `sets`, `reps`, `breaks`, `intensity_level`, `explanation`
+  - Fremdschlüssel: `categoryID` (verweist auf `exercise_categories`), `equipmentID` (verweist auf `equipment`)
+
+### 2. **ExerciseCategory Entität**
+Die `ExerciseCategory`-Klasse repräsentiert Kategorien, die Übungstypen und Zielmuskelgruppen kombinieren, wie "Cardio - Brust" oder "Kraft - Rücken".
+
+- **Table: exercise_categories**
+  - Spalten: `categoryID`, `muscleGroup`, `exerciseType`
+
+### 3. **Equipment Entität**
+Die `Equipment`-Entität stellt die verschiedenen Arten von Ausrüstung dar, die verwendet werden können, wie "Kurzhantel" oder "Laufband".
+
+- **Table: equipment**
+  - Spalten: `equipmentID`, `name`
+
+### 4. **User Entität**
+Die `User`-Entität repräsentiert die Nutzer der Fitness-App und ihre grundlegenden Informationen.
+
+- **Table: users**
+  - Spalten: `userID`, `username`, `email`, `password`, `birthday`, `gender`
+
+### 5. **WorkoutLog Entität**
+Die `WorkoutLog`-Entität repräsentiert die Verfolgung des Nutzerfortschritts, einschließlich der durchgeführten Übungen und der Metriken jeder Sitzung.
+
+- **Table: workout_logs**
+  - Spalten: `logID`, `userID` (verweist auf `users`), `exerciseID` (verweist auf `exercises`), `date`, `duration`, `sets`, `reps`, `notes`
+
+### Datenbankdiagramm und Beziehungen
+- **Exercises** (1) --- (Many) **ExerciseCategories**
+  - Beziehung: Eine `ExerciseCategory` kann mit vielen `Exercises` verknüpft sein.
+- **Exercises** (1) --- (Many) **Equipment**
+  - Beziehung: Ein `Equipment` kann mit vielen `Exercises` verknüpft sein.
+- **Users** (1) --- (Many) **WorkoutLogs**
+  - Beziehung: Ein `User` kann viele `WorkoutLogs` haben.
+- **Exercises** (1) --- (Many) **WorkoutLogs**
+  - Beziehung: Eine `Exercise` kann Teil vieler `WorkoutLogs` sein.
+

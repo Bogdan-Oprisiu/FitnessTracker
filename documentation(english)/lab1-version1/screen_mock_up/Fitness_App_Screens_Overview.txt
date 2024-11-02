@@ -1,0 +1,23 @@
+1. Statistics Screen
+
+The statistics screen provides an in-depth overview of the user's workout progress, displaying key metrics such as calories burned, exercise frequency, and workout duration.
+
+It features multiple graphs and visual data representations to help users easily interpret and analyze their progress.
+
+2. Weight Tracking Screen
+
+The weight tracking screen displays both the user's current and target weight in an engaging graph format.
+
+It includes a journal section where users can regularly log their weight and monitor their progress over time. The "Update Weight" button allows users to efficiently input new weight entries.
+
+3. AI Chatbot Screen
+
+The AI chatbot screen offers an interactive platform for users to ask fitness-related questions and receive real-time feedback.
+
+The screen features a chatbot icon and a messaging interface, making communication seamless and intuitive. This helps users receive personalized workout suggestions and general fitness guidance.
+
+4. Login Screen
+
+The login screen follows a minimalist design, emphasizing simplicity and user-friendliness.
+
+It includes fields for entering the username and password, along with options to sign in using social media accounts or create a new account if needed.

@@ -1,0 +1,46 @@
+### Fitness Tracker App Timeline
+
+The project follows a comprehensive timeline for development, testing, and deployment, with responsibilities clearly divided between Bogdan (Backend & AI) and Adi (Frontend). Below is the updated timeline:
+
+#### **October**: Backend and Frontend Initialization
+- **Backend Development (Bogdan)**:
+  - **API Development**: Develop core APIs for exercises, users, and logs.
+  - **Database Setup**: Set up the database and establish necessary connections.
+- **Frontend Development (Adi)**:
+  - **UI Setup**: Design and implement basic screens (e.g., Login, Dashboard, Exercise List).
+  - **Navigation**: Implement screen navigation for smooth user experience.
+- **First Demo (End of October)**: Present a working prototype showcasing partial backend and frontend integration.
+
+#### **November**: Integration and Feature Completion
+- **Finish Prototype (Adi & Bogdan)**:
+  - **Backend (Bogdan)**: Expand API functionalities to support additional features.
+  - **Frontend (Adi)**: Integrate the frontend with the backend APIs.
+  - **AI Development (Bogdan)**: Start incorporating AI-driven workout recommendations.
+- **Watch Integration (Both)**:
+  - **Frontend (Adi)**: Develop the UI for smartwatch synchronization.
+  - **Backend (Bogdan)**: Create API endpoints to handle smartwatch data.
+
+#### **December**: Testing and Debugging
+- **Start Testing**:
+  - **Unit Testing (Both)**:
+    - **Backend (Bogdan)**: Test API endpoints and ensure data integrity.
+    - **Frontend (Adi)**: Test UI components and interactions.
+- **Integration Testing and Debugging**:
+  - **Integration Testing (Both)**: Test the communication between the frontend and backend components.
+  - **Watch Functionality**: Validate the integration of smartwatch features with user profiles.
+  - **Debugging Sessions**: Assign tasks to address any bugs discovered during testing.
+
+#### **January**: Finalization and Documentation
+- **Documentation (Both)**:
+  - **User Guide (Adi)**: Write a user manual covering the UI functionalities.
+  - **Technical Documentation (Bogdan)**: Document backend architecture, AI functionalities, and API usage.
+- **Final Preparations**:
+  - **Google Play Store Compliance**: Ensure that the app meets all requirements for the Google Play Store.
+  - **Final Testing**: Conduct stress tests to ensure stability and usability.
+- **App Completion (End of January)**: The app should be finalized and ready for publication on the Google Play Store.
+
+### Summary of Developer Responsibilities
+- **Bogdan**: Backend development, AI integration, API management, and technical documentation.
+- **Adi**: Frontend development, UI/UX design, smartwatch integration, and user documentation.
+- **Both**: Integration testing, debugging, final testing, and documentation.
+

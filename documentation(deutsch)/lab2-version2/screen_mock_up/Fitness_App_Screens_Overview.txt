@@ -1,0 +1,32 @@
+### 1. **Statistik-Bildschirm**
+Der Statistik-Bildschirm bietet einen detaillierten Überblick über den Fortschritt des Nutzers beim Training und zeigt wichtige Metriken wie verbrannte Kalorien, Trainingshäufigkeit und Trainingsdauer an.
+
+Er enthält mehrere Diagramme und visuelle Datenrepräsentationen, die den Nutzern helfen, ihren Fortschritt einfach zu interpretieren und zu analysieren.
+
+### 2. **Gewichtstracking-Bildschirm**
+Der Gewichtstracking-Bildschirm zeigt sowohl das aktuelle als auch das Zielgewicht des Nutzers in einem ansprechenden Diagrammformat an.
+
+Er enthält einen Journalsektor, in dem Nutzer ihr Gewicht regelmäßig protokollieren und ihren Fortschritt im Laufe der Zeit überwachen können. Der "Gewicht aktualisieren"-Button ermöglicht eine effiziente Eingabe neuer Gewichtseinträge.
+
+### 3. **AI-Chatbot-Bildschirm**
+Der AI-Chatbot-Bildschirm bietet eine interaktive Plattform, auf der Nutzer fitnessbezogene Fragen stellen und in Echtzeit Antworten erhalten können.
+
+Der Bildschirm zeigt ein Chatbot-Symbol und eine Nachrichtenoberfläche, die die Kommunikation nahtlos und intuitiv gestaltet. Dies hilft den Nutzern, personalisierte Trainingsvorschläge und allgemeine Fitnessanleitungen zu erhalten.
+
+### 4. **Login-Bildschirm**
+Der Login-Bildschirm folgt einem minimalistischen Design, das Einfachheit und Benutzerfreundlichkeit betont.
+
+Er enthält Felder zur Eingabe von Benutzername und Passwort sowie Optionen zur Anmeldung über Google- oder Apple-Konten oder zur Erstellung eines neuen Kontos.
+
+### 5. **Registrierungsbildschirm**
+Der Registrierungsbildschirm ermöglicht es neuen Nutzern, ein Konto zu erstellen, indem sie ihren Benutzernamen, ihre E-Mail-Adresse, ihr Passwort und die Bestätigung des Passworts angeben.
+
+Der Bildschirm zeigt ein benutzerdefiniertes Symbol, das angepasst werden kann, und macht den Onboarding-Prozess ansprechender. Das Design sorgt für Benutzerfreundlichkeit und Zugänglichkeit für neue Nutzer.
+
+### 6. **Herzfrequenzmonitor-Bildschirm**
+Der Herzfrequenzmonitor-Bildschirm ist dafür ausgelegt, sich mit einem Polar-Sensor zu verbinden und die aktuelle Herzfrequenz des Nutzers in Echtzeit anzuzeigen.
+
+Er enthält ein Diagramm, das die Herzfrequenzdaten der letzten fünf Minuten darstellt und den Nutzern Einblicke in ihre kardiovaskuläre Leistung bietet.
+
+Der "Mit Polar-Sensor verbinden"-Button ermöglicht es den Nutzern, ihren Herzfrequenzsensor mit der App zu koppeln, um eine kontinuierliche Herzfrequenzüberwachung während des Trainings zu gewährleisten.
+
