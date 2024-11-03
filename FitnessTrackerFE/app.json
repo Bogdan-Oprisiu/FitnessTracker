@@ -1,0 +1,40 @@
+{
+  "expo": {
+    "name": "fitness-tracker",
+    "slug": "fitness-tracker",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "scheme": "com.fitnesstracker.fitnesstracker",
+    "ios": {
+      "bundleIdentifier": "com.fitnesstracker.fitness-tracker",
+      "supportsTablet": true,
+      "config": {
+        "googleSignIn": {
+          "reservedClientId": "com.googleusercontent.apps.751422930054-o25o9u2nv58v971pk23lanpgvq1srbp0.apps.googleusercontent.com"
+        }
+      }
+    },
+    "android": {
+      "package": "com.fitnesstracker.fitnesstracker",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "plugins": [
+      "expo-font"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "6e67cfe7-853a-4dc8-b391-0fc0f89f3bb0"
+      }
+    }
+  }
+}
