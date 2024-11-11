@@ -1,0 +1,258 @@
+{
+  "cardio": [
+    {
+      "name": "Jumping Jacks",
+      "difficulty": "beginner",
+      "instructions": "Stand upright with your legs together and arms at your sides. Jump up, spreading your legs shoulder-width apart while bringing your arms overhead. Jump again to return to the starting position.",
+      "equipment": "body_only",
+      "muscle_groups": ["full_body"]
+    },
+    {
+      "name": "Burpees",
+      "difficulty": "intermediate",
+      "instructions": "Begin in a standing position. Drop into a squat with your hands on the ground. Kick your feet back into a plank position, perform a push-up, then return to the squat position and jump up.",
+      "equipment": "body_only",
+      "muscle_groups": ["full_body"]
+    },
+    {
+      "name": "High Knees",
+      "difficulty": "beginner",
+      "instructions": "Stand tall with feet hip-width apart. Lift one knee toward your chest, then quickly switch to lift the other knee. Continue alternating knees at a running pace.",
+      "equipment": "body_only",
+      "muscle_groups": ["legs", "core"]
+    },
+    {
+      "name": "Mountain Climbers",
+      "difficulty": "intermediate",
+      "instructions": "Start in a plank position. Bring one knee toward your chest, then quickly switch legs, simulating a running motion while keeping your hands on the ground.",
+      "equipment": "body_only",
+      "muscle_groups": ["core", "shoulders", "legs"]
+    },
+    {
+      "name": "Butt Kicks",
+      "difficulty": "beginner",
+      "instructions": "Stand with feet hip-width apart. Jog in place, kicking your heels toward your glutes with each step.",
+      "equipment": "body_only",
+      "muscle_groups": ["legs"]
+    },
+    {
+      "name": "Jump Rope",
+      "difficulty": "intermediate",
+      "instructions": "Hold the handles of a jump rope with the rope behind you. Swing it over your head and jump as it passes under your feet. Continue swinging and jumping at a steady pace.",
+      "equipment": "jump_rope",
+      "muscle_groups": ["full_body"]
+    },
+    {
+      "name": "Box Jumps",
+      "difficulty": "advanced",
+      "instructions": "Stand in front of a sturdy box or platform. Bend your knees and swing your arms back. Jump onto the box, landing softly with both feet. Step down and repeat.",
+      "equipment": "box",
+      "muscle_groups": ["legs", "core"]
+    },
+    {
+      "name": "Lateral Shuffles",
+      "difficulty": "beginner",
+      "instructions": "Stand with feet shoulder-width apart. Bend your knees slightly and shuffle to one side for a set distance, then shuffle back.",
+      "equipment": "body_only",
+      "muscle_groups": ["legs"]
+    },
+    {
+      "name": "Tuck Jumps",
+      "difficulty": "advanced",
+      "instructions": "Stand with feet shoulder-width apart. Jump up, bringing your knees toward your chest. Land softly and repeat.",
+      "equipment": "body_only",
+      "muscle_groups": ["legs", "core"]
+    },
+    {
+      "name": "Skaters",
+      "difficulty": "intermediate",
+      "instructions": "Stand on one leg, leap sideways to the other leg, landing softly and bringing the opposite leg behind you. Continue leaping side to side.",
+      "equipment": "body_only",
+      "muscle_groups": ["legs", "core"]
+    },
+    {
+      "name": "Running",
+      "difficulty": "beginner",
+      "instructions": "Run at a steady pace, maintaining proper form with relaxed shoulders and a slight forward lean.",
+      "equipment": "body_only",
+      "muscle_groups": ["legs", "core"]
+    },
+    {
+      "name": "Cycling",
+      "difficulty": "beginner",
+      "instructions": "Ride a bicycle at a moderate pace, keeping your back straight and pedaling smoothly.",
+      "equipment": "bicycle",
+      "muscle_groups": ["legs", "core"]
+    },
+    {
+      "name": "Swimming",
+      "difficulty": "intermediate",
+      "instructions": "Swim laps using various strokes to engage different muscle groups and improve cardiovascular endurance.",
+      "equipment": "pool",
+      "muscle_groups": ["full_body"]
+    },
+    {
+      "name": "Rowing",
+      "difficulty": "intermediate",
+      "instructions": "Use a rowing machine or boat to perform rowing strokes, engaging both upper and lower body muscles.",
+      "equipment": "rowing_machine",
+      "muscle_groups": ["full_body"]
+    },
+    {
+      "name": "Elliptical Training",
+      "difficulty": "beginner",
+      "instructions": "Use an elliptical machine, moving your legs in an oval pattern while holding onto the handles.",
+      "equipment": "elliptical_machine",
+      "muscle_groups": ["legs", "arms", "core"]
+    },
+    {
+      "name": "Stair Climbing",
+      "difficulty": "intermediate",
+      "instructions": "Climb stairs at a steady pace, either on a stair machine or actual stairs, to elevate heart rate and strengthen legs.",
+      "equipment": "stairs",
+      "muscle_groups": ["legs", "glutes"]
+    },
+    {
+      "name": "Dancing",
+      "difficulty": "beginner",
+      "instructions": "Engage in rhythmic movements to music, varying intensity and style to keep the heart rate elevated.",
+      "equipment": "body_only",
+      "muscle_groups": ["full_body"]
+    },
+    {
+      "name": "Kickboxing",
+      "difficulty": "intermediate",
+      "instructions": "Perform a series of punches, kicks, and other martial arts moves in a continuous sequence.",
+      "equipment": "body_only",
+      "muscle_groups": ["full_body"]
+    },
+    {
+      "name": "Shadow Boxing",
+      "difficulty": "beginner",
+      "instructions": "Throw punches in the air, simulating a boxing match, to increase heart rate and improve coordination.",
+      "equipment": "body_only",
+      "muscle_groups": ["arms", "shoulders", "core"]
+    },
+    {
+      "name": "Jump Squats",
+      "difficulty": "intermediate",
+      "instructions": "Perform a standard squat, then explode upward into a jump, landing softly and immediately going into the next squat.",
+      "equipment": "body_only",
+      "muscle_groups": ["legs", "glutes", "core"]
+    },
+    {
+      "name": "Lunge Jumps",
+      "difficulty": "advanced",
+      "instructions": "Start in a lunge position, jump up, and switch legs in mid-air, landing in a lunge with the opposite leg forward.",
+      "equipment": "body_only",
+      "muscle_groups": ["legs", "glutes", "core"]
+    },
+    {
+      "name": "Inchworms",
+      "difficulty": "intermediate",
+      "instructions": "Stand tall, bend at the waist to touch the floor, walk your hands forward to a plank position, and then walk your feet forward to meet your hands. Repeat.",
+      "equipment": "body_only",
+      "muscle_groups": ["core", "shoulders", "hamstrings"]
+    },
+    {
+      "name": "Sprints",
+      "difficulty": "intermediate",
+      "instructions": "Run as fast as possible over a short distance, rest briefly, then repeat.",
+      "equipment": "body_only",
+      "muscle_groups": ["legs", "core"]
+    },
+    {
+      "name": "Power Walking",
+      "difficulty": "beginner",
+      "instructions": "Walk briskly with a steady pace, swinging your arms to elevate your heart rate.",
+      "equipment": "body_only",
+      "muscle_groups": ["legs", "core"]
+    },
+    {
+      "name": "Rowing Machine Intervals",
+      "difficulty": "intermediate",
+      "instructions": "Perform short bursts of high-intensity rowing, followed by rest periods, using a rowing machine.",
+      "equipment": "rowing_machine",
+      "muscle_groups": ["full_body"]
+    },
+    {
+      "name": "Step-Ups",
+      "difficulty": "beginner",
+      "instructions": "Step onto a platform or bench with one foot, then bring the other foot up. Step down and alternate legs.",
+      "equipment": "bench",
+      "muscle_groups": ["legs", "glutes"]
+    },
+    {
+      "name": "Battle Ropes",
+      "difficulty": "advanced",
+      "instructions": "Hold the ends of a rope in each hand. Use quick, alternating arm movements to create waves in the rope.",
+      "equipment": "battle_ropes",
+      "muscle_groups": ["arms", "shoulders", "core"]
+    },
+    {
+      "name": "Bear Crawls",
+      "difficulty": "intermediate",
+      "instructions": "Begin on hands and knees. Lift knees slightly and crawl forward on hands and feet, keeping hips low.",
+      "equipment": "body_only",
+      "muscle_groups": ["core", "shoulders", "legs"]
+    },
+    {
+      "name": "Agility Ladder Drills",
+      "difficulty": "intermediate",
+      "instructions": "Perform various quick-foot movements through an agility ladder on the ground to improve speed and coordination.",
+      "equipment": "agility_ladder",
+      "muscle_groups": ["legs", "core"]
+    },
+    {
+      "name": "Vertical Jumps",
+      "difficulty": "intermediate",
+      "instructions": "Jump as high as possible from a standing position, reaching your arms overhead. Land softly and repeat.",
+      "equipment": "body_only",
+      "muscle_groups": ["legs", "core"]
+    },
+    {
+      "name": "Bodyweight Circuit",
+      "difficulty": "intermediate",
+      "instructions": "Perform a combination of bodyweight exercises, such as push-ups, squats, and lunges, in a circuit format with minimal rest between exercises.",
+      "equipment": "body_only",
+      "muscle_groups": ["full_body"]
+    },
+    {
+      "name": "Punching Bag Workout",
+      "difficulty": "intermediate",
+      "instructions": "Use a punching bag to perform continuous punches, jabs, and kicks to improve cardiovascular endurance.",
+      "equipment": "punching_bag",
+      "muscle_groups": ["arms", "shoulders", "core"]
+    },
+    {
+      "name": "Fast Feet",
+      "difficulty": "beginner",
+      "instructions": "Stand in place and move your feet up and down rapidly, like running in place but with shorter, quicker steps.",
+      "equipment": "body_only",
+      "muscle_groups": ["legs", "core"]
+    },
+    {
+      "name": "Resistance Band Skater Jumps",
+      "difficulty": "intermediate",
+      "instructions": "Place a resistance band around your legs, and perform skater jumps side to side, keeping tension on the band.",
+      "equipment": "resistance_band",
+      "muscle_groups": ["legs", "glutes"]
+    },
+    {
+      "name": "Side-to-Side Hops",
+      "difficulty": "beginner",
+      "instructions": "Stand with feet together. Hop side to side in a controlled manner, focusing on agility and balance.",
+      "equipment": "body_only",
+      "muscle_groups": ["legs", "core"]
+    },
+    {
+      "name": "Bicycles",
+      "difficulty": "beginner",
+      "instructions": "Lie on your back, lift your legs, and pedal in the air as if riding a bicycle.",
+      "equipment": "body_only",
+      "muscle_groups": ["legs", "core"]
+    }
+  ]
+}
+
+ 
