@@ -1,10 +1,12 @@
 import React, { useRef, useEffect } from 'react';
-import { View, Image, Animated, ScrollView, Text, TouchableOpacity } from 'react-native';
+import { View, Image, Animated, ScrollView, Text, TouchableOpacity, Dimensions } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import WorkoutCard from './workout-card/workout-card';
 import styles from './workouts.style';
 import { useNavigation } from '@react-navigation/native';
+
+const { height } = Dimensions.get('window');
 
 export default function Workouts() {
   const imageOpacity = useRef(new Animated.Value(0)).current;
@@ -12,6 +14,7 @@ export default function Workouts() {
   const scrollY = useRef(new Animated.Value(0)).current;
   const backgroundImage = require('../../assets/images/workouts-background.webp');
   const navigation = useNavigation();
+  const strength_background = require('../../assets/images/start-workout-strength-background.webp')
   const predefinedWorkouts = [
     { name: 'Full Body Blast', exercises: 10, duration: 30, difficulty: 'Intermediate', type: 'strength' },
     { name: 'Core Crusher', exercises: 8, duration: 20, difficulty: 'Advanced', type: 'stretching' },
@@ -93,6 +96,7 @@ export default function Workouts() {
 
       <ScrollView
         contentContainerStyle={[styles.cardsContainer]}
+        style={{ marginTop: 100, height: height }}
         showsVerticalScrollIndicator={false}
         scrollEventThrottle={16}
         onScroll={Animated.event(

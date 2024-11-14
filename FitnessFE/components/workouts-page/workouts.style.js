@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
     gap: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 200
+    paddingTop: 100
   },
   addWorkoutButton: {
     backgroundColor: '#6a0dad',
