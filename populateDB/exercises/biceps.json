@@ -1,0 +1,162 @@
+[
+  {
+      "name": "Incline Hammer Curls",
+      "type": "strength",
+      "muscle": "biceps",
+      "equipment": "dumbbell",
+      "difficulty": "beginner",
+      "instructions": "Seat yourself on an incline bench with a dumbbell in each hand. You should pressed firmly against the back with your feet together..."
+  },
+  {
+      "name": "Wide-grip barbell curl",
+      "type": "strength",
+      "muscle": "biceps",
+      "equipment": "barbell",
+      "difficulty": "beginner",
+      "instructions": "Stand up with your torso upright while holding a barbell at the wide outer handle. The palm of your hands should be facing forward..."
+  },
+  {
+      "name": "EZ-bar spider curl",
+      "type": "strength",
+      "muscle": "biceps",
+      "equipment": "barbell",
+      "difficulty": "intermediate",
+      "instructions": "Start out by setting the bar on the part of the preacher bench that you would normally sit on..."
+  },
+  {
+      "name": "Hammer Curls",
+      "type": "strength",
+      "muscle": "biceps",
+      "equipment": "dumbbell",
+      "difficulty": "intermediate",
+      "instructions": "Stand up with your torso upright and a dumbbell on each hand being held at arms length..."
+  },
+  {
+      "name": "EZ-Bar Curl",
+      "type": "strength",
+      "muscle": "biceps",
+      "equipment": "e-z_curl_bar",
+      "difficulty": "intermediate",
+      "instructions": "Stand up straight while holding an EZ curl bar at the wide outer handle..."
+  },
+  {
+      "name": "Zottman Curl",
+      "type": "strength",
+      "muscle": "biceps",
+      "equipment": "None",
+      "difficulty": "intermediate",
+      "instructions": "Stand up with your torso upright and a dumbbell in each hand being held at arms length..."
+  },
+  {
+      "name": "Biceps curl to shoulder press",
+      "type": "strength",
+      "muscle": "biceps",
+      "equipment": "dumbbell",
+      "difficulty": "beginner",
+      "instructions": "Begin in a standing position with a dumbbell in each hand. Your arms should be hanging at your sides with your palms facing forward..."
+  },
+  {
+      "name": "Barbell Curl",
+      "type": "strength",
+      "muscle": "biceps",
+      "equipment": "barbell",
+      "difficulty": "intermediate",
+      "instructions": "Stand up with your torso upright while holding a barbell at a shoulder-width grip..."
+  },
+  {
+      "name": "Concentration curl",
+      "type": "strength",
+      "muscle": "biceps",
+      "equipment": "dumbbell",
+      "difficulty": "intermediate",
+      "instructions": "Sit down on a flat bench with one dumbbell in front of you between your legs. Your legs should be spread with your knees bent..."
+  },
+  {
+      "name": "Flexor Incline Dumbbell Curls",
+      "type": "strength",
+      "muscle": "biceps",
+      "equipment": "dumbbell",
+      "difficulty": "beginner",
+      "instructions": "Hold the dumbbell towards the side farther from you so that you have more weight on the side closest to you..."
+  },
+  {
+      "name": "Chin-Ups",
+      "type": "strength",
+      "muscle": "biceps",
+      "equipment": "pull-up bar",
+      "difficulty": "intermediate",
+      "instructions": "Grasp the pull-up bar with an underhand grip, hands shoulder-width apart. Hang fully extended, then pull your body upward until your chin is above the bar. Lower yourself back to the starting position with control."
+  },
+  {
+      "name": "Cable Bicep Curls",
+      "type": "strength",
+      "muscle": "biceps",
+      "equipment": "cable machine",
+      "difficulty": "intermediate",
+      "instructions": "Attach a straight bar to the low pulley of a cable machine. Stand facing the machine, grasp the bar with an underhand grip, and keep your elbows close to your torso. Curl the bar toward your shoulders, squeezing the biceps at the top, then slowly lower it back."
+  },
+  {
+      "name": "Preacher Curls",
+      "type": "strength",
+      "muscle": "biceps",
+      "equipment": "preacher bench",
+      "difficulty": "intermediate",
+      "instructions": "Sit on a preacher bench and place your upper arms on the pad. Grasp the barbell or dumbbells with an underhand grip. Curl the weight upward, focusing on the biceps contraction, then lower it back slowly."
+  },
+  {
+      "name": "Incline Dumbbell Curls",
+      "type": "strength",
+      "muscle": "biceps",
+      "equipment": "dumbbells",
+      "difficulty": "intermediate",
+      "instructions": "Sit on an incline bench set at a 45-degree angle, holding a dumbbell in each hand with arms fully extended. Curl the weights upward while keeping your upper arms stationary, then lower them back slowly."
+  },
+  {
+      "name": "Spider Curls",
+      "type": "strength",
+      "muscle": "biceps",
+      "equipment": "preacher bench",
+      "difficulty": "intermediate",
+      "instructions": "Lie face down on an incline bench, letting your arms hang straight down. Grasp the weights with an underhand grip and curl them upward, squeezing the biceps at the top, then lower them back slowly."
+  },
+  {
+      "name": "Resistance Band Curls",
+      "type": "strength",
+      "muscle": "biceps",
+      "equipment": "resistance band",
+      "difficulty": "beginner",
+      "instructions": "Stand on the center of the band, holding the handles with palms facing forward. Keeping your elbows close to your sides, curl the handles toward your shoulders, squeezing the biceps at the top, then lower them back slowly."
+  },
+  {
+      "name": "Reverse Curls",
+      "type": "strength",
+      "muscle": "biceps",
+      "equipment": "barbell",
+      "difficulty": "intermediate",
+      "instructions": "Hold the barbell with an overhand grip, palms facing down. Curl the weight upward, focusing on the biceps and forearms, then lower it back slowly."
+  },
+  {
+      "name": "Zottman Curls",
+      "type": "strength",
+      "muscle": "biceps",
+      "equipment": "dumbbells",
+      "difficulty": "intermediate",
+      "instructions": "Perform a standard dumbbell curl. At the top, rotate your wrists so palms face downward, then lower the weights in this position. Rotate back to the starting grip at the bottom."
+  },
+  {
+      "name": "Hammer Rope Curls",
+      "type": "strength",
+      "muscle": "biceps",
+      "equipment": "cable machine",
+      "difficulty": "intermediate",
+      "instructions": "Attach a rope to the low pulley of a cable machine. Stand upright, holding the rope with a neutral grip, and curl the rope upward, squeezing the biceps at the top. Lower it back slowly."
+  },
+  {
+      "name": "Single-Arm Dumbbell Preacher Curl",
+      "type": "strength",
+      "muscle": "biceps",
+      "equipment": "preacher bench",
+      "difficulty": "intermediate",
+      "instructions": "Place one arm on the preacher bench pad. Hold a dumbbell with an underhand grip, and curl the weight upward. Lower it back slowly to the starting position."
+  }
+]
