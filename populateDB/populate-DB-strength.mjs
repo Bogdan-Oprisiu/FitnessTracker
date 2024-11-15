@@ -44,33 +44,9 @@ async function populateStrengthExercises() {
   }
 }
 
-// Function to populate Firestore with cardio and stretching exercises
-async function populateCardioAndStretchingExercises() {
-  try {
-    for (const type of exerciseTypes) {
-      const filePath = path.join(exercisesFolder, `${type}.json`);
-      try {
-        const exercises = await loadExercisesFromFile(filePath);
-        const typeCollection = collection(db, `exercise_type/${type}`);
-
-        // Add each exercise of the type to Firestore
-        for (const exercise of exercises) {
-          await addDoc(typeCollection, exercise);
-        }
-        console.log(`${type.charAt(0).toUpperCase() + type.slice(1)} exercises populated successfully in Firestore.`);
-      } catch (error) {
-        console.error(`Error loading or populating exercises for ${type}:`, error.message);
-      }
-    }
-  } catch (error) {
-    console.error("Error populating Firestore for cardio and stretching exercises:", error);
-  }
-}
-
 // Main function to run the population functions
 async function main() {
   await populateStrengthExercises();
-  await populateCardioAndStretchingExercises();
 }
 
 main();

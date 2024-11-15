@@ -78,5 +78,85 @@
     "equipment": "cable",
     "difficulty": "intermediate",
     "instructions": "With your right hand, grasp a single handle attached to the high-cable pulley using a supinated (underhand; palms facing up) grip. You should be standing directly in front of the weight stack. Now pull the handle down so that your upper arm and elbow are locked in to the side of your body. Your upper arm and forearm should form an acute angle (less than 90-degrees). You can keep the other arm by the waist and you can have one leg in front of you and the other one back for better balance. This will be your starting position. As you contract the triceps, move the single handle attachment down to your side until your arm is straight. Breathe out as you perform this movement. Tip: Only the forearms should move. Your upper arms should remain stationary at all times. Squeeze the triceps and hold for a second in this contracted position. Slowly return the handle to the starting position. Repeat for the recommended amount of repetitions and then perform the same movement with the other arm.  Variations: You can use exercise bands to perform this exercise."
+  },
+  {
+    "name": "Overhead Dumbbell Triceps Extension",
+    "type": "strength",
+    "muscle": "triceps",
+    "equipment": "dumbbell",
+    "difficulty": "beginner",
+    "instructions": "Stand upright with your feet shoulder-width apart. Hold a dumbbell with both hands, positioning it behind your head with elbows pointing upward. Keeping your upper arms stationary, extend your elbows to lift the dumbbell overhead. Pause briefly at the top, then slowly lower the weight back behind your head. Repeat for the desired number of repetitions."
+  },
+  {
+    "name": "Triceps Kickback",
+    "type": "strength",
+    "muscle": "triceps",
+    "equipment": "dumbbell",
+    "difficulty": "beginner",
+    "instructions": "Hold a dumbbell in one hand and place the opposite knee and hand on a bench for support. Keep your back straight and upper arm parallel to your torso. Extend your elbow to straighten your arm, lifting the dumbbell backward. Pause at full extension, then return to the starting position. Complete the set and switch arms."
+  },
+  {
+    "name": "Close-Grip Bench Press",
+    "type": "strength",
+    "muscle": "triceps",
+    "equipment": "barbell",
+    "difficulty": "intermediate",
+    "instructions": "Lie on a flat bench, gripping the barbell with hands closer than shoulder-width apart. Unrack the bar and hold it above your chest with arms extended. Lower the bar slowly to your chest, keeping elbows close to your body. Press the bar back up to the starting position. Repeat for the desired number of repetitions."
+  },
+  {
+    "name": "Diamond Push-Up",
+    "type": "strength",
+    "muscle": "triceps",
+    "equipment": "body_only",
+    "difficulty": "intermediate",
+    "instructions": "Assume a push-up position with hands close together under your chest, forming a diamond shape with your thumbs and index fingers. Keep your body in a straight line from head to heels. Lower your chest toward your hands by bending your elbows, then push back up to the starting position. Repeat for the desired number of repetitions."
+  },
+  {
+    "name": "Bench Dip",
+    "type": "strength",
+    "muscle": "triceps",
+    "equipment": "body_only",
+    "difficulty": "beginner",
+    "instructions": "Sit on the edge of a bench with hands placed next to your hips. Slide your hips off the bench, supporting your weight with your arms. Lower your body by bending your elbows until your upper arms are parallel to the floor. Push through your palms to return to the starting position. Repeat for the desired number of repetitions."
+  },
+  {
+    "name": "Cable Triceps Pushdown",
+    "type": "strength",
+    "muscle": "triceps",
+    "equipment": "cable",
+    "difficulty": "beginner",
+    "instructions": "Stand facing a high pulley machine with a straight bar attachment. Grasp the bar with an overhand grip, elbows close to your sides. Push the bar down by extending your elbows until your arms are fully extended. Pause briefly, then return to the starting position. Repeat for the desired number of repetitions."
+  },
+  {
+    "name": "Lying Triceps Extension (Skullcrusher)",
+    "type": "strength",
+    "muscle": "triceps",
+    "equipment": "barbell",
+    "difficulty": "intermediate",
+    "instructions": "Lie on a flat bench, holding a barbell with a narrow overhand grip. Extend your arms above your chest. Keeping your upper arms stationary, bend your elbows to lower the bar toward your forehead. Stop just before the bar touches your head, then extend your elbows to return to the starting position. Repeat for the desired number of repetitions."
+  },
+  {
+    "name": "Overhead Cable Triceps Extension",
+    "type": "strength",
+    "muscle": "triceps",
+    "equipment": "cable",
+    "difficulty": "intermediate",
+    "instructions": "Attach a rope handle to a low pulley. Facing away from the machine, grasp the rope with both hands and extend your arms overhead. Keeping your upper arms stationary, bend your elbows to lower the rope behind your head. Extend your elbows to return to the starting position. Repeat for the desired number of repetitions."
+  },
+  {
+    "name": "Dumbbell Tate Press",
+    "type": "strength",
+    "muscle": "triceps",
+    "equipment": "dumbbell",
+    "difficulty": "intermediate",
+    "instructions": "Lie on a flat bench, holding a dumbbell in each hand with arms extended above your chest, palms facing your feet. Bend your elbows to lower the dumbbells toward your chest, keeping them close together. Once they touch your chest, extend your elbows to press the weights back up. Repeat for the desired number of repetitions."
+  },
+  {
+    "name": "Reverse Grip Bench Press",
+    "type": "strength",
+    "muscle": "triceps",
+    "equipment": "barbell",
+    "difficulty": "advanced",
+    "instructions": "Lie on a flat bench, gripping the barbell with an underhand grip, hands shoulder-width apart. Unrack the bar and hold it above your chest with arms extended. Lower the bar slowly to your chest, keeping elbows close to your body. Press the bar back up to the starting position. Repeat for the desired number of repetitions."
   }
 ]
