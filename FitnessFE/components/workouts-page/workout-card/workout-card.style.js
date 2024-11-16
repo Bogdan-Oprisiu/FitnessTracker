@@ -1,40 +1,40 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
-    card: {
-      width: '45%',
-      backgroundColor: '#333',
-      borderRadius: 10,
-      height: 200,
-      justifyContent: 'space-around',
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.3,
-      shadowRadius: 4,
-      elevation: 4,
-    },
-    gradientBackground: {
-      flex: 1,
-      padding: 15,
-      height: 100,
-      justifyContent: 'space-around',
-      borderRadius: 10,
-    },
-    iconContainer: {
-      position: 'absolute',
-      top: 10,
-      right: 10,
-    },
-    name: {
-      fontSize: 24,
-      fontWeight: 'bold',
-      color: '#fff',
-    },
-    details: {
-      fontSize: 16,
-      color: '#e0e0e0',
-    },
-    starsContainer: {
+  cardContainer: {
+    flex: 1,
+    borderRadius: 10,
+    overflow: 'hidden',
+  },
+  gradientBackground: {
+    flex: 1,
+    padding: 15,
+    justifyContent: 'space-between',
+  },
+  iconContainer: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+  },
+  iconsOverlay: {
+    position: 'absolute',
+    top: 10,
+    left: 10,
+    flexDirection: 'row',
+    gap: 10,
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 5,
+    marginRight: 20
+  },
+  cardDetails: {
+    fontSize: 14,
+    color: '#e0e0e0',
+  },
+  starsContainer: {
       flexDirection: 'row',
     },
     star: {

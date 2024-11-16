@@ -38,6 +38,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 100
   },
+  card: {
+    width: '45%',
+    backgroundColor: '#333',
+    borderRadius: 10,
+    height: 170,
+    justifyContent: 'space-around',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
+  },
   addWorkoutButton: {
     backgroundColor: '#6a0dad',
     padding: 15,

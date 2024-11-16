@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { View, Image, Animated, ScrollView, Text, TouchableOpacity, Dimensions } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -12,9 +12,12 @@ export default function Workouts() {
   const imageOpacity = useRef(new Animated.Value(0)).current;
   const gradientColorOpacity = useRef(new Animated.Value(0)).current;
   const scrollY = useRef(new Animated.Value(0)).current;
-  const backgroundImage = require('../../assets/images/workouts-background.webp');
   const navigation = useNavigation();
-  const strength_background = require('../../assets/images/start-workout-strength-background.webp')
+
+  const [editMode, setEditMode] = useState(false);
+  const [shakingCardIndex, setShakingCardIndex] = useState(null);
+  const shakeAnim = useRef(new Animated.Value(0)).current;
+
   const predefinedWorkouts = [
     { name: 'Full Body Blast', exercises: 10, duration: 30, difficulty: 'Intermediate', type: 'strength' },
     { name: 'Core Crusher', exercises: 8, duration: 20, difficulty: 'Advanced', type: 'stretching' },
@@ -40,9 +43,47 @@ export default function Workouts() {
     }).start();
   }, []);
 
-  const handleWorkoutPress = (workout) => {
-    navigation.navigate('StartWorkout', { workout });
-  }
+  const startShaking = (index) => {
+    setEditMode(true);
+    setShakingCardIndex(index);
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(shakeAnim, {
+          toValue: 0.5,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.timing(shakeAnim, {
+          toValue: -0.5,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  };
+
+  const stopShaking = () => {
+    setEditMode(false);
+    setShakingCardIndex(null);
+    shakeAnim.stopAnimation();
+    shakeAnim.setValue(0);
+  };
+
+  const handleWorkoutPress = (index) => {
+    if (editMode) {
+      stopShaking();
+    } else {
+      navigation.navigate('StartWorkout', { workout: predefinedWorkouts[index] });
+    }
+  };
+
+  const handleDelete = (index) => {
+    console.log(`Delete workout at index ${index}`);
+  };
+
+  const handleEdit = (index) => {
+    console.log(`Edit workout at index ${index}`);
+  };
 
   const textLeftPosition = scrollY.interpolate({
     inputRange: [0, 100],
@@ -65,7 +106,7 @@ export default function Workouts() {
   return (
     <View style={styles.container}>
       <Animated.View style={[styles.backgroundOverlay, { opacity: imageOpacity }]}>
-        <Image source={backgroundImage} style={styles.backgroundImage} />
+        <Image source={require('../../assets/images/workouts-background.webp')} style={styles.backgroundImage} />
         <BlurView intensity={30} style={styles.blurView} />
         <LinearGradient
           colors={['transparent', '#000']}
@@ -85,18 +126,22 @@ export default function Workouts() {
       <Animated.Text
         style={[
           styles.yourWorkoutsText,
-          { fontSize: textFontSize, left: textLeftPosition, transform: [
-            { translateX: -20 },
-            { translateY: textTranslateY },
-          ], },
+          {
+            fontSize: textFontSize,
+            left: textLeftPosition,
+            transform: [
+              { translateX: -20 },
+              { translateY: textTranslateY },
+            ],
+          },
         ]}
       >
         Your Workouts
       </Animated.Text>
 
       <ScrollView
-        contentContainerStyle={[styles.cardsContainer]}
-        style={{ marginTop: 100, height: height }}
+        contentContainerStyle={styles.cardsContainer}
+        style={{ marginTop: 100, height }}
         showsVerticalScrollIndicator={false}
         scrollEventThrottle={16}
         onScroll={Animated.event(
@@ -104,17 +149,40 @@ export default function Workouts() {
           { useNativeDriver: false }
         )}
       >
-        {predefinedWorkouts.map((workout, index) => (
-          <WorkoutCard
-            key={index}
-            name={workout.name}
-            exercises={workout.exercises}
-            duration={workout.duration}
-            difficulty={workout.difficulty}
-            type={workout.type}
-            onPress={() => handleWorkoutPress(workout)}
-          />
-        ))}
+        {predefinedWorkouts.map((workout, index) => {
+          const isShaking = shakingCardIndex === index;
+          return (
+            <Animated.View
+              key={index}
+              style={[styles.card, [
+                isShaking && {
+                  transform: [
+                    {
+                      translateY: shakeAnim.interpolate({
+                        inputRange: [-1, 1],
+                        outputRange: [-5, 5],
+                      }),
+                    },
+                  ],
+                }],
+              ]}
+            >
+              <WorkoutCard
+                name={workout.name}
+                exercises={workout.exercises}
+                duration={workout.duration}
+                difficulty={workout.difficulty}
+                type={workout.type}
+                onPress={() => handleWorkoutPress(index)}
+                onLongPress={() => startShaking(index)}
+                showIcons={isShaking}
+                onDelete={() => handleDelete(index)}
+                onEdit={() => handleEdit(index)}
+              />
+            </Animated.View>
+          );
+        })}
+
         <TouchableOpacity style={styles.addWorkoutButton}>
           <Text style={styles.addWorkoutText}>+ Add Personalized Workout</Text>
         </TouchableOpacity>

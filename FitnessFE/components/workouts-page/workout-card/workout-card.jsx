@@ -1,20 +1,21 @@
 import React from 'react';
-import { View, Text, StyleSheet, Touchable, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { MaterialIcons, FontAwesome5, FontAwesome } from '@expo/vector-icons';
+import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import styles from './workout-card.style';
 
-export default function WorkoutCard({ name, exercises, duration, difficulty, type, onPress }) {
-
+export default function WorkoutCard({ name, exercises, duration, difficulty, type, onPress, onLongPress, showIcons, onDelete, onEdit }) {
   const renderIcon = () => {
-    if (type === 'strength') {
-      return <FontAwesome5 name="dumbbell" size={18} color="#fff" />;
-    } else if (type === 'cardio') {
-      return <FontAwesome name="heartbeat" size={18} color="#fff" />;
-    } else if (type === 'stretching') {
-      return <MaterialIcons name="self-improvement" size={20} color="#fff" />;
+    switch (type) {
+      case 'strength':
+        return <MaterialIcons name="fitness-center" size={24} color="#fff" />;
+      case 'cardio':
+        return <MaterialIcons name="directions-run" size={24} color="#fff" />;
+      case 'stretching':
+        return <MaterialIcons name="self-improvement" size={24} color="#fff" />;
+      default:
+        return null;
     }
-    return null;
   };
 
   const renderStars = () => {
@@ -25,7 +26,7 @@ export default function WorkoutCard({ name, exercises, duration, difficulty, typ
 
     return (
       <View style={styles.starsContainer}>
-        <Text style={styles.details}>Difficulty: </Text>
+        <Text style={styles.cardDetails}>Difficulty: </Text>
         {Array(starCount)
           .fill()
           .map((_, index) => (
@@ -35,26 +36,38 @@ export default function WorkoutCard({ name, exercises, duration, difficulty, typ
     );
   };
 
-
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress}>
-        <LinearGradient
-          colors={['#6a0dad', '#8e2de2']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.gradientBackground}
-        >
-          <View style={styles.iconContainer}>
-            {renderIcon()}
+    <TouchableOpacity
+      style={styles.cardContainer}
+      onPress={onPress}
+      onLongPress={onLongPress}
+      activeOpacity={0.8}
+    >
+      <LinearGradient
+        colors={['#6a0dad', '#8e2de2']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.gradientBackground}
+      >
+        <View style={styles.iconContainer}>{renderIcon()}</View>
+        {showIcons && (
+          <View style={styles.iconsOverlay}>
+            <TouchableOpacity onPress={onDelete} style={styles.icon}>
+              <MaterialIcons name="remove-circle" size={24} color="red" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={onEdit} style={styles.icon}>
+              <MaterialIcons name="edit" size={24} color="yellow" />
+            </TouchableOpacity>
           </View>
-          <Text style={styles.name}>{name}</Text>
-          <Text style={styles.details}>Exercises: {exercises}</Text>
-          <Text style={styles.details}>Duration: {duration} mins</Text>
+        )}
+        <Text style={styles.cardTitle}>{name}</Text>
+        <Text style={styles.cardDetails}>Exercises: {exercises}</Text>
+        <Text style={styles.cardDetails}>Duration: {duration} mins</Text>
 
-          <View style={styles.starsContainer}>
-            {renderStars()}
-          </View>
-        </LinearGradient>
+        <View style={styles.starsContainer}>
+          {renderStars()}
+        </View>
+      </LinearGradient>
     </TouchableOpacity>
   );
 }
