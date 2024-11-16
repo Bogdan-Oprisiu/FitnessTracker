@@ -1,16 +1,36 @@
-import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import React, { useRef, useEffect } from 'react';
+import { View, Text, TouchableOpacity, Animated, Easing } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import styles from './workout-card.style';
 
 export default function WorkoutCard({ name, exercises, duration, difficulty, type, onPress, onLongPress, showIcons, onDelete, onEdit }) {
+  const actionBarHeight = useRef(new Animated.Value(0)).current;
+  const contentShift = useRef(new Animated.Value(20)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(actionBarHeight, {
+        toValue: showIcons ? 50 : 0,
+        duration: 150,
+        easing: Easing.inOut(Easing.ease),
+        useNativeDriver: false,
+      }),
+      Animated.timing(contentShift, {
+        toValue: name.length > 13 && showIcons ? -50 : name.length <= 13 && showIcons ? -25 : 0,
+        duration: 150,
+        easing: Easing.inOut(Easing.ease),
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [showIcons]);
+
   const renderIcon = () => {
     switch (type) {
       case 'strength':
         return <MaterialIcons name="fitness-center" size={24} color="#fff" />;
       case 'cardio':
-        return <MaterialIcons name="directions-run" size={24} color="#fff" />;
+        return <FontAwesome name="heartbeat" size={24} color="#fff" />;
       case 'stretching':
         return <MaterialIcons name="self-improvement" size={24} color="#fff" />;
       default:
@@ -49,24 +69,30 @@ export default function WorkoutCard({ name, exercises, duration, difficulty, typ
         end={{ x: 1, y: 1 }}
         style={styles.gradientBackground}
       >
-        <View style={styles.iconContainer}>{renderIcon()}</View>
-        {showIcons && (
-          <View style={styles.iconsOverlay}>
-            <TouchableOpacity onPress={onDelete} style={styles.icon}>
-              <MaterialIcons name="remove-circle" size={24} color="red" />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={onEdit} style={styles.icon}>
-              <MaterialIcons name="edit" size={24} color="yellow" />
-            </TouchableOpacity>
-          </View>
-        )}
-        <Text style={styles.cardTitle}>{name}</Text>
-        <Text style={styles.cardDetails}>Exercises: {exercises}</Text>
-        <Text style={styles.cardDetails}>Duration: {duration} mins</Text>
+        <Animated.View style={{ transform: [{ translateY: contentShift }]}}>
+          <View style={styles.iconContainer}>{renderIcon()}</View>
+          <Text style={styles.cardTitle}>{name}</Text>
+          <Text style={styles.cardDetails}>Exercises: {exercises}</Text>
+          <Text style={styles.cardDetails}>Duration: {duration} mins</Text>
+          <View style={styles.starsContainer}>{renderStars()}</View>
+        </Animated.View>
 
-        <View style={styles.starsContainer}>
-          {renderStars()}
-        </View>
+        <Animated.View
+          style={[
+            styles.actionBar,
+            {
+              height: actionBarHeight,
+              opacity: showIcons ? 1 : 0,
+            },
+          ]}
+        >
+          <TouchableOpacity onPress={onDelete} style={styles.actionButton}>
+            <MaterialIcons name="remove-circle" size={24} color="red" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={onEdit} style={styles.actionButton}>
+            <MaterialIcons name="edit" size={24} color="yellow" />
+          </TouchableOpacity>
+        </Animated.View>
       </LinearGradient>
     </TouchableOpacity>
   );

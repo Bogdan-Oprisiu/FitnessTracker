@@ -18,16 +18,22 @@ export default function Workouts() {
   const [shakingCardIndex, setShakingCardIndex] = useState(null);
   const shakeAnim = useRef(new Animated.Value(0)).current;
 
-  const predefinedWorkouts = [
-    { name: 'Full Body Blast', exercises: 10, duration: 30, difficulty: 'Intermediate', type: 'strength' },
-    { name: 'Core Crusher', exercises: 8, duration: 20, difficulty: 'Advanced', type: 'stretching' },
-    { name: 'Cardio Burn', exercises: 12, duration: 25, difficulty: 'Beginner', type: 'cardio' },
-    { name: 'Full Body Blast', exercises: 10, duration: 30, difficulty: 'Intermediate', type: 'strength' },
-    { name: 'Core Crusher', exercises: 8, duration: 20, difficulty: 'Advanced', type: 'stretching' },
-    { name: 'Cardio Burn', exercises: 12, duration: 25, difficulty: 'Beginner', type: 'cardio' },
-    { name: 'Core Crusher', exercises: 8, duration: 20, difficulty: 'Advanced', type: 'stretching' },
-    { name: 'Cardio Burn', exercises: 12, duration: 25, difficulty: 'Beginner', type: 'cardio' },
-  ];
+  const [predefinedWorkouts, setPredefinedWorkouts] = useState([
+    { id: 1, name: 'Full Body Blast', exercises: 10, duration: 30, difficulty: 'Intermediate', type: 'strength' },
+    { id: 2, name: 'Core Crusher', exercises: 8, duration: 20, difficulty: 'Advanced', type: 'stretching' },
+    { id: 3, name: 'Cardio Burn', exercises: 12, duration: 25, difficulty: 'Beginner', type: 'cardio' },
+    { id: 1, name: 'Full Body Blast', exercises: 10, duration: 30, difficulty: 'Intermediate', type: 'strength' },
+    { id: 2, name: 'Core Crusher', exercises: 8, duration: 20, difficulty: 'Advanced', type: 'stretching' },
+    { id: 3, name: 'Cardio Burn', exercises: 12, duration: 25, difficulty: 'Beginner', type: 'cardio' },
+    { id: 2, name: 'Core Crusher', exercises: 8, duration: 20, difficulty: 'Advanced', type: 'stretching' },
+    { id: 3, name: 'Cardio Burn', exercises: 12, duration: 25, difficulty: 'Beginner', type: 'cardio' },
+  ]);
+  const fadeAnim = useRef(predefinedWorkouts.map(() => new Animated.Value(1))).current;
+  const translateYAnim = useRef(predefinedWorkouts.map(() => new Animated.Value(0))).current;
+
+  useEffect(() => {
+    fadeAnim.current = predefinedWorkouts.map(() => new Animated.Value(1));
+  }, [predefinedWorkouts]);
 
   useEffect(() => {
     Animated.timing(imageOpacity, {
@@ -78,7 +84,26 @@ export default function Workouts() {
   };
 
   const handleDelete = (index) => {
-    console.log(`Delete workout at index ${index}`);
+    Animated.timing(fadeAnim[index], {
+      toValue: 0,
+      duration: 300,
+      useNativeDriver: true,
+    }).start(() => {
+      const updatedWorkouts = predefinedWorkouts.filter((_, i) => i !== index);
+
+      updatedWorkouts.forEach((_, i) => {
+        Animated.spring(translateYAnim[i], {
+          toValue: 0,
+          useNativeDriver: true,
+        }).start();
+      });
+
+      fadeAnim.splice(index, 1);
+      translateYAnim.splice(index, 1);
+      setPredefinedWorkouts(updatedWorkouts);
+      setEditMode(false);
+      setShakingCardIndex(null);
+    });
   };
 
   const handleEdit = (index) => {
@@ -156,6 +181,7 @@ export default function Workouts() {
               key={index}
               style={[styles.card, [
                 isShaking && {
+                  opacity: fadeAnim[index],
                   transform: [
                     {
                       translateY: shakeAnim.interpolate({

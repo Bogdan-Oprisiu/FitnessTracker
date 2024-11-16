@@ -13,8 +13,8 @@ const styles = StyleSheet.create({
   },
   iconContainer: {
     position: 'absolute',
-    top: 10,
-    right: 10,
+    top: 0,
+    right: 0,
   },
   iconsOverlay: {
     position: 'absolute',
@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#fff',
-    marginBottom: 5,
+    marginBottom: 20,
     marginRight: 20
   },
   cardDetails: {
@@ -35,12 +35,24 @@ const styles = StyleSheet.create({
     color: '#e0e0e0',
   },
   starsContainer: {
-      flexDirection: 'row',
-    },
-    star: {
-      marginRight: 3,
-      marginTop: 3
-    },
+    flexDirection: 'row',
+  },
+  star: {
+    marginRight: 3,
+    marginTop: 3
+  },
+  actionBar: {
+    position: 'absolute',
+    bottom: 0,
+    width: '125%',
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+    paddingVertical: 10,
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+  },  
 });
 
 export default styles;
