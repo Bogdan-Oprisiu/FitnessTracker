@@ -1,15 +1,14 @@
 import { useState, useRef, useEffect } from 'react';
 import { LinearGradient } from "expo-linear-gradient";
 import { View, Text, TouchableOpacity, Image, TextInput, Animated } from "react-native";
-import { auth, db, storage } from '../../config/firebase-config';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth, db, storage } from '../config/firebase-config';
+import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import { doc, setDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import * as ImagePicker from 'expo-image-picker';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Toast from 'react-native-toast-message'; 
-import Login from '../login/login';
 import styles from "./signup.style";
 
 export default function Signup() {
@@ -95,32 +94,49 @@ export default function Signup() {
 
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
-            console.log('User signed up:', user);
 
-            let profilePictureUrl = defaultProfilePicture;
-            if (profilePicture) {
-                const profilePicRef = ref(storage, `profilePictures/${user.uid}`);
-                const img = await fetch(profilePicture);
-                const bytes = await img.blob();
-                await uploadBytes(profilePicRef, bytes);
-                profilePictureUrl = await getDownloadURL(profilePicRef);
-            }
-
-            await setDoc(doc(db, 'users', user.uid), {
-                username,
-                email,
-                profilePictureUrl,
-            });
-
+            await sendEmailVerification(user);
             Toast.show({
-                type: 'success',
-                text1: 'Signup Successful',
-                text2: 'Welcome to our community!',
+                type: 'info',
+                text1: 'Verification Email Sent',
+                text2: 'Please check your email to verify your account.',
                 position: 'top',
                 visibilityTime: 5000,
-                autoHide: true, 
+                autoHide: true,
             });
 
+            console.log('User signed up:', user);
+
+            const checkEmailVerification = setInterval(async () => {
+                await user.reload();
+                if (user.emailVerified) {
+                    clearInterval(checkEmailVerification);
+    
+                    let profilePictureUrl = defaultProfilePicture;
+                    if (profilePicture) {
+                        const profilePicRef = ref(storage, `profilePictures/${user.uid}`);
+                        const img = await fetch(profilePicture);
+                        const bytes = await img.blob();
+                        await uploadBytes(profilePicRef, bytes);
+                        profilePictureUrl = await getDownloadURL(profilePicRef);
+                    }
+    
+                    await setDoc(doc(db, 'users', user.uid), {
+                        username,
+                        email,
+                        profilePictureUrl,
+                    });
+    
+                    Toast.show({
+                        type: 'success',
+                        text1: 'Signup Successful',
+                        text2: 'Welcome to our community!',
+                        position: 'top',
+                        visibilityTime: 5000,
+                        autoHide: true,
+                    });
+                }
+            }, 3000);
         } catch (error) {
             console.error('Error signing up:', error.message);
             if (error.code === 'auth/email-already-in-use') {
@@ -130,7 +146,7 @@ export default function Signup() {
                     text2: 'This email is already registered.',
                     position: 'top',
                     visibilityTime: 5000,
-                    autoHide: true, 
+                    autoHide: true,
                 });
             } else if (error.code === 'auth/weak-password') {
                 Toast.show({
@@ -139,7 +155,7 @@ export default function Signup() {
                     text2: 'Please choose a stronger password.',
                     position: 'top',
                     visibilityTime: 5000,
-                    autoHide: true, 
+                    autoHide: true,
                 });
             } else {
                 Toast.show({
@@ -148,7 +164,7 @@ export default function Signup() {
                     text2: 'An error occurred. Please try again.',
                     position: 'top',
                     visibilityTime: 5000,
-                    autoHide: true, 
+                    autoHide: true,
                 });
             }
         }

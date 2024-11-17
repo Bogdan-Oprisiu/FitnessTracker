@@ -9,10 +9,22 @@ import Home from './components/home-page/home';
 import MainTabs from './components/bottom-navbar';
 import Toast from 'react-native-toast-message';
 import { HeartRateProvider } from './components/heart-rate-provider';
+import { useFonts } from 'expo-font';
+import AppLoading from 'expo-app-loading';
+import StartWorkout from './components/workouts-page/start-workout/start-workout';
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+
+  const [fontsLoaded] = useFonts({
+    'FunkyFont': require('../FitnessFE/assets/fonts/Anton-Regular.ttf')
+  })
+
+  if (!fontsLoaded) {
+    return <AppLoading />;
+  }
+
   return (
     <HeartRateProvider>
       <GlobalBackground>
@@ -41,6 +53,11 @@ export default function App() {
             <Stack.Screen
               name="MainTabs"
               component={MainTabs}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name='StartWorkout'
+              component={StartWorkout}
               options={{ headerShown: false }}
             />
           </Stack.Navigator>

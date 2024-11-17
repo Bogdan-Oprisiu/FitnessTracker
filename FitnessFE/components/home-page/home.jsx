@@ -20,6 +20,7 @@ export default function Home() {
   const [showCalendar, setShowCalendar] = useState(false);
   const confettiRef = useRef(null);
   const scrollY = useRef(new Animated.Value(0)).current;
+  const backgroundImage = require('../../assets/images/home-background3.webp')
 
   useEffect(() => {
     if (workoutsCompleted >= goal && confettiRef.current) {
@@ -51,24 +52,23 @@ export default function Home() {
   };
 
   const imageOpacity = scrollY.interpolate({
-    inputRange: [0, 100],
-    outputRange: [1, 0.3],
+    inputRange: [0, 250],
+    outputRange: [0.15, 0],
     extrapolate: 'clamp',
   });
 
   const gradientColorOpacity = scrollY.interpolate({
-    inputRange: [150, 300],
-    outputRange: [0, 1],
+    inputRange: [150, 500],
+    outputRange: [0, 0.9],
     extrapolate: 'clamp',
   });
 
   const circleOpacity = scrollY.interpolate({
-    inputRange: [0, 150],
+    inputRange: [0, 250],
     outputRange: [1, 0],
     extrapolate: 'clamp',
   });
   
-
   return (
     <View style={{ flex: 1 }}>
       <LinearGradient
@@ -79,13 +79,16 @@ export default function Home() {
       />
 
       <Animated.View style={{ position: 'absolute', width: '100%', height: 800, opacity: imageOpacity }}>
-      <View style={styles.imageContainer}>
-        <Image
-          source={{ uri: 'https://c1.wallpaperflare.com/preview/161/809/107/dumbbell-sport-weights-strength-training-thumbnail.jpg' }}
-          style={styles.backgroundImage}
-        />
-        <BlurView intensity={30} style={styles.blurView} />
-      </View>
+        <View style={styles.imageContainer}>
+          <Image
+            source={backgroundImage}
+            style={styles.backgroundImage}
+          />
+          <BlurView intensity={30} style={styles.blurView} />
+        </View>
+        
+        <Animated.View style={[styles.darkOverlay, { opacity: gradientColorOpacity }]} />
+
         <LinearGradient
           colors={['transparent', '#000']}
           start={{ x: 0.5, y: 0 }}
@@ -113,7 +116,7 @@ export default function Home() {
         }}
       />
 
-      <Animated.View style={[styles.stickyHeader, { opacity: gradientColorOpacity }]}>
+      <Animated.View style={{ opacity: gradientColorOpacity }}>
         <View style={styles.progressDetailsRow}>
           <Text style={styles.goalText}>Weekly Goal:</Text>
           <Text style={styles.goalNumbers}>{workoutsCompleted}/{goal}</Text>
@@ -130,6 +133,7 @@ export default function Home() {
           </TouchableOpacity>
         </View>
       </Animated.View>
+
 
       <Animated.ScrollView
         contentContainerStyle={styles.scrollContainer}

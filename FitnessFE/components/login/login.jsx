@@ -6,13 +6,10 @@ import * as Google from 'expo-auth-session/providers/google';
 import * as WebBrowser from 'expo-web-browser';
 import * as AuthSession from 'expo-auth-session';
 import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
-import { useAuthRequest, makeRedirectUri } from 'expo-auth-session';
 import { useNavigation } from '@react-navigation/native';
 import { getDoc, getDocs, doc, collection, query, where, setDoc } from 'firebase/firestore';
-import { auth, db } from '../../config/firebase-config';
+import { auth, db } from '../config/firebase-config';
 import styles from "./login.style"
-import Signup from '../signup/signup';
-import MainTabs from '../../App';
 
 WebBrowser.maybeCompleteAuthSession();
 
