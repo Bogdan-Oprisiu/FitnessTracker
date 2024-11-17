@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, Animated, ScrollView, Modal, Linking } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, Animated, ScrollView, Modal, Linking, Easing } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
 import styles from './start-workout.style';
@@ -22,23 +22,43 @@ export default function StartWorkout({ route }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedExercise, setSelectedExercise] = useState(null);
   const modalOpacity = useRef(new Animated.Value(0)).current;
+  const modalScale = useRef(new Animated.Value(0.8)).current;
 
   const openModal = (exercise) => {
     setModalVisible(true);
     setSelectedExercise(exercise);
-    Animated.timing(modalOpacity, {
-      toValue: 1,
-      duration: 100,
-      useNativeDriver: true,
-    }).start();
+  
+    Animated.parallel([
+      Animated.timing(modalOpacity, {
+        toValue: 1,
+        duration: 250,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+      }),
+      Animated.timing(modalScale, {
+        toValue: 1,
+        duration: 250,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+      }),
+    ]).start();
   };
-
+  
   const closeModal = () => {
-    Animated.timing(modalOpacity, {
-      toValue: 0,
-      duration: 100,
-      useNativeDriver: true,
-    }).start(() => {
+    Animated.parallel([
+      Animated.timing(modalOpacity, {
+        toValue: 0,
+        duration: 250,
+        easing: Easing.in(Easing.ease),
+        useNativeDriver: true,
+      }),
+      Animated.timing(modalScale, {
+        toValue: 0,
+        duration: 250,
+        easing: Easing.in(Easing.ease),
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
       setModalVisible(false);
       setSelectedExercise(null);
     });
@@ -176,25 +196,32 @@ export default function StartWorkout({ route }) {
       </ScrollView>
 
       {modalVisible && (
-      <Animated.View style={[styles.modalOverlay, { opacity: modalOpacity }]}>
-        <View style={styles.modalContainer}>
-          <Animated.View style={[styles.modalContent, { opacity: modalOpacity }]}>
+        <Animated.View style={[styles.modalOverlay, { opacity: modalOpacity }]}>
+          <Animated.View
+            style={[
+              styles.modalContainer,
+              {
+                transform: [{ scale: modalScale }],
+              },
+            ]}
+          >
             <Text style={styles.modalTitle}>{selectedExercise?.name}</Text>
+            <Text style={styles.modalDescription}>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus interdum nulla et lectus commodo, nec pellentesque nunc volutpat.
+            </Text>
             <Text style={styles.modalDuration}>Duration: {selectedExercise?.duration}</Text>
             <TouchableOpacity
               style={styles.videoLinkButton}
-              onPress={() => openYouTubeLink(selectedExercise?.videoLink)}
+              onPress={() => Linking.openURL(selectedExercise?.videoLink)}
             >
-              <Text style={styles.videoLinkText}>Watch Video</Text>
+              <Text style={styles.videoLinkText}>Watch Video Tutorial</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
               <Text style={styles.closeButtonText}>Close</Text>
             </TouchableOpacity>
           </Animated.View>
-        </View>
-      </Animated.View>
-)}
-
+        </Animated.View>
+      )}
     </>
   );
 }
