@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const styles = StyleSheet.create({
   container: {
@@ -40,7 +41,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
-    textAlign: 'center'
+    textAlign: 'center',
   },
   pulseContainer: {
     alignItems: 'center',
@@ -60,16 +61,22 @@ const styles = StyleSheet.create({
     maxHeight: 600,
   },
   exerciseCard: {
+    flexDirection: 'column',
+    backgroundColor: '#444',
+    borderRadius: 15,
+    paddingVertical: 20,
+    paddingHorizontal: 15,
+    marginVertical: 10,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+  },
+  exerciseDetails: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#333',
-    borderRadius: 10,
-    padding: 20,
-    marginVertical: 10,
-  },
-  exerciseDetails: {
-    flex: 1,
   },
   exerciseText: {
     fontSize: 18,
@@ -89,72 +96,57 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 30,
     borderRadius: 10,
-    width:'100%',
+    width: '100%',
   },
   startWorkoutText: {
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
-    textAlign: 'center'
-  },
-  modalOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContainer: {
-    width: '90%',
-    backgroundColor: '#333',
-    borderRadius: 20,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
-    elevation: 5,
-  },
-  modalTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#ccc',
-    marginBottom: 10,
     textAlign: 'center',
   },
-  modalDescription: {
+  dropdownContent: {
+    marginTop: 15,
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#666',
+  },
+  descriptionWrapper: {
+    flex: 1,
+    justifyContent: 'space-between',
+    marginTop: 15,
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#666',
+  },
+  descriptionScrollView: {
+    flex: 1, 
+    marginBottom: 10,
+    maxHeight: 160,
+  },
+  descriptionContent: {
+    paddingBottom: 10,
+    paddingLeft: 7,
+    paddingRight: 7
+  },
+  exerciseDescription: {
     fontSize: 16,
     color: '#aaa',
-    marginBottom: 15,
+    lineHeight: 22,
     textAlign: 'justify',
   },
-  modalDuration: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#777',
-    marginBottom: 20,
+  fixedButtonContainer: {
+    justifyContent: 'flex-end',
   },
   videoLinkButton: {
     backgroundColor: '#6a0dad',
-    paddingVertical: 10,
+    paddingVertical: 12,
     borderRadius: 10,
     alignItems: 'center',
-    marginBottom: 15,
   },
   videoLinkText: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: '600',
-  },
-  closeButton: {
-    backgroundColor: '#f44336',
-    paddingVertical: 10,
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  closeButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+    fontWeight: 'bold',
   },
 });
 
