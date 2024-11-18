@@ -1,0 +1,105 @@
+{
+  "warmUp": {
+    "duration": 5,
+    "description": "Light cardio to increase blood flow and prepare muscles.",
+    "exercises": [
+      {
+        "name": "Jumping Jacks",
+        "sets": 1,
+        "reps": 30
+      },
+      {
+        "name": "High Knees",
+        "sets": 1,
+        "reps": 30
+      },
+      {
+        "name": "Butt Kicks",
+        "sets": 1,
+        "reps": 30
+      },
+      {
+        "name": "Arm Circles (forward and backward)",
+        "sets": 1,
+        "reps": "15 per direction"
+      }
+    ]
+  },
+  "mainWorkout": {
+    "duration": 20,
+    "description": "Chest and back strength training.",
+    "exercises": [
+      {
+        "name": "Incline Push-Ups",
+        "sets": 3,
+        "reps": {
+          "min": 8,
+          "max": 12
+        },
+        "rest": 60
+      },
+      {
+        "name": "Resistance Band Chest Press",
+        "sets": 3,
+        "reps": {
+          "min": 10,
+          "max": 15
+        },
+        "rest": 60
+      },
+      {
+        "name": "Pec Deck Machine",
+        "sets": 3,
+        "reps": {
+          "min": 10,
+          "max": 15
+        },
+        "rest": 60
+      },
+      {
+        "name": "Bodyweight Flyes (using EZ curl bar)",
+        "sets": 3,
+        "reps": {
+          "min": 10,
+          "max": 15
+        },
+        "rest": 60
+      },
+      {
+        "name": "Chest Press Machine",
+        "sets": 3,
+        "reps": {
+          "min": 10,
+          "max": 15
+        },
+        "rest": 60
+      }
+    ]
+  },
+  "coolDown": {
+    "duration": 5,
+    "description": "Static stretches to improve flexibility and reduce muscle soreness.",
+    "exercises": [
+      {
+        "name": "Chest Stretch",
+        "duration": 30
+      },
+      {
+        "name": "Shoulder Stretch",
+        "duration": 30
+      },
+      {
+        "name": "Triceps Stretch",
+        "duration": 30
+      },
+      {
+        "name": "Upper Back Stretch",
+        "duration": 30
+      },
+      {
+        "name": "Child's Pose",
+        "duration": 60
+      }
+    ]
+  }
+}
