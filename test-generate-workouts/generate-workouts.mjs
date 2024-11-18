@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 import { db } from './config/firebaseConfig.mjs';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { collection, getDocs, query, where, doc, setDoc } from 'firebase/firestore';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import fs from 'fs/promises';
 
@@ -95,6 +95,25 @@ async function generateWorkout(focusAreas, difficulty, duration, exercises, incl
   }
 }
 
+// Save workout to user's Firestore document
+async function saveWorkoutForUser(userId, workoutPlan) {
+  try {
+    const userDocRef = doc(db, `users/${userId}`);
+    const workoutsCollectionRef = collection(userDocRef, 'workouts');
+
+    // Create a new workout document
+    const newWorkoutRef = doc(workoutsCollectionRef);
+    await setDoc(newWorkoutRef, {
+      createdAt: new Date().toISOString(),
+      workoutPlan,
+    });
+
+    console.log(`Workout plan saved to user ${userId} in the "workouts" collection.`);
+  } catch (error) {
+    console.error('Error saving workout for user:', error.message);
+  }
+}
+
 // Main function
 async function main() {
   try {
@@ -104,6 +123,9 @@ async function main() {
     const duration = 30;
     const includeWarmUp = true;
     const includeStretching = true;
+
+    // User ID
+    const userId = 'AvVvoYv5GJPfU599rXsTNI1ZRH83';
 
     // Fetch exercises
     const strengthExercises = await fetchExercisesFromDatabase('strength', 'chest', difficulty);
@@ -119,10 +141,8 @@ async function main() {
     // Generate the workout plan
     const workoutPlan = await generateWorkout(focusAreas, difficulty, duration, exercises, includeWarmUp, includeStretching);
 
-    // Save the workout plan to a JSON file
-    const fileName = `workoutPlan_${Date.now()}.json`;
-    await fs.writeFile(fileName, JSON.stringify(workoutPlan, null, 2));
-    console.log(`Workout plan saved to ${fileName}`);
+    // Save the workout plan for the user
+    await saveWorkoutForUser(userId, workoutPlan);
   } catch (error) {
     console.error('Error generating workout plan:', error);
   }
