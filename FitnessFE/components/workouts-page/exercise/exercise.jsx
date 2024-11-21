@@ -24,7 +24,9 @@ export default function ExercisePage({ route }) {
     if (currentExerciseIndex < exercises.length - 1) {
       setCurrentExerciseIndex(currentExerciseIndex + 1);
     } else {
-      completeWorkout();
+      setTimeout(() => {
+        completeWorkout();
+      }, 500);
       navigation.navigate('Home');
     }
   };
