@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, Animated, ScrollView, Modal, Linking, Easing, LayoutAnimation, Platform, UIManager } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import styles from './start-workout.style';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -10,6 +11,7 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
 
 export default function StartWorkout({ route }) {
   const { workout } = route.params;
+  const navigation = useNavigation();
 
   const workoutImage =
     workout.type === 'strength'
@@ -131,8 +133,8 @@ export default function StartWorkout({ route }) {
     { name: 'Sit-Ups', duration: '1 min', videoLink: 'https://www.youtube.com/watch?v=F5vrjzPXZ9k' },
     { name: 'Squats', duration: '1 min', videoLink: 'https://www.youtube.com/watch?v=F5vrjzPXZ9k' },
     { name: 'Lunges', duration: '1 min', videoLink: 'https://www.youtube.com/watch?v=F5vrjzPXZ9k' },
-    { name: 'Planks', duration: '1 min', videoLink: 'https://www.youtube.com/watch?v=F5vrjzPXZ9k' },
-    { name: 'Planks', duration: '1 min', videoLink: 'https://www.youtube.com/watch?v=F5vrjzPXZ9k' },
+    { name: 'Bench Press', duration: '1 min', videoLink: 'https://www.youtube.com/watch?v=F5vrjzPXZ9k' },
+    { name: 'Bicep Curls', duration: '1 min', videoLink: 'https://www.youtube.com/watch?v=F5vrjzPXZ9k' },
     { name: 'Planks', duration: '1 min', videoLink: 'https://www.youtube.com/watch?v=F5vrjzPXZ9k' },
   ];
 
@@ -190,9 +192,12 @@ export default function StartWorkout({ route }) {
             {workout.name}
           </Animated.Text>
           <Animated.View style={{ opacity: fadeOutOpacity }}>
-            <TouchableOpacity style={styles.startButton} onPress={() => console.log('Start Workout')}>
-              <Text style={styles.startButtonText}>Start Workout</Text>
-            </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.startButton}
+            onPress={() => navigation.navigate('ExercisePage', { exercises, currentIndex: 0, completeWorkout })}
+          >
+            <Text style={styles.startButtonText}>Start Workout</Text>
+          </TouchableOpacity>
           </Animated.View>
         </View>
   
@@ -267,13 +272,12 @@ export default function StartWorkout({ route }) {
                 )}
               </View>
             ))}
-  
-            <View style={styles.startWorkoutContainerScrolled}>
-              <TouchableOpacity style={styles.startWorkoutButton}>
-                <Text style={styles.startWorkoutText}>Start Workout</Text>
-              </TouchableOpacity>
-            </View>
           </ScrollView>
+          <View style={styles.startWorkoutContainerScrolled}>
+            <TouchableOpacity style={styles.startWorkoutButton} onPress={() => navigation.navigate('ExercisePage', { exercises, currentIndex: 0 })}>
+              <Text style={styles.startWorkoutText}>Start Workout</Text>
+            </TouchableOpacity>
+          </View>
         </Animated.View>
       </ScrollView>
     </>

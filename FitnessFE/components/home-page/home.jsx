@@ -8,14 +8,14 @@ import { MaterialIcons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
 import { BlurView } from 'expo-blur';
 import WeeklyProgress from './weekly-progress/weekly-progress';
+import { useWorkout } from '../workout-provider';
 import Widget from '../widgets-template';
 import styles from './home.style';
 
 const { width } = Dimensions.get('window');
 
 export default function Home() {
-  const [goal, setGoal] = useState(3); // weekly workout goal, default is 3
-  const [workoutsCompleted, setWorkoutsCompleted] = useState(0);
+  const { workoutsCompleted, goal, completeWorkout } = useWorkout();
   const [confettiVisible, setConfettiVisible] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
   const confettiRef = useRef(null);
@@ -32,20 +32,6 @@ export default function Home() {
       }, 5000);
     }
   }, [workoutsCompleted, goal]);
-
-  const completeWorkout = () => {
-    if (workoutsCompleted < 7) {
-      setWorkoutsCompleted(workoutsCompleted + 1);
-      Toast.show({
-        type: 'success',
-        text1: 'Workout Completed',
-        text2: `You have completed ${workoutsCompleted + 1} out of ${goal} workouts!`,
-        position: 'top',
-        visibilityTime: 5000,
-        autoHide: true,
-      });
-    }
-  };
 
   const toggleCalendar = () => {
     setShowCalendar(!showCalendar);
@@ -163,10 +149,6 @@ export default function Home() {
               <Text style={styles.weeklyStats}>{workoutsCompleted} / {goal}</Text>
             </View>
           </View>
-
-          <TouchableOpacity onPress={completeWorkout} style={styles.button}>
-            <Text style={styles.buttonText}>Complete Workout</Text>
-          </TouchableOpacity>
 
           <WeeklyProgress onPress={toggleCalendar} />
         </Animated.View>
