@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { LinearGradient } from "expo-linear-gradient";
 import { View, Text, TouchableOpacity, Image, TextInput, Animated } from "react-native";
-import { auth, db, storage } from '../../firebase-config';
+import { auth, db, storage } from '../config/firebase-config';
 import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import { doc, setDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
