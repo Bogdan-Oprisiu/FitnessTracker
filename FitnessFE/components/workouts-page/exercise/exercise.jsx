@@ -6,6 +6,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import AnimatedHeart from '../../animated-components/heart-animation';
 import { useHeartRate } from '../../heart-rate-provider';
 import { useWorkout } from '../../workout-provider';
+import { useNotification } from '../../notification-context';
 import styles from './exercise.style';
 
 export default function ExercisePage({ route }) {
@@ -14,6 +15,24 @@ export default function ExercisePage({ route }) {
   const { completeWorkout } = useWorkout();
   const [currentExerciseIndex, setCurrentExerciseIndex] = useState(currentIndex || 0);
   const { heartRate } = useHeartRate();
+  const { scheduleCurrentExerciseNotification, scheduleNextExerciseNotification, cancelAllNotifications } = useNotification();
+
+  useEffect(() => {
+    const currentExercise = exercises[currentExerciseIndex];
+    scheduleCurrentExerciseNotification(currentExercise);
+
+    const interval = setInterval(() => {
+      if (heartRate >= 80 || currentExerciseIndex < exercises.length - 1) {
+        clearInterval(interval);
+        const nextExercise = exercises[currentExerciseIndex + 1];
+        if (nextExercise) {
+          scheduleNextExerciseNotification(nextExercise, 180);
+        }
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [currentExerciseIndex, heartRate]);
 
   const currentExercise = {
     ...exercises[currentExerciseIndex],
@@ -21,6 +40,7 @@ export default function ExercisePage({ route }) {
   };
 
   const handleNext = () => {
+    cancelAllNotifications();
     if (currentExerciseIndex < exercises.length - 1) {
       setCurrentExerciseIndex(currentExerciseIndex + 1);
     } else {

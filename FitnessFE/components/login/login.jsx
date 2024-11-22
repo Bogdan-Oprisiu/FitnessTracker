@@ -8,7 +8,7 @@ import * as AuthSession from 'expo-auth-session';
 import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
 import { useNavigation } from '@react-navigation/native';
 import { getDoc, getDocs, doc, collection, query, where, setDoc } from 'firebase/firestore';
-import { auth, db } from '../config/firebase-config';
+import { auth, db } from '../../firebase-config';
 import styles from "./login.style"
 
 WebBrowser.maybeCompleteAuthSession();

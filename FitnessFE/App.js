@@ -11,6 +11,7 @@ import Toast from 'react-native-toast-message';
 import { HeartRateProvider } from './components/heart-rate-provider';
 import { WorkoutProvider } from './components/workout-provider';
 import { useFonts } from 'expo-font';
+import { NotificationProvider } from './components/notification-context';
 import AppLoading from 'expo-app-loading';
 import StartWorkout from './components/workouts-page/start-workout/start-workout';
 import ExercisePage from './components/workouts-page/exercise/exercise';
@@ -30,48 +31,50 @@ export default function App() {
   return (
     <HeartRateProvider>
       <WorkoutProvider>
-        <GlobalBackground>
-          <NavigationContainer>
-            <Stack.Navigator 
-              initialRouteName="Welcome"
-              screenOptions={{
-                cardStyle: { backgroundColor: 'transparent' },
-              }}
-            >
-              <Stack.Screen
-                name="Welcome"
-                component={Welcome}
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name="Signup"
-                component={Signup}
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name="Login"
-                component={Login}
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name="MainTabs"
-                component={MainTabs}
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name='StartWorkout'
-                component={StartWorkout}
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name='ExercisePage'
-                component={ExercisePage}
-                options={{ headerShown: false }}
-              />
-            </Stack.Navigator>
-          </NavigationContainer>
-          <Toast />
-        </GlobalBackground>
+        <NotificationProvider>
+          <GlobalBackground>
+            <NavigationContainer>
+              <Stack.Navigator 
+                initialRouteName="Welcome"
+                screenOptions={{
+                  cardStyle: { backgroundColor: 'transparent' },
+                }}
+              >
+                <Stack.Screen
+                  name="Welcome"
+                  component={Welcome}
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name="Signup"
+                  component={Signup}
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name="Login"
+                  component={Login}
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name="MainTabs"
+                  component={MainTabs}
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name='StartWorkout'
+                  component={StartWorkout}
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name='ExercisePage'
+                  component={ExercisePage}
+                  options={{ headerShown: false }}
+                />
+              </Stack.Navigator>
+            </NavigationContainer>
+            <Toast />
+          </GlobalBackground>
+        </NotificationProvider>
       </WorkoutProvider>
     </HeartRateProvider>
   );

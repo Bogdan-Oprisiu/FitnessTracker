@@ -3,6 +3,7 @@ import { View, Text, Image, StyleSheet, TouchableOpacity, Animated, ScrollView, 
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { useNotification } from '../../notification-context';
 import styles from './start-workout.style';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -12,6 +13,7 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
 export default function StartWorkout({ route }) {
   const { workout } = route.params;
   const navigation = useNavigation();
+  const { scheduleCurrentExerciseNotification, cancelAllNotifications } = useNotification();
 
   const workoutImage =
     workout.type === 'strength'
@@ -167,6 +169,13 @@ export default function StartWorkout({ route }) {
     Linking.openURL(link).catch((err) => console.error("Couldn't load page", err));
   };
 
+  const handleStartWorkout = () => {
+    cancelAllNotifications();
+    const firstExercise = exercises[0];
+    scheduleCurrentExerciseNotification(firstExercise);
+    navigation.navigate('ExercisePage', { exercises, currentIndex: 0, completeWorkout })
+  };
+
   return (
     <>
       <ScrollView
@@ -194,7 +203,7 @@ export default function StartWorkout({ route }) {
           <Animated.View style={{ opacity: fadeOutOpacity }}>
           <TouchableOpacity
             style={styles.startButton}
-            onPress={() => navigation.navigate('ExercisePage', { exercises, currentIndex: 0, completeWorkout })}
+            onPress={() => handleStartWorkout()}
           >
             <Text style={styles.startButtonText}>Start Workout</Text>
           </TouchableOpacity>
@@ -274,7 +283,10 @@ export default function StartWorkout({ route }) {
             ))}
           </ScrollView>
           <View style={styles.startWorkoutContainerScrolled}>
-            <TouchableOpacity style={styles.startWorkoutButton} onPress={() => navigation.navigate('ExercisePage', { exercises, currentIndex: 0 })}>
+            <TouchableOpacity 
+              style={styles.startWorkoutButton}             
+              onPress={() => handleStartWorkout()}
+            >
               <Text style={styles.startWorkoutText}>Start Workout</Text>
             </TouchableOpacity>
           </View>
