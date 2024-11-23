@@ -129,13 +129,13 @@ export default function StartWorkout({ route }) {
   });
 
   const exercises = [
-    { name: 'Push-Ups', duration: '1 min', videoLink: 'https://www.youtube.com/watch?v=F5vrjzPXZ9k' },
-    { name: 'Sit-Ups', duration: '1 min', videoLink: 'https://www.youtube.com/watch?v=F5vrjzPXZ9k' },
-    { name: 'Squats', duration: '1 min', videoLink: 'https://www.youtube.com/watch?v=F5vrjzPXZ9k' },
-    { name: 'Lunges', duration: '1 min', videoLink: 'https://www.youtube.com/watch?v=F5vrjzPXZ9k' },
-    { name: 'Bench Press', duration: '1 min', videoLink: 'https://www.youtube.com/watch?v=F5vrjzPXZ9k' },
-    { name: 'Bicep Curls', duration: '1 min', videoLink: 'https://www.youtube.com/watch?v=F5vrjzPXZ9k' },
-    { name: 'Planks', duration: '1 min', videoLink: 'https://www.youtube.com/watch?v=F5vrjzPXZ9k' },
+    { name: 'Push-Ups', duration: '1 min', videoLink: 'https://www.youtube.com/watch?v=F5vrjzPXZ9k', sets: 4 },
+    { name: 'Sit-Ups', duration: '1 min', videoLink: 'https://www.youtube.com/watch?v=F5vrjzPXZ9k', sets: 4 },
+    { name: 'Squats', duration: '1 min', videoLink: 'https://www.youtube.com/watch?v=F5vrjzPXZ9k', sets: 3 },
+    { name: 'Lunges', duration: '1 min', videoLink: 'https://www.youtube.com/watch?v=F5vrjzPXZ9k', sets: 3 },
+    { name: 'Bench Press', duration: '1 min', videoLink: 'https://www.youtube.com/watch?v=F5vrjzPXZ9k', sets: 4 },
+    { name: 'Bicep Curls', duration: '1 min', videoLink: 'https://www.youtube.com/watch?v=F5vrjzPXZ9k', sets: 4 },
+    { name: 'Planks', duration: '1 min', videoLink: 'https://www.youtube.com/watch?v=F5vrjzPXZ9k', sets: 2 },
   ];
 
   useEffect(() => {

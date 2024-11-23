@@ -1,5 +1,8 @@
 import { StyleSheet } from "react-native";
 
+const circleSize = 300;
+const textContainerSize = 200;
+
 const styles = StyleSheet.create({
   gradientContainer: {
     flex: 1,
@@ -33,19 +36,57 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
   },
+  progressContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 30,
+  },
+  circleContent: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1, 
+  },
+  centeredTextContainer: {
+    position: 'absolute',
+    top: '50%',
+    left: '47%',
+    transform: [{ translateX: -125 }, { translateY: -125 }],
+    width: 200,
+    height: 250,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   exerciseName: {
-    fontSize: 52,
-    color: '#fff',
+    fontSize: 30,
     fontWeight: 'bold',
+    color: '#fff',
     textAlign: 'center',
-    marginBottom: 50,
+    marginBottom: 10,
+  },
+  setProgress: {
+    fontSize: 20,
+    color: '#eee',
+    textAlign: 'center',
+  },
+  nextSetButton: {
+    backgroundColor: '#6a0dad',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginHorizontal: 40,
+    marginTop: 40,
+  },
+  nextSetButtonText: {
+    color: '#fff',
+    fontSize: 18,
   },
   descriptionContainer: {
-    maxHeight: 300,
+    maxHeight: 250,
     minHeight: 100,
     marginBottom: 30,
     paddingRight: 10,
-    paddingLeft: 10
+    paddingLeft: 10,
+    marginTop: 50
   },
   exerciseDescription: {
     fontSize: 20,
@@ -93,6 +134,61 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
   },
+  takeABreakText: {
+    fontSize: 50,
+    fontWeight: 'bold',
+    color: '#fff',
+    textAlign: 'center',
+    marginBottom: 10,
+    marginTop: -150
+  },
+  restInstructions: {
+    color: '#fff',
+    fontSize: 18,
+    textAlign: 'center',
+    marginVertical: 20,
+  },
+  restDuration: {
+    color: '#fff',
+    fontSize: 24,
+    textAlign: 'center',
+    marginBottom: 30,
+  },
+  nextUp: {
+    fontSize: 30,
+    color: '#fff',
+    marginTop: 25,
+    textAlign: 'center'
+  },
+  proceedButton: {
+    backgroundColor: '#6a0dad',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginHorizontal: 40,
+  },
+  proceedButtonText: {
+    color: '#fff',
+    fontSize: 18,
+  },
+  setCounter: {
+    fontSize: 18,
+    color: '#fff',
+    textAlign: 'center',
+    marginVertical: 10,
+  },
+  nextSetButton: {
+    backgroundColor: '#6a0dad',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginHorizontal: 40,
+    marginTop: 20,
+  },
+  nextSetButtonText: {
+    color: '#fff',
+    fontSize: 18,
+  },  
 });
   
 export default styles;
