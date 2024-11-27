@@ -111,19 +111,19 @@ export default function StartWorkout({ route }) {
   });
 
   const fadeOutOpacity = scrollY.interpolate({
-    inputRange: [0, 100],
+    inputRange: [0, 80],
     outputRange: [1, 0],
     extrapolate: 'clamp',
   });
 
   const titleTranslateY = scrollY.interpolate({
-    inputRange: [0, 150],
-    outputRange: [0, -80],
+    inputRange: [0, 80],
+    outputRange: [0, -170],
     extrapolate: 'clamp',
   });
 
   const exercisesOpacity = scrollY.interpolate({
-    inputRange: [50, 150],
+    inputRange: [50, 300],
     outputRange: [0, 1],
     extrapolate: 'clamp',
   });
@@ -191,22 +191,10 @@ export default function StartWorkout({ route }) {
           <Animated.Text style={[styles.workoutName, { transform: [{ translateY: titleTranslateY }] }]}>
             {workout.name}
           </Animated.Text>
-          <Animated.View style={{ opacity: fadeOutOpacity }}>
-          <TouchableOpacity
-            style={styles.startButton}
-            onPress={() => navigation.navigate('ExercisePage', { exercises, currentIndex: 0, completeWorkout })}
-          >
-            <Text style={styles.startButtonText}>Start Workout</Text>
-          </TouchableOpacity>
+          <Animated.View style={{ opacity: fadeOutOpacity, marginTop: 10 }}>
+            <Text style={styles.workoutDescription}>A high-intensity workout targeting all major muscle groups.</Text>
           </Animated.View>
         </View>
-  
-        <Animated.View style={[styles.pulseContainer, { opacity: fadeOutOpacity }]}>
-          <Text style={styles.swipeText}>Swipe for Workout Details</Text>
-          <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
-            <MaterialIcons name="keyboard-arrow-down" size={26} color="#6a0dad" />
-          </Animated.View>
-        </Animated.View>
   
         <Animated.View style={[styles.exercisesContainer, { opacity: exercisesOpacity }]}>
           <ScrollView
@@ -280,6 +268,30 @@ export default function StartWorkout({ route }) {
           </View>
         </Animated.View>
       </ScrollView>
+      <Animated.View style={[styles.pulseContainer, { opacity: fadeOutOpacity }]}>
+        <Text style={styles.swipeText}>Swipe for Workout Details</Text>
+        <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
+          <MaterialIcons name="keyboard-arrow-down" size={26} color="#6a0dad" />
+        </Animated.View>
+      </Animated.View>
+      <Animated.View
+        style={[
+          styles.startArrow,
+          { opacity: fadeOutOpacity },
+        ]}
+      >
+        <TouchableOpacity 
+          onPress={() => navigation.navigate('ExercisePage', { exercises, currentIndex: 0 })} 
+        >
+          <Animated.View
+            style={{
+              transform: [{ scale: pulseAnim }],
+            }}
+          >
+            <MaterialIcons name="keyboard-arrow-right" size={50} color="#6a0dad" />
+          </Animated.View>
+        </TouchableOpacity>
+      </Animated.View>
     </>
   );
   

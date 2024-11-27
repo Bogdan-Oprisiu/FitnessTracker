@@ -4,6 +4,7 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     backgroundColor: 'black',
+    position: 'relative'
   },
   imageContainer: {
     position: 'relative',
@@ -30,6 +31,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 20,
   },
+  workoutDescription: {
+    fontSize: 16,
+    color: '#aaa',
+    textAlign: 'center',
+    paddingHorizontal: 20,
+    lineHeight: 24,
+  },  
   startButton: {
     backgroundColor: '#6a0dad',
     paddingVertical: 12,
@@ -43,8 +51,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   pulseContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
     alignItems: 'center',
-    marginTop: 75,
   },
   swipeText: {
     color: '#6a0dad',
@@ -147,6 +158,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  startArrow: {
+    position: 'absolute',
+    top: 40,
+    right: 20,
+    zIndex: 10,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    padding: 10,
+    borderRadius: 50,
+  },  
 });
 
 export default styles;

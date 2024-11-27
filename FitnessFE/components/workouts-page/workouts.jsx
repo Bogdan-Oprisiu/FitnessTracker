@@ -19,14 +19,14 @@ export default function Workouts() {
   const shakeAnim = useRef(new Animated.Value(0)).current;
 
   const [predefinedWorkouts, setPredefinedWorkouts] = useState([
-    { id: 1, name: 'Full Body Blast', exercises: 10, duration: 30, difficulty: 'Intermediate', type: 'strength' },
-    { id: 2, name: 'Core Crusher', exercises: 8, duration: 20, difficulty: 'Advanced', type: 'stretching' },
-    { id: 3, name: 'Cardio Burn', exercises: 12, duration: 25, difficulty: 'Beginner', type: 'cardio' },
-    { id: 1, name: 'Full Body Blast', exercises: 10, duration: 30, difficulty: 'Intermediate', type: 'strength' },
-    { id: 2, name: 'Core Crusher', exercises: 8, duration: 20, difficulty: 'Advanced', type: 'stretching' },
-    { id: 3, name: 'Cardio Burn', exercises: 12, duration: 25, difficulty: 'Beginner', type: 'cardio' },
-    { id: 2, name: 'Core Crusher', exercises: 8, duration: 20, difficulty: 'Advanced', type: 'stretching' },
-    { id: 3, name: 'Cardio Burn', exercises: 12, duration: 25, difficulty: 'Beginner', type: 'cardio' },
+    { id: 1, name: 'Full Body Blast', exercises: 10, duration: 30, difficulty: 'Intermediate', type: 'strength', description: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nisi tenetur facere explicabo culpa, accusamus libero assumenda! Laboriosam quidem repellendus dicta autem omnis voluptas, dolores hic quod asperiores magni quae minus!' },
+    { id: 2, name: 'Core Crusher', exercises: 8, duration: 20, difficulty: 'Advanced', type: 'stretching', description: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nisi tenetur facere explicabo culpa, accusamus libero assumenda! Laboriosam quidem repellendus dicta autem omnis voluptas, dolores hic quod asperiores magni quae minus!' },
+    { id: 3, name: 'Cardio Burn', exercises: 12, duration: 25, difficulty: 'Beginner', type: 'cardio', description: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nisi tenetur facere explicabo culpa, accusamus libero assumenda! Laboriosam quidem repellendus dicta autem omnis voluptas, dolores hic quod asperiores magni quae minus!' },
+    { id: 1, name: 'Full Body Blast', exercises: 10, duration: 30, difficulty: 'Intermediate', type: 'strength', description: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nisi tenetur facere explicabo culpa, accusamus libero assumenda! Laboriosam quidem repellendus dicta autem omnis voluptas, dolores hic quod asperiores magni quae minus!' },
+    { id: 2, name: 'Core Crusher', exercises: 8, duration: 20, difficulty: 'Advanced', type: 'stretching', description: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nisi tenetur facere explicabo culpa, accusamus libero assumenda! Laboriosam quidem repellendus dicta autem omnis voluptas, dolores hic quod asperiores magni quae minus!' },
+    { id: 3, name: 'Cardio Burn', exercises: 12, duration: 25, difficulty: 'Beginner', type: 'cardio', description: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nisi tenetur facere explicabo culpa, accusamus libero assumenda! Laboriosam quidem repellendus dicta autem omnis voluptas, dolores hic quod asperiores magni quae minus!' },
+    { id: 2, name: 'Core Crusher', exercises: 8, duration: 20, difficulty: 'Advanced', type: 'stretching', description: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nisi tenetur facere explicabo culpa, accusamus libero assumenda! Laboriosam quidem repellendus dicta autem omnis voluptas, dolores hic quod asperiores magni quae minus!' },
+    { id: 3, name: 'Cardio Burn', exercises: 12, duration: 25, difficulty: 'Beginner', type: 'cardio', description: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nisi tenetur facere explicabo culpa, accusamus libero assumenda! Laboriosam quidem repellendus dicta autem omnis voluptas, dolores hic quod asperiores magni quae minus!' },
   ]);
   const fadeAnim = useRef(predefinedWorkouts.map(() => new Animated.Value(1))).current;
   const translateYAnim = useRef(predefinedWorkouts.map(() => new Animated.Value(0))).current;
