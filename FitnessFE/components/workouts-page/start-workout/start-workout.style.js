@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
   },
   pulseContainer: {
     position: 'absolute',
-    bottom: 0,
+    bottom: -50,
     left: 0,
     right: 0,
     alignItems: 'center',
@@ -65,7 +65,6 @@ const styles = StyleSheet.create({
   exercisesContainer: {
     paddingHorizontal: 20,
     marginTop: -250,
-    paddingBottom: 40,
   },
   exercisesScrollView: {
     maxHeight: 600,
@@ -93,16 +92,26 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
   },
-  exerciseDuration: {
+  exerciseSets: {
     fontSize: 14,
     color: '#ccc',
   },
+  editModeDetails: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  textContainer: {
+    flex: 1,
+    flexDirection: 'column',
+  },
   startWorkoutContainerScrolled: {
     alignItems: 'center',
-    marginTop: 30,
   },
   startWorkoutButton: {
     backgroundColor: '#6a0dad',
+    marginTop: 10,
+    marginBottom: 10,
     paddingVertical: 12,
     paddingHorizontal: 30,
     borderRadius: 10,
@@ -167,6 +176,38 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 50,
   },  
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'black',
+  },
+  loadingText: {
+    marginTop: 20,
+    fontSize: 16,
+    color: '#6a0dad',
+    fontWeight: 'bold',
+  },
+  reorderButton: {
+    backgroundColor: '#6a0dad',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 10,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+  },
+  reorderButtonText: {
+    color: '#fff', 
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'flex-start',
+  },
 });
 
 export default styles;

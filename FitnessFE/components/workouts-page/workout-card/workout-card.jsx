@@ -4,7 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import styles from './workout-card.style';
 
-export default function WorkoutCard({ name, exercises, duration, difficulty, type, onPress, onLongPress, showIcons, onDelete, onEdit }) {
+export default function WorkoutCard({ name, exercises, difficulty, type, onPress, onLongPress, showIcons, onDelete, onEdit }) {
   const actionBarHeight = useRef(new Animated.Value(0)).current;
   const contentShift = useRef(new Animated.Value(20)).current;
 
@@ -73,7 +73,6 @@ export default function WorkoutCard({ name, exercises, duration, difficulty, typ
           <View style={styles.iconContainer}>{renderIcon()}</View>
           <Text style={styles.cardTitle}>{name}</Text>
           <Text style={styles.cardDetails}>Exercises: {exercises}</Text>
-          <Text style={styles.cardDetails}>Duration: {duration} mins</Text>
           <View style={styles.starsContainer}>{renderStars()}</View>
         </Animated.View>
 

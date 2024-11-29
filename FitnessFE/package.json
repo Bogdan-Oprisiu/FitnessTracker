@@ -47,6 +47,7 @@
     "react-native-circular-progress": "^1.4.1",
     "react-native-confetti": "^0.1.0",
     "react-native-confetti-cannon": "^1.5.2",
+    "react-native-draggable-flatlist": "^4.0.1",
     "react-native-gesture-handler": "~2.16.1",
     "react-native-pager-view": "6.3.0",
     "react-native-permissions": "^5.1.0",

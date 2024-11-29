@@ -3,6 +3,8 @@ import { View, Image, Animated, ScrollView, Text, TouchableOpacity, Dimensions }
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import WorkoutCard from './workout-card/workout-card';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../config/firebase-config';
 import styles from './workouts.style';
 import { useNavigation } from '@react-navigation/native';
 
@@ -13,23 +15,42 @@ export default function Workouts() {
   const gradientColorOpacity = useRef(new Animated.Value(0)).current;
   const scrollY = useRef(new Animated.Value(0)).current;
   const navigation = useNavigation();
-
   const [editMode, setEditMode] = useState(false);
   const [shakingCardIndex, setShakingCardIndex] = useState(null);
   const shakeAnim = useRef(new Animated.Value(0)).current;
-
-  const [predefinedWorkouts, setPredefinedWorkouts] = useState([
-    { id: 1, name: 'Full Body Blast', exercises: 10, duration: 30, difficulty: 'Intermediate', type: 'strength', description: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nisi tenetur facere explicabo culpa, accusamus libero assumenda! Laboriosam quidem repellendus dicta autem omnis voluptas, dolores hic quod asperiores magni quae minus!' },
-    { id: 2, name: 'Core Crusher', exercises: 8, duration: 20, difficulty: 'Advanced', type: 'stretching', description: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nisi tenetur facere explicabo culpa, accusamus libero assumenda! Laboriosam quidem repellendus dicta autem omnis voluptas, dolores hic quod asperiores magni quae minus!' },
-    { id: 3, name: 'Cardio Burn', exercises: 12, duration: 25, difficulty: 'Beginner', type: 'cardio', description: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nisi tenetur facere explicabo culpa, accusamus libero assumenda! Laboriosam quidem repellendus dicta autem omnis voluptas, dolores hic quod asperiores magni quae minus!' },
-    { id: 1, name: 'Full Body Blast', exercises: 10, duration: 30, difficulty: 'Intermediate', type: 'strength', description: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nisi tenetur facere explicabo culpa, accusamus libero assumenda! Laboriosam quidem repellendus dicta autem omnis voluptas, dolores hic quod asperiores magni quae minus!' },
-    { id: 2, name: 'Core Crusher', exercises: 8, duration: 20, difficulty: 'Advanced', type: 'stretching', description: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nisi tenetur facere explicabo culpa, accusamus libero assumenda! Laboriosam quidem repellendus dicta autem omnis voluptas, dolores hic quod asperiores magni quae minus!' },
-    { id: 3, name: 'Cardio Burn', exercises: 12, duration: 25, difficulty: 'Beginner', type: 'cardio', description: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nisi tenetur facere explicabo culpa, accusamus libero assumenda! Laboriosam quidem repellendus dicta autem omnis voluptas, dolores hic quod asperiores magni quae minus!' },
-    { id: 2, name: 'Core Crusher', exercises: 8, duration: 20, difficulty: 'Advanced', type: 'stretching', description: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nisi tenetur facere explicabo culpa, accusamus libero assumenda! Laboriosam quidem repellendus dicta autem omnis voluptas, dolores hic quod asperiores magni quae minus!' },
-    { id: 3, name: 'Cardio Burn', exercises: 12, duration: 25, difficulty: 'Beginner', type: 'cardio', description: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nisi tenetur facere explicabo culpa, accusamus libero assumenda! Laboriosam quidem repellendus dicta autem omnis voluptas, dolores hic quod asperiores magni quae minus!' },
-  ]);
+  const [predefinedWorkouts, setPredefinedWorkouts] = useState([]);
   const fadeAnim = useRef(predefinedWorkouts.map(() => new Animated.Value(1))).current;
   const translateYAnim = useRef(predefinedWorkouts.map(() => new Animated.Value(0))).current;
+
+  useEffect(() => {
+    const fetchWorkouts = async () => {
+      try {
+        const workoutsCollection = collection(db, 'default_workouts');
+        const workoutsSnapshot = await getDocs(workoutsCollection);
+    
+        const workouts = await Promise.all(
+          workoutsSnapshot.docs.map(async (doc) => {
+            const workoutData = doc.data();
+            const exerciseSubCollection = collection(db, `default_workouts/${doc.id}/exercise_id`);
+            const exerciseSnapshot = await getDocs(exerciseSubCollection);
+    
+            const exercises = exerciseSnapshot.docs.map((exerciseDoc) => ({
+              id: exerciseDoc.id,
+              ...exerciseDoc.data(),
+            }));
+    
+            return { id: doc.id, ...workoutData, exercises };
+          })
+        );
+    
+        setPredefinedWorkouts(workouts);
+      } catch (error) {
+        console.error('Error fetching workouts:', error);
+      }
+    };    
+
+    fetchWorkouts();
+  }, []);
 
   useEffect(() => {
     fadeAnim.current = predefinedWorkouts.map(() => new Animated.Value(1));
@@ -195,8 +216,7 @@ export default function Workouts() {
             >
               <WorkoutCard
                 name={workout.name}
-                exercises={workout.exercises}
-                duration={workout.duration}
+                exercises={workout.exercises.length}
                 difficulty={workout.difficulty}
                 type={workout.type}
                 onPress={() => handleWorkoutPress(index)}
