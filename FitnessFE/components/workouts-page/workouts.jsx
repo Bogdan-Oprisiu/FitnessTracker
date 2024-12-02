@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { View, Image, Animated, ScrollView, Text, TouchableOpacity, Dimensions } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -6,7 +6,7 @@ import WorkoutCard from './workout-card/workout-card';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../config/firebase-config';
 import styles from './workouts.style';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 
 const { height } = Dimensions.get('window');
 
@@ -22,35 +22,37 @@ export default function Workouts() {
   const fadeAnim = useRef(predefinedWorkouts.map(() => new Animated.Value(1))).current;
   const translateYAnim = useRef(predefinedWorkouts.map(() => new Animated.Value(0))).current;
 
-  useEffect(() => {
-    const fetchWorkouts = async () => {
-      try {
-        const workoutsCollection = collection(db, 'default_workouts');
-        const workoutsSnapshot = await getDocs(workoutsCollection);
-    
-        const workouts = await Promise.all(
-          workoutsSnapshot.docs.map(async (doc) => {
-            const workoutData = doc.data();
-            const exerciseSubCollection = collection(db, `default_workouts/${doc.id}/exercise_id`);
-            const exerciseSnapshot = await getDocs(exerciseSubCollection);
-    
-            const exercises = exerciseSnapshot.docs.map((exerciseDoc) => ({
-              id: exerciseDoc.id,
-              ...exerciseDoc.data(),
-            }));
-    
-            return { id: doc.id, ...workoutData, exercises };
-          })
-        );
-    
-        setPredefinedWorkouts(workouts);
-      } catch (error) {
-        console.error('Error fetching workouts:', error);
-      }
-    };    
+  const fetchWorkouts = async () => {
+    try {
+      const workoutsCollection = collection(db, 'default_workouts');
+      const workoutsSnapshot = await getDocs(workoutsCollection);
+  
+      const workouts = await Promise.all(
+        workoutsSnapshot.docs.map(async (doc) => {
+          const workoutData = doc.data();
+          const exerciseSubCollection = collection(db, `default_workouts/${doc.id}/exercise_id`);
+          const exerciseSnapshot = await getDocs(exerciseSubCollection);
+  
+          const exercises = exerciseSnapshot.docs.map((exerciseDoc) => ({
+            id: exerciseDoc.id,
+            ...exerciseDoc.data(),
+          }));
+  
+          return { id: doc.id, ...workoutData, exercises };
+        })
+      );
+  
+      setPredefinedWorkouts(workouts);
+    } catch (error) {
+      console.error('Error fetching workouts:', error);
+    }
+  };    
 
-    fetchWorkouts();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchWorkouts();
+    }, [])
+  );
 
   useEffect(() => {
     fadeAnim.current = predefinedWorkouts.map(() => new Animated.Value(1));
@@ -105,20 +107,28 @@ export default function Workouts() {
   };
 
   const handleDelete = (index) => {
+    if (predefinedWorkouts.length === 1) {
+      setPredefinedWorkouts([]);
+      setEditMode(false);
+      setShakingCardIndex(null);
+      shakeAnim.setValue(0);
+      return;
+    }
+  
     Animated.timing(fadeAnim[index], {
       toValue: 0,
       duration: 300,
       useNativeDriver: true,
     }).start(() => {
       const updatedWorkouts = predefinedWorkouts.filter((_, i) => i !== index);
-
+  
       updatedWorkouts.forEach((_, i) => {
         Animated.spring(translateYAnim[i], {
           toValue: 0,
           useNativeDriver: true,
         }).start();
       });
-
+  
       fadeAnim.splice(index, 1);
       translateYAnim.splice(index, 1);
       setPredefinedWorkouts(updatedWorkouts);
@@ -128,7 +138,7 @@ export default function Workouts() {
   };
 
   const handleEdit = (index) => {
-    console.log(`Edit workout at index ${index}`);
+    navigation.navigate('EditWorkout', { workout: predefinedWorkouts[index] });
   };
 
   const textLeftPosition = scrollY.interpolate({
@@ -185,6 +195,14 @@ export default function Workouts() {
         Your Workouts
       </Animated.Text>
 
+      {predefinedWorkouts.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>No workouts available. Add one!</Text>
+          <TouchableOpacity style={styles.addWorkoutButton}>
+            <Text style={styles.addWorkoutText}>+ Add Workout</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
       <ScrollView
         contentContainerStyle={styles.cardsContainer}
         style={{ marginTop: 100, height }}
@@ -233,6 +251,7 @@ export default function Workouts() {
           <Text style={styles.addWorkoutText}>+ Add Personalized Workout</Text>
         </TouchableOpacity>
       </ScrollView>
+      )}
     </View>
   );
 }

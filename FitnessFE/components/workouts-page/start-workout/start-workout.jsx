@@ -5,7 +5,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { ActivityIndicator } from 'react-native';
 import DraggableFlatList from 'react-native-draggable-flatlist';
-import { collection, getDocs, getDoc, doc, writeBatch, query, orderBy } from 'firebase/firestore';
+import { collection, getDocs, getDoc, doc, writeBatch, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { db } from '../../config/firebase-config';
 import styles from './start-workout.style';
 
@@ -17,6 +17,7 @@ export default function StartWorkout({ route }) {
   const { workout } = route.params;
   const navigation = useNavigation();
   const [exercises, setExercises] = useState([]);
+  const [workoutName, setWorkoutName] = useState(workout.name);
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const scrollY = useRef(new Animated.Value(0)).current;
   const [exercisesScrollEnabled, setExercisesScrollEnabled] = useState(false);
@@ -138,6 +139,22 @@ export default function StartWorkout({ route }) {
       });
     }
   }, [exercises]);
+
+  useEffect(() => {
+    const workoutDocRef = doc(db, `default_workouts/${workout.id}`);
+    
+    const unsubscribe = onSnapshot(workoutDocRef, (docSnapshot) => {
+      if (docSnapshot.exists()) {
+        const data = docSnapshot.data();
+        setWorkoutName(data.name); 
+        console.log('Workout name updated in UI:', data.name);
+      } else {
+        console.warn('Workout document does not exist!');
+      }
+    });
+
+    return () => unsubscribe();
+  }, [workout.id]);
   
 
   const toggleDropdown = (index) => {
@@ -319,7 +336,7 @@ export default function StartWorkout({ route }) {
                   { transform: [{ translateY: titleTranslateY }] },
                 ]}
               >
-                {workout.name}
+                {workoutName}
               </Animated.Text>
               <Animated.View style={{ opacity: fadeOutOpacity, marginTop: 10 }}>
                 <Text style={styles.workoutDescription}>

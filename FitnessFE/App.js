@@ -15,6 +15,7 @@ import AppLoading from 'expo-app-loading';
 import StartWorkout from './components/workouts-page/start-workout/start-workout';
 import ExercisePage from './components/workouts-page/exercise/exercise';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import EditWorkout from './components/workouts-page/edit-workout/edit-workout';
 
 const Stack = createNativeStackNavigator();
 
@@ -68,6 +69,11 @@ export default function App() {
                 <Stack.Screen
                   name='ExercisePage'
                   component={ExercisePage}
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name='EditWorkout'
+                  component={EditWorkout}
                   options={{ headerShown: false }}
                 />
               </Stack.Navigator>
