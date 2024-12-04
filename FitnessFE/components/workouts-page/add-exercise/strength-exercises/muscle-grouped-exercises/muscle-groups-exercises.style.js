@@ -120,7 +120,87 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontWeight: 'bold',
         fontSize: 16,
-    },      
+    },   
+    setModalContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    setsModalButtonsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'space-between',
+        gap: 5
+    },
+    setModalContent: {
+        width: '80%',
+        backgroundColor: '#111',
+        borderRadius: 10,
+        padding: 20,
+        alignItems: 'center',
+    },
+    setModalTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 15,
+        color: '#fff',
+        textAlign: 'center',
+    },
+    setInput: {
+        width: '100%',
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 5,
+        padding: 10,
+        fontSize: 16,
+        color: '#fff',
+        marginBottom: 20,
+        textAlign: 'center',
+    },
+    confirmButton: {
+        backgroundColor: '#6a0dad',
+        padding: 10,
+        borderRadius: 5,
+        alignItems: 'center',
+        marginBottom: 10,
+        width: '50%',
+    },
+    confirmButtonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    cancelButton: {
+        backgroundColor: 'red',
+        padding: 10,
+        borderRadius: 5,
+        alignItems: 'center',
+        marginBottom: 10,
+        width: '50%',
+    },
+    cancelButtonText: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#fff',
+    },  
+    infoTextContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 10,
+        paddingHorizontal: 10,
+    },
+    infoText: {
+        marginTop: 20,
+        fontSize: 14,
+        fontStyle: 'italic',
+        color: '#888',
+        textAlign: 'center',
+    },
+    infoIcon: {
+        marginRight: 5,
+        marginTop: 20
+    }
 });
 
 export default styles;
