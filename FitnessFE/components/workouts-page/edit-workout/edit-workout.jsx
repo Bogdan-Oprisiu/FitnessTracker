@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ActivityIndicator, Animated, Modal, TextInput, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import DraggableFlatList from 'react-native-draggable-flatlist';
+import { useNavigation } from '@react-navigation/native';
 import { getDoc, doc, collection, deleteDoc, query, orderBy, getDocs, updateDoc, writeBatch, onSnapshot } from 'firebase/firestore';
 import { db } from '../../config/firebase-config';
 import styles from './edit-workout.style';
 
-export default function EditWorkout({ route, navigation }) {
+export default function EditWorkout({ route }) {
   const { workout } = route.params;
+  const navigation = useNavigation();
   const [exercises, setExercises] = useState(workout.exercises);
   const [loading, setLoading] = useState(true);
   const [isDraggable, setIsDraggable] = useState(false);
@@ -83,9 +85,36 @@ export default function EditWorkout({ route, navigation }) {
     return () => unsubscribe();
   }, [workout.id]);
 
+  useEffect(() => {
+    const exercisesRef = collection(
+      db,
+      `default_workouts/${workout.id}/exercise_id`
+    );
+    const orderedExercisesQuery = query(exercisesRef, orderBy('order'));
+  
+    const unsubscribe = onSnapshot(orderedExercisesQuery, async (snapshot) => {
+      const updatedExercises = await Promise.all(
+        snapshot.docs.map(async (doc) => {
+          const exerciseData = doc.data();
+          const details = await fetchExerciseDetails(doc.id);
+          return {
+            id: doc.id,
+            ...exerciseData,
+            ...details,
+          };
+        })
+      );
+  
+      setExercises(updatedExercises.filter(Boolean));
+    });
+  
+    return () => unsubscribe();
+  }, [workout.id]);
+  
+
   const handleNameEdit = async () => {
     if (!workoutName.trim()) {
-      Alert.alert('Error', 'Workout name cannot be empty.');
+      Alert.alert('Error', 'Workout name cannot be empty.');   // should be a toast, hoepfully i dont forget
       return;
     }
 
@@ -228,7 +257,7 @@ export default function EditWorkout({ route, navigation }) {
   };
 
   const handleAddExercise = () => {
-    console.log('Navigate to Add Exercise Page');
+    navigation.navigate('AddExercisePage', { workoutId: workout.id });  
   };
 
   const toggleDraggable = async () => {

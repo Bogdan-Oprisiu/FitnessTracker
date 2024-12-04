@@ -30,6 +30,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 20,
+    paddingRight: 5
   },
   workoutDescription: {
     fontSize: 16,
