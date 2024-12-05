@@ -5,6 +5,7 @@ import { setDoc, doc, getDocs, query, orderBy, collection } from 'firebase/fires
 import Toast from 'react-native-toast-message';
 import { db } from '../../../../config/firebase-config';
 import styles from './muscle-groups-exercises.style';
+import { ScrollView } from 'react-native-gesture-handler';
 
 export default function MuscleGroupExercises({ route }) {
   const { muscleGroup, workoutExerciseIds: initialExerciseIds = [], workoutId } = route.params;
@@ -281,15 +282,17 @@ export default function MuscleGroupExercises({ route }) {
           <Animated.View style={[styles.modalContainer, { opacity: fadeAnim }]}>
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>{currentExerciseInfo?.name}</Text>
-              <Text style={styles.modalDescription}>{currentExerciseInfo?.description}</Text>
-              {currentExerciseInfo?.video && (
-                <TouchableOpacity onPress={() => alert('Navigate to video')}>
-                  <Text style={styles.videoLink}>Watch Tutorial</Text>
+              <ScrollView style={styles.modalDescriptionContainer}>
+                <Text style={styles.modalDescription}>{currentExerciseInfo?.instructions}</Text>
+              </ScrollView>
+              <View style={styles.modalButtonsContainer}>
+                <TouchableOpacity onPress={() => console.log('Video pressed')} style={styles.videoButton}>
+                  <Text style={styles.videoButtonText}>Watch Tutorial</Text>
                 </TouchableOpacity>
-              )}
-              <TouchableOpacity onPress={fadeOutModal} style={styles.closeButton}>
-                <Text style={styles.closeButtonText}>Close</Text>
-              </TouchableOpacity>
+                <TouchableOpacity onPress={fadeOutModal} style={styles.closeButton}>
+                  <Text style={styles.closeButtonText}>Close</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </Animated.View>
         </Modal>
@@ -308,7 +311,7 @@ export default function MuscleGroupExercises({ route }) {
                 value={setsInput}
                 onChangeText={setSetsInput}
               />
-              <View style={styles.setsModalButtonsContainer}>
+              <View style={styles.modalButtonsContainer}>
                 <TouchableOpacity
                   style={styles.confirmButton}
                   onPress={confirmAddExercise}

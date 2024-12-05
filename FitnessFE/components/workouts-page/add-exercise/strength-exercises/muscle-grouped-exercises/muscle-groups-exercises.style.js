@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
     },
     modalContent: {
         width: '80%',
-        backgroundColor: '#fff',
+        backgroundColor: '#111',
         borderRadius: 10,
         padding: 20,
         alignItems: 'center',
@@ -98,12 +98,18 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: 'bold',
         marginBottom: 10,
+        color: '#fff',
+        textAlign: 'center'
+    },
+    modalDescriptionContainer: {
+        height: 200,
+        marginBottom: 15
     },
     modalDescription: {
         fontSize: 16,
-        color: '#333',
+        color: '#888',
         marginBottom: 10,
-        textAlign: 'center',
+        textAlign: 'center'
     },
     videoLink: {
         color: '#6a0dad',
@@ -111,10 +117,26 @@ const styles = StyleSheet.create({
         fontSize: 16,
         marginBottom: 10,
     },
-    closeButton: {
+    videoButton: {
         backgroundColor: '#6a0dad',
         padding: 10,
         borderRadius: 5,
+        alignItems: 'center',
+        marginBottom: 10,
+        width: '50%',
+    },
+    videoButtonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    closeButton: {
+        backgroundColor: 'red',
+        padding: 10,
+        borderRadius: 5,
+        alignItems: 'center',
+        marginBottom: 10,
+        width: '50%',
     },
     closeButtonText: {
         color: '#fff',
@@ -127,7 +149,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
-    setsModalButtonsContainer: {
+    modalButtonsContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'space-between',

@@ -6,6 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import { getDoc, doc, collection, deleteDoc, query, orderBy, getDocs, updateDoc, writeBatch, onSnapshot } from 'firebase/firestore';
 import { db } from '../../config/firebase-config';
 import styles from './edit-workout.style';
+import { ScrollView } from 'react-native-gesture-handler';
 
 export default function EditWorkout({ route }) {
   const { workout } = route.params;
@@ -325,17 +326,19 @@ export default function EditWorkout({ route }) {
             </View>
 
             {isDraggable ? (
+              <ScrollView style={{ paddingRight: 20, paddingLeft: 20 }}>
                 <DraggableFlatList
                     data={exercises}
                     keyExtractor={(item, index) => `${item.id}-${index}`}
+                    scrollEnabled={false}
                     renderItem={({ item, index, drag, isActive }) => (
                     <TouchableOpacity
                         style={[
                             styles.exerciseCard,
                             isActive && { backgroundColor: '#6a0dad' },
                         ]}
-                        onPressIn={drag}
                         onPress={toggleDraggable}
+                        onPressIn={drag}
                     >
                     <MaterialIcons
                         name="drag-handle"
@@ -345,12 +348,13 @@ export default function EditWorkout({ route }) {
                     />
                     <Text style={styles.exerciseText}>{item.name}</Text>
                     </TouchableOpacity>
-                )}
-                onDragEnd={({ data }) => setExercises(data)}
-                contentContainerStyle={{ paddingBottom: 20 }}
-            />
+                    )}
+                  onDragEnd={({ data }) => setExercises(data)}
+                  contentContainerStyle={{ paddingBottom: 20 }}
+                />
+                </ScrollView>
             ) : (
-                <View>
+                <ScrollView>
                     {exercises.map((exercise, index) => (
                         <TouchableOpacity onLongPress={toggleDraggable} key={exercise.id}>
                             <View style={styles.exerciseCard}>
@@ -371,7 +375,7 @@ export default function EditWorkout({ route }) {
                             </View>
                         </TouchableOpacity>
                     ))}
-                </View>
+                </ScrollView>
             )}
 
             {isModalVisible && (
@@ -403,7 +407,7 @@ export default function EditWorkout({ route }) {
             )}
 
             <View style={styles.reorderHintContainer}>
-                <MaterialIcons name="info" size={18} color="#888" style={styles.infoIcon} />
+                <MaterialIcons name="info-outline" size={18} color="#6a0dad" style={styles.infoIcon} />
                 <Text style={styles.reorderHint}>
                     {isDraggable
                         ? 'Tap an exercise card after reordering to toggle off.'

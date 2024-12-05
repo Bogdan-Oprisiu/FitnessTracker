@@ -1,34 +1,43 @@
 import React from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import styles from './cardio-exercises.style';
 
-const dummyCardioExercises = [
-  { id: '1', name: 'Running' },
-  { id: '2', name: 'Cycling' },
-  { id: '3', name: 'Jumping Jacks' },
-  { id: '4', name: 'Burpees' },
+const difficultyLevels = [
+  { id: 'beginner', name: 'Beginner' },
+  { id: 'intermediate', name: 'Intermediate' },
+  { id: 'advanced', name: 'Advanced' },
 ];
 
-export default function CardioExercises() {
-  const handleAddExercise = (exercise) => {
-    alert(`Added ${exercise.name}`);
+export default function CardioExercises({ navigation, route }) {
+  const { workoutId, workoutExerciseIds, onExerciseAdded } = route.params;
+
+  const handleDifficultyPress = async (level) => {
+    const exercisesRef = collection(db, `default_workouts/${workoutId}/exercise_id`);
+    const snapshot = await getDocs(exercisesRef);
+    const updatedWorkoutExerciseIds = snapshot.docs.map((doc) => doc.id);
+
+    navigation.navigate('DifficultyFilteredExercises', {
+      difficulty: level,
+      workoutExerciseIds: updatedWorkoutExerciseIds,
+      workoutId,
+      onExerciseAdded
+    });
   };
 
   return (
     <View style={styles.container}>
+      <Text style={styles.title}>Cardio Exercises by Difficulty</Text>
       <FlatList
-        data={dummyCardioExercises}
+        data={difficultyLevels}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <View style={styles.exerciseCard}>
-            <Text style={styles.exerciseName}>{item.name}</Text>
-            <TouchableOpacity
-              style={styles.addButton}
-              onPress={() => handleAddExercise(item)}
-            >
-              <Text style={styles.addButtonText}>Add</Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity
+            style={styles.difficultyCard}
+            onPress={() => handleDifficultyPress(item.id)}
+          >
+            <Text style={styles.difficultyText}>{item.name}</Text>
+          </TouchableOpacity>
         )}
       />
     </View>

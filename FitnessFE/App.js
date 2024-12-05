@@ -18,6 +18,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import EditWorkout from './components/workouts-page/edit-workout/edit-workout';
 import AddExercise from './components/workouts-page/add-exercise/add-exercise';
 import MuscleGroupExercises from './components/workouts-page/add-exercise/strength-exercises/muscle-grouped-exercises/muscle-grouped-exercises';
+import DifficultyFilteredExercises from './components/workouts-page/add-exercise/difficulty-filtered-exercises/difficulty-filtered-exercises';
 
 const Stack = createNativeStackNavigator();
 
@@ -86,6 +87,11 @@ export default function App() {
                 <Stack.Screen
                   name='MuscleGroupExercises'
                   component={MuscleGroupExercises}
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name='DifficultyFilteredExercises'
+                  component={DifficultyFilteredExercises}
                   options={{ headerShown: false }}
                 />
               </Stack.Navigator>

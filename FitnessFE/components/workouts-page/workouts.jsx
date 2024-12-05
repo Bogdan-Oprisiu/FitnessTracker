@@ -139,6 +139,8 @@ export default function Workouts() {
 
   const handleEdit = (index) => {
     navigation.navigate('EditWorkout', { workout: predefinedWorkouts[index] });
+    setEditMode(false);
+    setShakingCardIndex(null);
   };
 
   const textLeftPosition = scrollY.interpolate({
