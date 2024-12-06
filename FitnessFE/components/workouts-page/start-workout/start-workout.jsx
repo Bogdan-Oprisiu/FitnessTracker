@@ -18,6 +18,7 @@ export default function StartWorkout({ route }) {
   const navigation = useNavigation();
   const [exercises, setExercises] = useState([]);
   const [workoutName, setWorkoutName] = useState(workout.name);
+  const [workoutDescription, setWorkoutDescription] = useState(workout.description);
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const scrollY = useRef(new Animated.Value(0)).current;
   const [exercisesScrollEnabled, setExercisesScrollEnabled] = useState(false);
@@ -340,7 +341,9 @@ export default function StartWorkout({ route }) {
               </Animated.Text>
               <Animated.View style={{ opacity: fadeOutOpacity, marginTop: 10 }}>
                 <Text style={styles.workoutDescription}>
-                  A high-intensity workout targeting all major muscle groups.
+                {workoutDescription && workoutDescription.trim()
+                  ? workoutDescription
+                  : "No description available for this workout."}
                 </Text>
               </Animated.View>
 

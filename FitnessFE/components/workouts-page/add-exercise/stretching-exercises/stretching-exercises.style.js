@@ -6,29 +6,21 @@ const styles = StyleSheet.create({
       backgroundColor: 'black',
       padding: 10,
     },
-    exerciseCard: {
+    difficultyCard: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
       backgroundColor: '#333',
-      padding: 15,
-      marginBottom: 10,
+      padding: 20,
       borderRadius: 5,
+      marginBottom: 10,
     },
-    exerciseName: {
+    difficultyText: {
       color: '#fff',
       fontSize: 16,
+      fontWeight: 'bold',
     },
-    addButton: {
-      backgroundColor: '#6a0dad',
-      paddingVertical: 5,
-      paddingHorizontal: 15,
-      borderRadius: 5,
-    },
-    addButtonText: {
-      color: '#fff',
-      fontSize: 14,
-    },
+    
 });
-  
+
 export default styles;

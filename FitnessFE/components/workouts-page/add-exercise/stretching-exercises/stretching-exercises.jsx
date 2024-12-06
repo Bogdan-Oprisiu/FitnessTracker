@@ -1,34 +1,49 @@
 import React from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity } from 'react-native';
+import { db } from '../../../config/firebase-config';
+import { collection, getDocs } from 'firebase/firestore';
+import { MaterialIcons } from '@expo/vector-icons';
 import styles from './stretching-exercises.style';
 
-const dummyStretchingExercises = [
-  { id: '1', name: 'Forward Bend' },
-  { id: '2', name: 'Seated Hamstring Stretch' },
-  { id: '3', name: 'Child’s Pose' },
-  { id: '4', name: 'Cat-Cow Stretch' },
+const difficultyLevels = [
+  { id: 'beginner', name: 'Beginner' },
+  { id: 'intermediate', name: 'Intermediate' },
 ];
 
-export default function StretchingExercises() {
-  const handleAddExercise = (exercise) => {
-    alert(`Added ${exercise.name}`);
+export default function StretchingExercises({ navigation, route }) {
+  const { workoutId, workoutExerciseIds, onExerciseAdded } = route.params;
+
+  const handleDifficultyPress = async (level) => {
+    const exercisesRef = collection(db, `default_workouts/${workoutId}/exercise_id`);
+    const snapshot = await getDocs(exercisesRef);
+    const updatedWorkoutExerciseIds = snapshot.docs.map((doc) => doc.id);
+
+    navigation.navigate('DifficultyFilteredExercises', {
+      difficulty: level,
+      workoutExerciseIds: updatedWorkoutExerciseIds,
+      workoutId,
+      onExerciseAdded,
+      exerciseType: 'stretching'
+    });
   };
 
   return (
     <View style={styles.container}>
       <FlatList
-        data={dummyStretchingExercises}
+        data={difficultyLevels}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <View style={styles.exerciseCard}>
-            <Text style={styles.exerciseName}>{item.name}</Text>
-            <TouchableOpacity
-              style={styles.addButton}
-              onPress={() => handleAddExercise(item)}
-            >
-              <Text style={styles.addButtonText}>Add</Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity
+            style={styles.difficultyCard}
+            onPress={() => handleDifficultyPress(item.id)}
+          >
+            <Text style={styles.difficultyText}>{item.name}</Text>
+            <MaterialIcons
+                name="keyboard-arrow-right"
+                size={32}
+                color="#6a0dad"
+            />
+          </TouchableOpacity>
         )}
       />
     </View>

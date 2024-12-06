@@ -36,7 +36,8 @@ export default function StrengthExercises({ navigation, route }) {
         muscleGroup: group,
         workoutExerciseIds: updatedWorkoutExerciseIds,
         workoutId,
-        onExerciseAdded
+        onExerciseAdded,
+        exerciseType: 'stretching'
       });
   };
 

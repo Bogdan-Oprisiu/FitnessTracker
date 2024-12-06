@@ -18,7 +18,9 @@ export default function EditWorkout({ route }) {
   const [currentSetCount, setCurrentSetCount] = useState(0);
   const [currentExerciseIndex, setCurrentExerciseIndex] = useState(null);
   const [workoutName, setWorkoutName] = useState(workout.name);
+  const [workoutDescription, setWorkoutDescription] = useState(workout.description || '');
   const [isEditingName, setIsEditingName] = useState(false);
+  const [isEditingDescription, setIsEditingDescription] = useState(false);
   const [fadeAnim] = useState(new Animated.Value(0));
 
   const handleEditExercise = (index) => {
@@ -131,6 +133,17 @@ export default function EditWorkout({ route }) {
       setLoading(false);
       setIsEditingName(false);
     }
+  };
+
+  const handleDescriptionEdit = async () => {
+    try {
+      const workoutDocRef = doc(db, `default_workouts/${workout.id}`);
+      await updateDoc(workoutDocRef, { description: workoutDescription });
+    } catch (error) {
+      console.error('Error updating workout description:', error);
+      alert('Failed to update workout description.');
+    }
+    setIsEditingDescription(false);
   };
 
   const handleDismissKeyboard = () => {
@@ -323,6 +336,31 @@ export default function EditWorkout({ route }) {
                     <MaterialIcons name="edit" size={16} color="#fff" />
                 </TouchableOpacity>
                 )}
+            </View>
+
+            <View style={styles.descriptionContainer}>
+              {isEditingDescription ? (
+                <View style={styles.inputWrapper}>
+                  <TextInput
+                    style={styles.input}
+                    value={workoutDescription}
+                    onChangeText={(text) => setWorkoutDescription(text.slice(0, 100))}
+                    onBlur={handleDescriptionEdit}
+                    placeholder="Enter workout description"
+                    placeholderTextColor="#fff"
+                    autoFocus
+                  />
+                  <Text style={styles.counter}>{workoutDescription.length}/100</Text>
+                </View>
+              ) : (
+                <TouchableOpacity
+                  style={styles.descriptionWrapper}
+                  onPress={() => setIsEditingDescription(true)}
+                >
+                  <Text style={styles.description}>{workoutDescription || 'Add a description'}</Text>
+                  <MaterialIcons name="edit" size={16} color="#fff" />
+                </TouchableOpacity>
+              )}
             </View>
 
             {isDraggable ? (

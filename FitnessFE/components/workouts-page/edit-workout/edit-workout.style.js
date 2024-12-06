@@ -9,7 +9,6 @@ const styles = StyleSheet.create({
     titleContainer: {
         alignItems: 'center',
         marginTop: 50,
-        marginBottom: 50,
     },
     titleWrapper: {
         flexDirection: 'row',
@@ -30,13 +29,39 @@ const styles = StyleSheet.create({
         padding: 10,
         textAlign: 'center',
     },
+    descriptionContainer: {
+        marginVertical: 10,
+        paddingHorizontal: 15,
+        justifyContent: 'center',
+        alignItems: 'center',
+        textAlign: 'center',
+        marginBottom: 50
+    },
+    descriptionWrapper: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    description: {
+        fontSize: 16,
+        color: '#fff',
+        marginRight: 10,
+        textAlign: 'center'
+    },
+    input: {
+        backgroundColor: '#444',
+        color: '#fff',
+        padding: 10,
+        borderRadius: 5,
+        fontSize: 16,
+    },
     counter: {
         position: 'absolute',
-        bottom: 33,
-        right: 15,
-        color: '#ccc',
-        fontSize: 14,
-    },
+        bottom: 20,
+        right: 10,
+        fontSize: 12,
+        color: '#aaa',
+    },      
     inputWrapper: {
         position: 'relative',
         width: '80%',

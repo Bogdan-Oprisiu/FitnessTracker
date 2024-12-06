@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
   contentContainer: {
     alignItems: 'center',
     paddingTop: 20,
-    paddingBottom: 40,
+    paddingBottom: 25,
   },
   workoutName: {
     fontSize: 50,

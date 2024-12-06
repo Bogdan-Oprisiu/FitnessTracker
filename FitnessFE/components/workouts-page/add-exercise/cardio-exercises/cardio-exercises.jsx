@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Text, FlatList, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { db } from '../../../config/firebase-config';
+import { collection, getDocs } from 'firebase/firestore';
+import { MaterialIcons } from '@expo/vector-icons';
 import styles from './cardio-exercises.style';
 
 const difficultyLevels = [
@@ -21,13 +23,13 @@ export default function CardioExercises({ navigation, route }) {
       difficulty: level,
       workoutExerciseIds: updatedWorkoutExerciseIds,
       workoutId,
-      onExerciseAdded
+      onExerciseAdded,
+      exerciseType: 'cardio'
     });
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Cardio Exercises by Difficulty</Text>
       <FlatList
         data={difficultyLevels}
         keyExtractor={(item) => item.id}
@@ -37,6 +39,11 @@ export default function CardioExercises({ navigation, route }) {
             onPress={() => handleDifficultyPress(item.id)}
           >
             <Text style={styles.difficultyText}>{item.name}</Text>
+            <MaterialIcons
+                name="keyboard-arrow-right"
+                size={32}
+                color="#6a0dad"
+            />
           </TouchableOpacity>
         )}
       />

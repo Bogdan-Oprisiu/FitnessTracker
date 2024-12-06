@@ -2,29 +2,29 @@ import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
     container: {
-      flex: 1,
-      backgroundColor: 'black',
-      padding: 10,
+        flex: 1,
+        backgroundColor: 'black',
+        padding: 10,
     },
     loadingContainer: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: '#000'
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#000'
     },
     loadingText: {
-      marginTop: 20,
-      fontSize: 16,
-      color: '#6a0dad',
-      fontWeight: 'bold',
+        marginTop: 20,
+        fontSize: 16,
+        color: '#6a0dad',
+        fontWeight: 'bold',
     },
     title: {
-      color: '#fff',
-      fontSize: 32,
-      fontWeight: 'bold',
-      textAlign: 'center',
-      marginBottom: 20,
-      marginTop: 50
+        color: '#fff',
+        fontSize: 32,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        marginBottom: 20,
+        marginTop: 50
     },
     exerciseCard: {
         flexDirection: 'row',
