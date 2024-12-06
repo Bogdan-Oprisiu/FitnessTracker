@@ -1,10 +1,10 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { View, Image, Animated, ScrollView, Text, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Image, Animated, ScrollView, Text, TouchableOpacity, Dimensions, Alert } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import WorkoutCard from './workout-card/workout-card';
-import { collection, getDocs } from 'firebase/firestore';
-import { db } from '../config/firebase-config';
+import { collection, getDocs, addDoc, serverTimestamp, doc, deleteDoc } from 'firebase/firestore';
+import { db, auth } from '../config/firebase-config';
 import styles from './workouts.style';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 
@@ -18,36 +18,72 @@ export default function Workouts() {
   const [editMode, setEditMode] = useState(false);
   const [shakingCardIndex, setShakingCardIndex] = useState(null);
   const shakeAnim = useRef(new Animated.Value(0)).current;
-  const [predefinedWorkouts, setPredefinedWorkouts] = useState([]);
-  const fadeAnim = useRef(predefinedWorkouts.map(() => new Animated.Value(1))).current;
-  const translateYAnim = useRef(predefinedWorkouts.map(() => new Animated.Value(0))).current;
+  const [workouts, setWorkouts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const fadeAnim = useRef(workouts.map(() => new Animated.Value(1))).current;
+  const translateYAnim = useRef(workouts.map(() => new Animated.Value(0))).current;
+
+  const fetchExerciseCount = async (workoutId, source, userId = null) => {
+    try {
+      let exercisesRef;
+      if (source === "default") {
+        exercisesRef = collection(db, `default_workouts/${workoutId}/exercise_id`);
+      } else if (source === "personalized" && userId) {
+        exercisesRef = collection(db, `users/${userId}/personalized_workouts/${workoutId}/exercise_id`);
+      }
+  
+      const snapshot = await getDocs(exercisesRef);
+      return snapshot.size;
+    } catch (error) {
+      console.error(`Error fetching exercises for workout ${workoutId}:`, error);
+      return 0;
+    }
+  };
 
   const fetchWorkouts = async () => {
     try {
-      const workoutsCollection = collection(db, 'default_workouts');
-      const workoutsSnapshot = await getDocs(workoutsCollection);
+      const user = auth.currentUser;
+      const defaultWorkoutsCollection = collection(db, "default_workouts");
+      const personalizedWorkoutsCollection = user
+        ? collection(db, `users/${user.uid}/personalized_workouts`)
+        : null;
   
-      const workouts = await Promise.all(
-        workoutsSnapshot.docs.map(async (doc) => {
-          const workoutData = doc.data();
-          const exerciseSubCollection = collection(db, `default_workouts/${doc.id}/exercise_id`);
-          const exerciseSnapshot = await getDocs(exerciseSubCollection);
+      const [defaultWorkoutsSnapshot, personalizedWorkoutsSnapshot] = await Promise.all([
+        getDocs(defaultWorkoutsCollection),
+        personalizedWorkoutsCollection ? getDocs(personalizedWorkoutsCollection) : Promise.resolve({ docs: [] }),
+      ]);
   
-          const exercises = exerciseSnapshot.docs.map((exerciseDoc) => ({
-            id: exerciseDoc.id,
-            ...exerciseDoc.data(),
-          }));
-  
-          return { id: doc.id, ...workoutData, exercises };
+      const defaultWorkouts = await Promise.all(
+        defaultWorkoutsSnapshot.docs.map(async (doc) => {
+          const exerciseCount = await fetchExerciseCount(doc.id, "default");
+          return {
+            id: doc.id,
+            ...doc.data(),
+            source: "default",
+            exerciseCount,
+          };
         })
       );
   
-      setPredefinedWorkouts(workouts);
+      const personalizedWorkouts = await Promise.all(
+        personalizedWorkoutsSnapshot.docs.map(async (doc) => {
+          const exerciseCount = await fetchExerciseCount(doc.id, "personalized", user.uid);
+          return {
+            id: doc.id,
+            ...doc.data(),
+            source: "personalized",
+            exerciseCount,
+          };
+        })
+      );
+  
+      const combinedWorkouts = [...defaultWorkouts, ...personalizedWorkouts];
+      setWorkouts(combinedWorkouts);
     } catch (error) {
-      console.error('Error fetching workouts:', error);
+      console.error("Error fetching workouts:", error);
     }
-  };    
-
+  };
+  
   useFocusEffect(
     useCallback(() => {
       fetchWorkouts();
@@ -55,8 +91,8 @@ export default function Workouts() {
   );
 
   useEffect(() => {
-    fadeAnim.current = predefinedWorkouts.map(() => new Animated.Value(1));
-  }, [predefinedWorkouts]);
+    fadeAnim.current = workouts.map(() => new Animated.Value(1));
+  }, [workouts]);
 
   useEffect(() => {
     Animated.timing(imageOpacity, {
@@ -102,45 +138,72 @@ export default function Workouts() {
     if (editMode) {
       stopShaking();
     } else {
-      navigation.navigate('StartWorkout', { workout: predefinedWorkouts[index] });
+      navigation.navigate('StartWorkout', { workout: workouts[index] });
     }
   };
 
-  const handleDelete = (index) => {
-    if (predefinedWorkouts.length === 1) {
-      setPredefinedWorkouts([]);
-      setEditMode(false);
-      setShakingCardIndex(null);
-      shakeAnim.setValue(0);
-      return;
+  const handleDelete = async (index) => {
+    const workoutToDelete = workouts[index];
+    const user = auth.currentUser;
+
+    stopShaking();
+  
+    if (!workoutToDelete) return;
+  
+    try {
+      const docPath =
+        workoutToDelete.source === "personalized"
+          ? `users/${user.uid}/personalized_workouts/${workoutToDelete.id}`
+          : `default_workouts/${workoutToDelete.id}`;
+  
+      await deleteDoc(doc(db, docPath));
+      const updatedWorkouts = workouts.filter((_, i) => i !== index);
+      setWorkouts(updatedWorkouts);
+    } catch (error) {
+      console.error("Error deleting workout:", error);
+      Alert.alert("Error", "Failed to delete workout. Please try again.");
     }
-  
-    Animated.timing(fadeAnim[index], {
-      toValue: 0,
-      duration: 300,
-      useNativeDriver: true,
-    }).start(() => {
-      const updatedWorkouts = predefinedWorkouts.filter((_, i) => i !== index);
-  
-      updatedWorkouts.forEach((_, i) => {
-        Animated.spring(translateYAnim[i], {
-          toValue: 0,
-          useNativeDriver: true,
-        }).start();
-      });
-  
-      fadeAnim.splice(index, 1);
-      translateYAnim.splice(index, 1);
-      setPredefinedWorkouts(updatedWorkouts);
-      setEditMode(false);
-      setShakingCardIndex(null);
-    });
   };
+  
 
   const handleEdit = (index) => {
-    navigation.navigate('EditWorkout', { workout: predefinedWorkouts[index] });
+    navigation.navigate('EditWorkout', { workout: workouts[index] });
     setEditMode(false);
     setShakingCardIndex(null);
+  };
+
+  const handleAddPersonalizedWorkout = async () => {
+    const user = auth.currentUser;
+
+    if (!user || !user.uid) {
+      Alert.alert('Error', 'You must be logged in to create a workout.');
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const workoutsRef = collection(db, `users/${user.uid}/personalized_workouts`);
+      const workoutDoc = await addDoc(workoutsRef, {
+        name: '',
+        description: '',
+        difficulty: '',
+        type: '',
+        createdAt: serverTimestamp(),
+      });
+
+      console.log('Created personalized workout:', workoutDoc.id);
+
+      navigation.navigate('AddPersonalizedWorkout', {
+        workoutId: workoutDoc.id,
+        userId: user.uid,
+      });
+    } catch (error) {
+      console.error('Error creating personalized workout:', error);
+      Alert.alert('Error', 'Could not create workout. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const textLeftPosition = scrollY.interpolate({
@@ -197,7 +260,7 @@ export default function Workouts() {
         Your Workouts
       </Animated.Text>
 
-      {predefinedWorkouts.length === 0 ? (
+      {workouts.length === 0 ? (
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyText}>No workouts available. Add one!</Text>
           <TouchableOpacity style={styles.addWorkoutButton}>
@@ -215,7 +278,7 @@ export default function Workouts() {
           { useNativeDriver: false }
         )}
       >
-        {predefinedWorkouts.map((workout, index) => {
+        {workouts.map((workout, index) => {
           const isShaking = shakingCardIndex === index;
           return (
             <Animated.View
@@ -236,7 +299,7 @@ export default function Workouts() {
             >
               <WorkoutCard
                 name={workout.name}
-                exercises={workout.exercises.length}
+                exercises={workout.exerciseCount}
                 difficulty={workout.difficulty}
                 type={workout.type}
                 onPress={() => handleWorkoutPress(index)}
@@ -249,7 +312,7 @@ export default function Workouts() {
           );
         })}
 
-        <TouchableOpacity style={styles.addWorkoutButton}>
+        <TouchableOpacity style={styles.addWorkoutButton} onPress={handleAddPersonalizedWorkout}>
           <Text style={styles.addWorkoutText}>+ Add Personalized Workout</Text>
         </TouchableOpacity>
       </ScrollView>

@@ -4,13 +4,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#000',
   },
   title: {
-    fontSize: 20,
+    fontSize: 25,
     fontWeight: 'bold',
     marginBottom: 20,
-    color: '#333',
+    marginTop: 50,
+    textAlign: 'center',
+    color: '#ccc',
   },
   input: {
     borderWidth: 1,
@@ -19,7 +21,7 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 10,
     fontSize: 16,
-    color: '#333',
+    color: '#ccc',
   },
   descriptionInput: {
     height: 80,
@@ -39,7 +41,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
-    color: '#333',
+    color: '#ccc',
   },
   exerciseCard: {
     flexDirection: 'row',
@@ -47,14 +49,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 10,
     borderWidth: 1,
-    borderColor: '#ccc',
     borderRadius: 8,
     marginBottom: 10,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#333',
   },
   exerciseName: {
     fontSize: 16,
-    color: '#333',
+    color: '#fff',
   },
   removeButton: {
     marginLeft: 10,
@@ -78,7 +79,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   saveButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#6a0dad',
     padding: 15,
     borderRadius: 8,
     alignItems: 'center',
@@ -90,7 +91,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   disabledButton: {
-    backgroundColor: '#ccc',
+    backgroundColor: '#555',
   },
 });
 

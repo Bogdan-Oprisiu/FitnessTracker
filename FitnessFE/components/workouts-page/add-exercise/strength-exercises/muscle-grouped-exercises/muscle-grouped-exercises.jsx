@@ -8,7 +8,7 @@ import styles from './muscle-groups-exercises.style';
 import { ScrollView } from 'react-native-gesture-handler';
 
 export default function MuscleGroupExercises({ route }) {
-  const { muscleGroup, workoutExerciseIds: initialExerciseIds = [], workoutId } = route.params;
+  const { muscleGroup, workoutExerciseIds: initialExerciseIds = [], workoutId, workoutSource, userId } = route.params;
   const [workoutExerciseIds, setWorkoutExerciseIds] = useState(initialExerciseIds);
   const [exercises, setExercises] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -59,20 +59,31 @@ export default function MuscleGroupExercises({ route }) {
 
   const confirmAddExercise = async () => {
     try {
-      const exercisesRef = collection(db, `default_workouts/${workoutId}/exercise_id`);
-
+      console.log("Adding exercise...");
+      console.log("Workout Source:", workoutSource);
+      console.log("User ID:", userId);
+      console.log("Workout ID:", workoutId);
+  
+      let exercisesRef;
+  
+      if (workoutSource === 'default') {
+        exercisesRef = collection(db, `default_workouts/${workoutId}/exercise_id`);
+      } else if (workoutSource === 'personalized' && userId) {
+        exercisesRef = collection(db, `users/${userId}/personalized_workouts/${workoutId}/exercise_id`);
+      }
+  
       const currentExercisesSnapshot = await getDocs(query(exercisesRef, orderBy('order')));
       const currentExercises = currentExercisesSnapshot.docs.map((doc) => doc.data());
-      const nextOrder = currentExercises.length;
-
-      const exerciseDocRef = doc(db, `default_workouts/${workoutId}/exercise_id/${currentExercise.id}`);
+      const nextOrder = currentExercises.length || 0;
+  
+      const exerciseDocRef = doc(exercisesRef, currentExercise.id);
       await setDoc(exerciseDocRef, {
         sets: parseInt(setsInput, 10),
         order: nextOrder,
       });
-
+    
       route.params.onExerciseAdded(currentExercise.id);
-
+  
       Toast.show({
         type: 'success',
         text1: `${currentExercise.name} Added Successfully`,
@@ -80,7 +91,7 @@ export default function MuscleGroupExercises({ route }) {
         visibilityTime: 5000,
         autoHide: true,
       });
-
+  
       setWorkoutExerciseIds((prevIds) => [...prevIds, currentExercise.id]);
       setSetModalVisible(false);
     } catch (error) {
@@ -95,7 +106,7 @@ export default function MuscleGroupExercises({ route }) {
       });
     }
   };
-
+  
   const handleToggleSelection = (exerciseId) => {
     if (workoutExerciseIds.includes(exerciseId)) {
       return;
@@ -126,14 +137,25 @@ export default function MuscleGroupExercises({ route }) {
 
   const handleAddSelectedExercises = async () => {
     try {
-      const exercisesRef = collection(db, `default_workouts/${workoutId}/exercise_id`);
+      let exercisesRef;
+      if (workoutSource === 'default') {
+        exercisesRef = collection(db, `default_workouts/${workoutId}/exercise_id`);
+      } else if (workoutSource === 'personalized' && userId) {
+        exercisesRef = collection(
+          db,
+          `users/${userId}/personalized_workouts/${workoutId}/exercise_id`
+        );
+      }
   
       const currentExercisesSnapshot = await getDocs(query(exercisesRef, orderBy('order')));
       const currentExercises = currentExercisesSnapshot.docs.map((doc) => doc.data());
       let nextOrder = currentExercises.length;
   
       for (const exerciseId of selectedExercises) {
-        const exerciseDocRef = doc(db, `default_workouts/${workoutId}/exercise_id/${exerciseId}`);
+        const exerciseDocRef = doc(
+          exercisesRef,
+          exerciseId
+        );
         await setDoc(exerciseDocRef, {
           sets: 1,
           order: nextOrder++,

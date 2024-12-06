@@ -4,7 +4,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import DraggableFlatList from 'react-native-draggable-flatlist';
 import { useNavigation } from '@react-navigation/native';
 import { getDoc, doc, collection, deleteDoc, query, orderBy, getDocs, updateDoc, writeBatch, onSnapshot } from 'firebase/firestore';
-import { db } from '../../config/firebase-config';
+import { db, auth } from '../../config/firebase-config';
 import styles from './edit-workout.style';
 import { ScrollView } from 'react-native-gesture-handler';
 
@@ -22,6 +22,37 @@ export default function EditWorkout({ route }) {
   const [isEditingName, setIsEditingName] = useState(false);
   const [isEditingDescription, setIsEditingDescription] = useState(false);
   const [fadeAnim] = useState(new Animated.Value(0));
+  const user = auth.currentUser;
+  const basePath =
+    workout.source === 'personalized' && user
+      ? `users/${user.uid}/personalized_workouts/${workout.id}`
+      : `default_workouts/${workout.id}`;
+
+  useEffect(() => {
+    const fetchExercises = async () => {
+      try {
+        const exercisesRef = collection(db, `${basePath}/exercise_id`);
+        const exercisesQuery = query(exercisesRef, orderBy('order'));
+        const snapshot = await getDocs(exercisesQuery);
+
+        const detailedExercises = await Promise.all(
+          snapshot.docs.map(async (doc) => {
+            const exerciseData = doc.data();
+            const details = await fetchExerciseDetails(doc.id);
+            return { id: doc.id, ...exerciseData, ...details };
+          })
+        );
+
+        setExercises(detailedExercises.filter(Boolean));
+      } catch (error) {
+        console.error('Error fetching exercises:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchExercises();
+  }, [basePath]);
 
   const handleEditExercise = (index) => {
     setCurrentSetCount(exercises[index].sets);
@@ -57,7 +88,7 @@ export default function EditWorkout({ route }) {
       try {
         const exerciseDocRef = doc(
           db,
-          `default_workouts/${workout.id}/exercise_id/${exercise.id}`
+          `${basePath}/exercise_id/${exercise.id}`
         );
         await updateDoc(exerciseDocRef, { sets: exercise.sets });
         console.log('Exercise sets updated in Firestore');
@@ -73,7 +104,7 @@ export default function EditWorkout({ route }) {
   };
 
   useEffect(() => {
-    const workoutDocRef = doc(db, `default_workouts/${workout.id}`);
+    const workoutDocRef = doc(db, basePath);
     
     const unsubscribe = onSnapshot(workoutDocRef, (docSnapshot) => {
       if (docSnapshot.exists()) {
@@ -91,7 +122,7 @@ export default function EditWorkout({ route }) {
   useEffect(() => {
     const exercisesRef = collection(
       db,
-      `default_workouts/${workout.id}/exercise_id`
+      `${basePath}/exercise_id`
     );
     const orderedExercisesQuery = query(exercisesRef, orderBy('order'));
   
@@ -123,7 +154,7 @@ export default function EditWorkout({ route }) {
 
     setLoading(true);
     try {
-      const workoutDocRef = doc(db, `default_workouts/${workout.id}`);
+      const workoutDocRef = doc(db, basePath);
       await updateDoc(workoutDocRef, { name: workoutName });
       console.log('Workout name updated successfully in Firestore.');
     } catch (error) {
@@ -137,7 +168,7 @@ export default function EditWorkout({ route }) {
 
   const handleDescriptionEdit = async () => {
     try {
-      const workoutDocRef = doc(db, `default_workouts/${workout.id}`);
+      const workoutDocRef = doc(db, basePath);
       await updateDoc(workoutDocRef, { description: workoutDescription });
     } catch (error) {
       console.error('Error updating workout description:', error);
@@ -158,7 +189,7 @@ export default function EditWorkout({ route }) {
       try {
         const exercisesRef = collection(
           db,
-          `default_workouts/${workout.id}/exercise_id`
+          `${basePath}/exercise_id`
         );
         const orderedExercisesQuery = query(exercisesRef, orderBy('order'));
         const exercisesSnapshot = await getDocs(orderedExercisesQuery);
@@ -260,7 +291,7 @@ export default function EditWorkout({ route }) {
     try {
       const exerciseDocRef = doc(
         db,
-        `default_workouts/${workout.id}/exercise_id/${exercise.id}`
+        `${basePath}/exercise_id/${exercise.id}`
       );
       await deleteDoc(exerciseDocRef);
       console.log('Exercise deleted from Firestore');
@@ -271,7 +302,7 @@ export default function EditWorkout({ route }) {
   };
 
   const handleAddExercise = () => {
-    navigation.navigate('AddExercisePage', { workoutId: workout.id });  
+    navigation.navigate('AddExercisePage', { workoutId: workout.id, workoutSource: workout.source });  
   };
 
   const toggleDraggable = async () => {
@@ -288,7 +319,7 @@ export default function EditWorkout({ route }) {
     
           const batch = writeBatch(db);
           updatedExercises.forEach((exercise) => {
-            const exerciseRef = doc(db, `default_workouts/${workout.id}/exercise_id/${exercise.id}`);
+            const exerciseRef = doc(db, `${basePath}/exercise_id/${exercise.id}`);
             batch.update(exerciseRef, { order: exercise.order });
           });
     

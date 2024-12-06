@@ -25,10 +25,20 @@ const muscleGroups = [
 ];
 
 export default function StrengthExercises({ navigation, route }) {
-  const { workoutId, workoutExerciseIds, onExerciseAdded } = route.params;
+  const { workoutId, workoutExerciseIds, onExerciseAdded, workoutSource, userId } = route.params;
     
   const handleMuscleGroupPress = async (group) => {
-    const exercisesRef = collection(db, `default_workouts/${workoutId}/exercise_id`);
+    let exercisesRef;
+    
+    if (workoutSource === 'default') {
+      exercisesRef = collection(db, `default_workouts/${workoutId}/exercise_id`);
+    } else if (workoutSource === 'personalized' && userId) {
+      exercisesRef = collection(db, `users/${userId}/personalized_workouts/${workoutId}/exercise_id`);
+    } else {
+      console.warn('Invalid workout source or userId is missing.');
+      return;
+    }
+
     const snapshot = await getDocs(exercisesRef);
     const updatedWorkoutExerciseIds = snapshot.docs.map((doc) => doc.id);
 
@@ -37,7 +47,9 @@ export default function StrengthExercises({ navigation, route }) {
         workoutExerciseIds: updatedWorkoutExerciseIds,
         workoutId,
         onExerciseAdded,
-        exerciseType: 'stretching'
+        exerciseType: 'strength',
+        workoutSource,
+        userId
       });
   };
 

@@ -7,7 +7,7 @@ import { db } from '../../../config/firebase-config';
 import styles from './difficulty-filtered-exercises.style';
 
 export default function DifficultyFilteredExercises({ route }) {
-  const { difficulty, workoutId, workoutExerciseIds: initialExerciseIds = [], exerciseType } = route.params;
+  const { difficulty, workoutId, workoutExerciseIds: initialExerciseIds = [], exerciseType, workoutSource, userId } = route.params;
   const [exercises, setExercises] = useState([]);
   const [workoutExerciseIds, setWorkoutExerciseIds] = useState(initialExerciseIds);
   const [loading, setLoading] = useState(true);
@@ -89,17 +89,28 @@ export default function DifficultyFilteredExercises({ route }) {
 
   const confirmAddExercise = async () => {
     try {
-      const exercisesRef = collection(db, `default_workouts/${workoutId}/exercise_id`);
-
-      const currentExercisesSnapshot = await getDocs(exercisesRef);
+      let exercisesRef;
+      let currentExercisesSnapshot;
+  
+      if (workoutSource === 'default') {
+        exercisesRef = collection(db, `default_workouts/${workoutId}/exercise_id`);
+        currentExercisesSnapshot = await getDocs(exercisesRef);
+      } else if (workoutSource === 'personalized' && userId) {
+        exercisesRef = collection(db, `users/${userId}/personalized_workouts/${workoutId}/exercise_id`);
+        currentExercisesSnapshot = await getDocs(exercisesRef);
+      } else {
+        console.warn('Invalid workout source or userId is missing.');
+        return;
+      }
+  
       const nextOrder = currentExercisesSnapshot.size;
-
-      const exerciseDocRef = doc(db, `default_workouts/${workoutId}/exercise_id/${currentExercise.id}`);
+  
+      const exerciseDocRef = doc(exercisesRef, currentExercise.id);
       await setDoc(exerciseDocRef, {
         sets: parseInt(setsInput, 10),
         order: nextOrder,
       });
-
+  
       Toast.show({
         type: 'success',
         text1: `${currentExercise.name} Added Successfully`,
@@ -107,7 +118,7 @@ export default function DifficultyFilteredExercises({ route }) {
         visibilityTime: 5000,
         autoHide: true,
       });
-
+  
       setWorkoutExerciseIds((prevIds) => [...prevIds, currentExercise.id]);
       setSetModalVisible(false);
     } catch (error) {
@@ -121,18 +132,27 @@ export default function DifficultyFilteredExercises({ route }) {
         autoHide: true,
       });
     }
-  };
+  };  
 
   const handleAddSelectedExercises = async () => {
     try {
-      const exercisesRef = collection(db, `default_workouts/${workoutId}/exercise_id`);
+      let exercisesRef;
+  
+      if (workoutSource === 'default') {
+        exercisesRef = collection(db, `default_workouts/${workoutId}/exercise_id`);
+      } else if (workoutSource === 'personalized' && userId) {
+        exercisesRef = collection(db, `users/${userId}/personalized_workouts/${workoutId}/exercise_id`);
+      } else {
+        console.warn('Invalid workout source or userId is missing.');
+        return;
+      }
   
       const currentExercisesSnapshot = await getDocs(query(exercisesRef, orderBy('order')));
       const currentExercises = currentExercisesSnapshot.docs.map((doc) => doc.data());
       let nextOrder = currentExercises.length;
   
       for (const exerciseId of selectedExercises) {
-        const exerciseDocRef = doc(db, `default_workouts/${workoutId}/exercise_id/${exerciseId}`);
+        const exerciseDocRef = doc(exercisesRef, exerciseId);
         await setDoc(exerciseDocRef, {
           sets: 1,
           order: nextOrder++,
@@ -153,7 +173,7 @@ export default function DifficultyFilteredExercises({ route }) {
         autoHide: true,
       });
     }
-  };
+  };  
 
   const handleToggleSelection = (exerciseId) => {
     if (workoutExerciseIds.includes(exerciseId)) return;

@@ -40,9 +40,9 @@ export default function WorkoutCard({ name, exercises, difficulty, type, onPress
 
   const renderStars = () => {
     let starCount = 0;
-    if (difficulty === 'Beginner') starCount = 1;
-    else if (difficulty === 'Intermediate') starCount = 2;
-    else if (difficulty === 'Advanced') starCount = 3;
+    if (difficulty.toLowerCase() === 'beginner') starCount = 1;
+    else if (difficulty.toLowerCase() === 'intermediate') starCount = 2;
+    else if (difficulty.toLowerCase() === 'advanced') starCount = 3;
 
     return (
       <View style={styles.starsContainer}>
@@ -86,7 +86,7 @@ export default function WorkoutCard({ name, exercises, difficulty, type, onPress
           ]}
         >
           <TouchableOpacity onPress={onDelete} style={styles.actionButton}>
-            <MaterialIcons name="remove-circle" size={24} color="red" />
+            <MaterialIcons name="delete" size={24} color="red" />
           </TouchableOpacity>
           <TouchableOpacity onPress={onEdit} style={styles.actionButton}>
             <MaterialIcons name="edit" size={24} color="yellow" />

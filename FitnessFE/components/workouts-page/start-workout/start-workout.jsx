@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import { ActivityIndicator } from 'react-native';
 import DraggableFlatList from 'react-native-draggable-flatlist';
 import { collection, getDocs, getDoc, doc, writeBatch, query, orderBy, onSnapshot } from 'firebase/firestore';
-import { db } from '../../config/firebase-config';
+import { db, auth } from '../../config/firebase-config';
 import styles from './start-workout.style';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -29,29 +29,34 @@ export default function StartWorkout({ route }) {
   const [loading, setLoading] = useState(true);
   const [isEditMode, setIsEditMode] = useState(false);
   const workoutImage =
-    workout.type === 'Strength'
+    workout.type.toLowerCase() === 'strength'
       ? require('../../../assets/images/start-workout-strength-background.webp')
-      : workout.type === 'Cardio'
+      : workout.type.toLowerCase() === 'cardio'
       ? require('../../../assets/images/start-workout-cardio-background.webp')
       : require('../../../assets/images/start-workout-stretching-background.webp');
 
   useEffect(() => {
     const fetchWorkoutExercises = async () => {
       try {
-        const exerciseCollection = collection(db, `default_workouts/${workout.id}/exercise_id`);
+        const exercisesPath =
+          workout.source === 'default'
+            ? `default_workouts/${workout.id}/exercise_id`
+            : `users/${auth.currentUser?.uid}/personalized_workouts/${workout.id}/exercise_id`;
+  
+        const exerciseCollection = collection(db, exercisesPath);
         const exerciseQuery = query(exerciseCollection, orderBy('order'));
         const exerciseSnapshot = await getDocs(exerciseQuery);
-    
+  
         const exerciseDetails = await Promise.all(
           exerciseSnapshot.docs.map(async (doc) => {
             const exerciseId = doc.id;
             const sets = doc.data().sets;
-
+  
             const exercise = await fetchExerciseDetails(exerciseId);
             return { id: exerciseId, sets, ...exercise };
           })
         );
-    
+  
         setExercises(exerciseDetails);
       } catch (error) {
         console.error('Error fetching workout exercises:', error);
@@ -59,7 +64,7 @@ export default function StartWorkout({ route }) {
         setLoading(false);
       }
     };
-
+  
     fetchWorkoutExercises();
   }, [workout]);
 
@@ -142,20 +147,29 @@ export default function StartWorkout({ route }) {
   }, [exercises]);
 
   useEffect(() => {
-    const workoutDocRef = doc(db, `default_workouts/${workout.id}`);
-    
-    const unsubscribe = onSnapshot(workoutDocRef, (docSnapshot) => {
-      if (docSnapshot.exists()) {
-        const data = docSnapshot.data();
-        setWorkoutName(data.name); 
-        console.log('Workout name updated in UI:', data.name);
-      } else {
-        console.warn('Workout document does not exist!');
-      }
+    const exercisesPath =
+      workout.source === 'default'
+        ? `default_workouts/${workout.id}/exercise_id`
+        : `users/${auth.currentUser?.uid}/personalized_workouts/${workout.id}/exercise_id`;
+  
+    const exerciseCollection = collection(db, exercisesPath);
+  
+    const unsubscribe = onSnapshot(query(exerciseCollection, orderBy('order')), async (snapshot) => {
+      const exerciseDetails = await Promise.all(
+        snapshot.docs.map(async (doc) => {
+          const exerciseId = doc.id;
+          const sets = doc.data().sets;
+  
+          const exercise = await fetchExerciseDetails(exerciseId);
+          return { id: exerciseId, sets, ...exercise };
+        })
+      );
+  
+      setExercises(exerciseDetails);
     });
-
+  
     return () => unsubscribe();
-  }, [workout.id]);
+  }, [workout]);  
   
 
   const toggleDropdown = (index) => {
@@ -234,8 +248,21 @@ export default function StartWorkout({ route }) {
         setExercises(updatedExercises);
   
         const batch = writeBatch(db);
+
         updatedExercises.forEach((exercise) => {
-          const exerciseRef = doc(db, `default_workouts/${workout.id}/exercise_id/${exercise.id}`);
+          let exerciseRef;
+
+          if (workout.source === 'default') {
+            exerciseRef = doc(db, `default_workouts/${workout.id}/exercise_id/${exercise.id}`);
+          } else if (workout.source === 'personalized' && auth.currentUser) {
+            exerciseRef = doc(
+              db,
+              `users/${auth.currentUser.uid}/personalized_workouts/${workout.id}/exercise_id/${exercise.id}`
+            );
+          } else {
+            console.warn('Invalid workout source or user is not authenticated.');
+            return;
+          }
           batch.update(exerciseRef, { order: exercise.order });
         });
   

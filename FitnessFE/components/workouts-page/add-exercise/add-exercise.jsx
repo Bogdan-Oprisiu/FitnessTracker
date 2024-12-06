@@ -3,6 +3,7 @@ import { View, Text, ActivityIndicator } from 'react-native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../config/firebase-config';
+import { auth } from '../../config/firebase-config';
 import StrengthExercises from './strength-exercises/strength-exercises';
 import CardioExercises from './cardio-exercises/cardio-exercises';
 import StretchingExercises from './stretching-exercises/stretching-exercises';
@@ -10,13 +11,19 @@ import StretchingExercises from './stretching-exercises/stretching-exercises';
 const Tab = createMaterialTopTabNavigator();
 
 export default function AddExercisePage({ route, navigation }) {
-  const { workoutId } = route.params;
+  const { workoutId, workoutSource } = route.params;
   const [workoutExerciseIds, setWorkoutExerciseIds] = useState(null);
+  const user = auth.currentUser;
 
   useEffect(() => {
     const fetchWorkoutExerciseIds = async () => {
       try {
-        const exercisesRef = collection(db, `default_workouts/${workoutId}/exercise_id`);
+        let exercisesRef;
+        if (workoutSource === 'default') {
+          exercisesRef = collection(db, `default_workouts/${workoutId}/exercise_id`);
+        } else if (workoutSource === 'personalized' && user) {
+          exercisesRef = collection(db, `users/${user.uid}/personalized_workouts/${workoutId}/exercise_id`);
+        }
         const snapshot = await getDocs(exercisesRef);
         if (!snapshot.empty) {
           const ids = snapshot.docs.map((doc) => doc.id);
@@ -57,17 +64,38 @@ export default function AddExercisePage({ route, navigation }) {
       <Tab.Screen
         name="Strength"
         component={StrengthExercises}
-        initialParams={{ workoutId, workoutExerciseIds, onExerciseAdded: handleExerciseAdded, }}
+        initialParams={{
+          workoutId,
+          workoutExerciseIds,
+          workoutType: 'strength',
+          workoutSource,
+          userId: user?.uid,
+          onExerciseAdded: handleExerciseAdded,
+        }}
       />
       <Tab.Screen
         name="Cardio"
         component={CardioExercises}
-        initialParams={{ workoutId, workoutExerciseIds, onExerciseAdded: handleExerciseAdded, }}
+        initialParams={{
+          workoutId,
+          workoutExerciseIds,
+          workoutType: 'cardio',
+          workoutSource,
+          userId: user?.uid,
+          onExerciseAdded: handleExerciseAdded,
+        }}
       />
       <Tab.Screen
         name="Stretching"
         component={StretchingExercises}
-        initialParams={{ workoutId, workoutExerciseIds, onExerciseAdded: handleExerciseAdded, }}
+        initialParams={{
+          workoutId,
+          workoutExerciseIds,
+          workoutType: 'stretching',
+          workoutSource,
+          userId: user?.uid,
+          onExerciseAdded: handleExerciseAdded,
+        }}
       />
     </Tab.Navigator>
   );
