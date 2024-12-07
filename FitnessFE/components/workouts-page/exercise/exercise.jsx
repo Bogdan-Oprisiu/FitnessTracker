@@ -7,11 +7,14 @@ import * as Progress from 'react-native-progress';
 import AnimatedHeart from '../../animated-components/heart-animation';
 import { useHeartRate } from '../../heart-rate-provider';
 import { useWorkout } from '../../workout-provider';
+import { db, auth } from '../../config/firebase-config';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import Toast from 'react-native-toast-message';
 import styles from './exercise.style';
 
 export default function ExercisePage({ route }) {
   const navigation = useNavigation();
-  const { exercises, currentIndex } = route.params;
+  const { workoutId, exercises, currentIndex, source } = route.params;
   const { completeWorkout } = useWorkout();
   const [currentExerciseIndex, setCurrentExerciseIndex] = useState(currentIndex || 0);
   const [currentSet, setCurrentSet] = useState(0);
@@ -87,10 +90,38 @@ export default function ExercisePage({ route }) {
     setRestDuration(0);
   }
 
-  const handleFinishWorkout = () => {
-    setTimeout(() => {
-      completeWorkout();
-    }, 500);
+  const handleFinishWorkout = async () => {
+    try{
+      const user = auth.currentUser;
+      if (!user) {
+        console.log('No user is signed in');
+        return;
+      }
+
+      const completedWorkoutsRef = collection(db, 'users', user.uid, 'completed_workouts');
+
+      await addDoc(completedWorkoutsRef, {
+        workoutId: workoutId,
+        dateCompleted: new Date(),
+        source: source
+      });
+
+      await completeWorkout();
+
+      Toast.show({
+        type: 'success',
+        text1: 'Workout Completed!',
+        text2: 'Your workout has been logged.',
+      });
+    } catch (error) {
+      console.error('Error completing workout:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Could not complete workout.',
+      });
+    }
+
     navigation.navigate('Home');
   };
 

@@ -7,7 +7,7 @@ const WorkoutContext = createContext();
 export const useWorkout = () => useContext(WorkoutContext);
 
 export const WorkoutProvider = ({ children }) => {
-  const [goal, setGoal] = useState(3); // weekly workout goal, default is 3 workouts per week
+  const [goal, setGoal] = useState(5); // weekly workout goal, default is 3 workouts per week
   const [workoutsCompleted, setWorkoutsCompleted] = useState(0);
   const confettiRef = useRef(null);
 
@@ -33,7 +33,7 @@ export const WorkoutProvider = ({ children }) => {
   };
 
   return (
-    <WorkoutContext.Provider value={{ goal, workoutsCompleted, completeWorkout, confettiRef }}>
+    <WorkoutContext.Provider value={{ goal, workoutsCompleted, setWorkoutsCompleted, completeWorkout, confettiRef }}>
       {children}
     </WorkoutContext.Provider>
   );

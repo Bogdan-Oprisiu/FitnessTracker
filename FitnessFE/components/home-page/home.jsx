@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Animated, Dimensions, Modal, Image } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Animated, Dimensions, Modal, Image, ActivityIndicator, FlatList } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Progress from 'react-native-progress';
 import Confetti from 'react-native-confetti';
@@ -9,17 +9,31 @@ import Toast from 'react-native-toast-message';
 import { BlurView } from 'expo-blur';
 import WeeklyProgress from './weekly-progress/weekly-progress';
 import { useWorkout } from '../workout-provider';
+import { db, auth } from '../config/firebase-config';
+import { collection, query, where, getDocs, onSnapshot, doc, getDoc } from 'firebase/firestore';
+import { useRoute } from '@react-navigation/native';
 import Widget from '../widgets-template';
 import styles from './home.style';
 
 const { width } = Dimensions.get('window');
 
 export default function Home() {
-  const { workoutsCompleted, goal, completeWorkout } = useWorkout();
+  const route = useRoute();
+  const { workoutsCompleted, setWorkoutsCompleted, goal, completeWorkout } = useWorkout();
   const [confettiVisible, setConfettiVisible] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
+  const [markedDates, setMarkedDates] = useState({});
+  const [completedDays, setCompletedDays] = useState([]);
   const confettiRef = useRef(null);
   const scrollY = useRef(new Animated.Value(0)).current;
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedDate, setSelectedDate] = useState('');
+  const [workoutsForDate, setWorkoutsForDate] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const backgroundOpacity = useRef(new Animated.Value(0)).current;
+  const modalOpacity = useRef(new Animated.Value(0)).current;
   const backgroundImage = require('../../assets/images/home-background3.webp')
 
   useEffect(() => {
@@ -35,6 +49,122 @@ export default function Home() {
 
   const toggleCalendar = () => {
     setShowCalendar(!showCalendar);
+  };
+
+  const openModal = () => {
+    setModalVisible(true);
+    Animated.parallel([
+      Animated.timing(backgroundOpacity, {
+        toValue: 0.5,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+      Animated.timing(modalOpacity, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+
+  const closeModal = () => {
+    Animated.parallel([
+      Animated.timing(backgroundOpacity, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+      Animated.timing(modalOpacity, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      setModalVisible(false);
+    });
+  };
+
+  const fetchWorkoutsForDate = async (date) => {
+    setLoading(true);
+    setError('');
+    setWorkoutsForDate([]);
+
+    try {
+      const user = auth.currentUser;
+      if (!user) {
+        setError('User not authenticated.');
+        setLoading(false);
+        return;
+      }
+
+      const startOfDay = new Date(date);
+      startOfDay.setHours(0, 0, 0, 0);
+
+      const endOfDay = new Date(date);
+      endOfDay.setHours(23, 59, 59, 999);
+
+      const completedWorkoutsRef = collection(db, 'users', user.uid, 'completed_workouts');
+      const completedWorkoutsQuery = query(
+        completedWorkoutsRef,
+        where('dateCompleted', '>=', startOfDay),
+        where('dateCompleted', '<=', endOfDay)
+      );
+
+      const completedWorkoutsSnapshot = await getDocs(completedWorkoutsQuery);
+
+      if (completedWorkoutsSnapshot.empty) {
+        setWorkoutsForDate([]);
+        setLoading(false);
+        return;
+      }
+
+      const workouts = [];
+
+      for (const docSnap of completedWorkoutsSnapshot.docs) {
+        const data = docSnap.data();
+        const workoutId = data.workoutId;
+        const source = data.source;
+
+        let workoutDocRef;
+
+        if (source === 'default') {
+          workoutDocRef = doc(db, 'default_workouts', workoutId);
+        } else if (source === 'personalized') {
+          workoutDocRef = doc(db, 'users', user.uid, 'personalized_workouts', workoutId);
+        } else {
+          console.warn(`Unknown source '${source}' for workoutId '${workoutId}'`);
+          continue;
+        }
+
+        const workoutSnapshot = await getDoc(workoutDocRef);
+
+        if (workoutSnapshot.exists()) {
+          const workoutData = workoutSnapshot.data();
+          workouts.push({
+            id: workoutSnapshot.id,
+            name: workoutData.name,
+            description: workoutData.description,
+            type: workoutData.type.charAt(0).toUpperCase() + workoutData.type.slice(1),
+            difficulty: workoutData.difficulty.charAt(0).toUpperCase() + workoutData.difficulty.slice(1)
+          });
+        } else {
+          console.warn(`Workout with id '${workoutId}' not found in '${source}_workouts'`);
+        }
+      }
+
+      setWorkoutsForDate(workouts);
+    } catch (err) {
+      console.error('Error fetching workouts for date:', err);
+      setError('Failed to fetch workouts. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDayPress = (day) => {
+    setSelectedDate(day.dateString);
+    openModal();
+    fetchWorkoutsForDate(day.dateString);
   };
 
   const imageOpacity = scrollY.interpolate({
@@ -54,6 +184,80 @@ export default function Home() {
     outputRange: [1, 0],
     extrapolate: 'clamp',
   });
+
+  useEffect(() => {
+    const subscribe = () => {
+      const user = auth.currentUser;
+      if (!user) {
+        console.log('No user is signed in');
+        return;
+      }
+
+      const completedWorkoutsRef = collection(db, 'users', user.uid, 'completed_workouts');
+      const q = query(completedWorkoutsRef);
+
+      const unsubscribe = onSnapshot(
+        q,
+        (querySnapshot) => {
+          const dates = {};
+          let countLastWeek = 0;
+
+          const now = new Date();
+          const oneWeekAgo = new Date();
+          oneWeekAgo.setDate(now.getDate() - 6);
+
+          const completedDaysSet = new Set();
+
+          querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            const dateCompleted = data.dateCompleted ? data.dateCompleted.toDate() : null;
+
+            if (dateCompleted) {
+              const dateStr = dateCompleted.toISOString().split('T')[0];
+              dates[dateStr] = { marked: true, dotColor: '#6a0dad' };
+
+              if (dateCompleted >= oneWeekAgo && dateCompleted <= now) {
+                const dayName = dateCompleted.toLocaleDateString('en-US', { weekday: 'short' }); // like 'Mon'
+                completedDaysSet.add(dayName);
+                countLastWeek += 1;
+              }
+            }
+          });
+
+          setMarkedDates(dates);
+          setWorkoutsCompleted(countLastWeek);
+          setCompletedDays(Array.from(completedDaysSet));
+
+          if (route.params?.newCompletionDate) {
+            const newDate = route.params.newCompletionDate.toISOString().split('T')[0];
+            dates[newDate] = { marked: true, dotColor: '#6a0dad' };
+            const newDateObj = new Date(route.params.newCompletionDate);
+            if (newDateObj >= oneWeekAgo && newDateObj <= now) {
+              setWorkoutsCompleted((prev) => prev + 1);
+              const newDayName = newDateObj.toLocaleDateString('en-US', { weekday: 'short' });
+              setCompletedDays((prev) => [...prev, newDayName]);
+            }
+            navigation.setParams({ newCompletionDate: null });
+          }
+        },
+        (error) => {
+          console.error('Error fetching completed workouts:', error);
+          Toast.show({
+            type: 'error',
+            text1: 'Error',
+            text2: 'Could not fetch completed workouts.',
+          });
+        }
+      );
+
+      return unsubscribe;
+    };
+
+    const unsubscribe = subscribe();
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, [route.params?.newCompletionDate]);
   
   return (
     <View style={{ flex: 1 }}>
@@ -150,7 +354,7 @@ export default function Home() {
             </View>
           </View>
 
-          <WeeklyProgress onPress={toggleCalendar} />
+          <WeeklyProgress onPress={toggleCalendar} completedDays={completedDays} />
         </Animated.View>
 
         <View style={styles.widgetsContainer}>
@@ -173,10 +377,7 @@ export default function Home() {
             <View style={styles.modalBackground}>
               <View style={styles.calendarContainer}>
                 <Calendar
-                  markedDates={{
-                    '2024-11-01': { marked: true, dotColor: '#6a0dad' },
-                    '2024-11-02': { marked: true, dotColor: '#6a0dad' },
-                  }}
+                  markedDates={markedDates}
                   theme={{
                     backgroundColor: '#1a1a1a',
                     calendarBackground: '#1a1a1a',
@@ -186,12 +387,58 @@ export default function Home() {
                     monthTextColor: '#6a0dad',
                     arrowColor: '#6a0dad',
                   }}
+                  onDayPress={handleDayPress}
                 />
                 <TouchableOpacity onPress={toggleCalendar} style={styles.closeButton}>
                   <Text style={styles.closeButtonText}>Close</Text>
                 </TouchableOpacity>
               </View>
             </View>
+          </Modal>
+        )}
+
+        {modalVisible && (
+          <Modal
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={closeModal}
+          >
+            <View style={styles.modalBackground}>
+            <Animated.View style={[styles.backgroundOverlay, { opacity: backgroundOpacity }]} />
+
+            <Animated.View style={[styles.modalContainer, { opacity: modalOpacity }]}>
+              <Text style={styles.modalTitle}>
+                Workouts Completed on {selectedDate}
+              </Text>
+              {loading ? (
+                <ActivityIndicator size="large" color="#6a0dad" />
+              ) : error ? (
+                <Text style={styles.errorText}>{error}</Text>
+              ) : workoutsForDate.length === 0 ? (
+                <Text style={styles.noWorkoutsText}>No workouts completed on this day.</Text>
+              ) : (
+                <FlatList
+                  data={workoutsForDate}
+                  keyExtractor={(item) => item.id}
+                  style={{ maxHeight: 350 }}
+                  renderItem={({ item }) => (
+                    <View style={styles.workoutItem}>
+                      <Text style={styles.workoutName}>{item.name}</Text>
+                      <Text style={styles.workoutDetails}>{item.description}</Text>
+                      <Text style={styles.workoutDetails}>Type: {item.type}</Text>
+                      <Text style={styles.workoutDetails}>Difficulty: {item.difficulty}</Text>
+                    </View>
+                  )}
+                />
+              )}
+              <TouchableOpacity
+                onPress={closeModal}
+                style={styles.closeButton}
+              >
+                <Text style={styles.closeButtonText}>Close</Text>
+              </TouchableOpacity>
+            </Animated.View>
+          </View>
           </Modal>
         )}
       </Animated.ScrollView>

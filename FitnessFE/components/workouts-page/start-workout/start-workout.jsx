@@ -498,8 +498,10 @@ export default function StartWorkout({ route }) {
                     style={styles.startWorkoutButton}
                     onPress={() =>
                       navigation.navigate('ExercisePage', {
+                        workoutId: workout.id,
                         exercises,
                         currentIndex: 0,
+                        source: workout.source
                       })
                     }
                   >
@@ -512,7 +514,7 @@ export default function StartWorkout({ route }) {
           <Animated.View style={[styles.startArrow, { opacity: fadeOutOpacity }]}>
             <TouchableOpacity
               onPress={() =>
-                navigation.navigate('ExercisePage', { exercises, currentIndex: 0 })
+                navigation.navigate('ExercisePage', { workoutId: workout.id, exercises, currentIndex: 0, source: workout.source })
               }
             >
               <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>

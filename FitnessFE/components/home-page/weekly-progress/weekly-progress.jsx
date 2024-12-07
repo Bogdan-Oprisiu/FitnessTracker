@@ -4,11 +4,9 @@ import { MaterialIcons } from '@expo/vector-icons';
 
 const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-export default function WeeklyProgress({ onPress }) {
-  const [completedWorkouts, setCompletedWorkouts] = useState(['Mon', 'Thu', 'Sun']);
-
+export default function WeeklyProgress({ onPress, completedDays }) {
   const renderDayItem = ({ item }) => {
-    const isCompleted = completedWorkouts.includes(item);
+    const isCompleted = completedDays.includes(item);
     return (
       <View style={styles.dayContainer}>
         <Text style={styles.dayText}>{item}</Text>
@@ -21,15 +19,15 @@ export default function WeeklyProgress({ onPress }) {
 
   return (
     <View style={styles.weekContainer}>
-        <TouchableOpacity onPress={onPress}>
-            <FlatList
-                data={daysOfWeek}
-                renderItem={renderDayItem}
-                keyExtractor={(item) => item}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-            />
-        </TouchableOpacity>
+      <TouchableOpacity onPress={onPress}>
+        <FlatList
+          data={daysOfWeek}
+          renderItem={renderDayItem}
+          keyExtractor={(item) => item}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+        />
+      </TouchableOpacity>
     </View>
   );
 }
