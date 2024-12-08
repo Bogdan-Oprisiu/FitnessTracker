@@ -204,7 +204,7 @@ export default function Home() {
 
           const now = new Date();
           const oneWeekAgo = new Date();
-          oneWeekAgo.setDate(now.getDate() - 6);
+          oneWeekAgo.setDate(now.getDate() - 7);
 
           const completedDaysSet = new Set();
 
