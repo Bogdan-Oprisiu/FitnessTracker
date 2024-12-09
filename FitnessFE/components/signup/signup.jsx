@@ -123,6 +123,7 @@ export default function Signup() {
     
                     await setDoc(doc(db, 'users', user.uid), {
                         username,
+                        username_lowercase: username.toLowerCase(),
                         email,
                         profilePictureUrl,
                         friendsCount: 0

@@ -5,9 +5,11 @@ import { LinearGradient } from 'expo-linear-gradient';
 import * as ImagePicker from 'expo-image-picker';
 import { MaterialIcons, Ionicons, Feather } from '@expo/vector-icons';
 import { auth, db, storage } from '../config/firebase-config';
-import { getDoc, doc, updateDoc } from 'firebase/firestore';
+import { getDoc, doc, updateDoc, query as firestoreQuery, where, getDocs, collection, addDoc, deleteDoc } from 'firebase/firestore';
 import { getStorage, uploadBytes, getDownloadURL, ref } from 'firebase/storage';
+import { debounce } from 'lodash';
 import { useNavigation } from '@react-navigation/native';
+import Notifications from './notifications/notifications';
 import Toast from 'react-native-toast-message';
 import styles from './profile.style';
 
@@ -21,6 +23,10 @@ export default function Profile() {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [searchResults, setSearchResults] = useState([]);
+  const [loadingUsers, setLoadingUsers] = useState(false);
+  const [friends, setFriends] = useState([]);
+  const [recentActivities, setRecentActivities] = useState([]);
+  const [notificationsModalVisible, setNotificationsModalVisible] = useState(false);
   const scrollY = useRef(new Animated.Value(0)).current;
   const HEADER_HEIGHT = 60;
 
@@ -36,72 +42,18 @@ export default function Profile() {
     extrapolate: 'clamp',
   });
 
-  const user = {
-    username: 'JohnDoe',
-    profilePicture: 'https://via.placeholder.com/150', 
-    friendsCount: 10,
-    friendsList: [
-      {
-        id: '1',
-        username: 'JaneSmith',
-        profilePicture: 'https://via.placeholder.com/100',
-      },
-      {
-        id: '2',
-        username: 'MikeOxlong',
-        profilePicture: 'https://via.placeholder.com/100',
-      },
-      {
-        id: '3',
-        username: 'AliceWonder',
-        profilePicture: 'https://via.placeholder.com/100',
-      },
-    ],
-  };
-
-  const allUsers = [
-    {
-      id: '4',
-      username: 'BobBuilder',
-      profilePicture: 'https://via.placeholder.com/100',
-    },
-    {
-      id: '5',
-      username: 'CharlieBrown',
-      profilePicture: 'https://via.placeholder.com/100',
-    },
-  ];
-
-  const recentActivities = [
-    {
-      id: '1',
-      activity: 'Liked a post',
-      timestamp: '2 hours ago',
-    },
-    {
-      id: '2',
-      activity: 'Commented on a photo',
-      timestamp: 'Yesterday',
-    },
-    {
-      id: '3',
-      activity: 'Completed a workout',
-      timestamp: '2 days ago',
-    },
-  ];
-
   const profileScale = scrollY.interpolate({
     inputRange: [0, 240],
     outputRange: [1, 0.3],
     extrapolate: 'clamp',
   });
-  
+
   const profileTranslateX = scrollY.interpolate({
     inputRange: [0, 240],
     outputRange: [0, -550],
     extrapolate: 'clamp',
   });
-  
+
   const profileTranslateY = scrollY.interpolate({
     inputRange: [0, 240],
     outputRange: [0, -470],
@@ -113,13 +65,13 @@ export default function Profile() {
     outputRange: [1, 0.8],
     extrapolate: 'clamp',
   });
-  
+
   const usernameTranslateX = scrollY.interpolate({
     inputRange: [0, 240],
     outputRange: [0, -125],
     extrapolate: 'clamp',
   });
-  
+
   const usernameTranslateY = scrollY.interpolate({
     inputRange: [0, 240],
     outputRange: [0, -290],
@@ -160,26 +112,6 @@ export default function Profile() {
     setSearchResults([]);
   };
 
-  const handleSearch = (query) => {
-    setSearchQuery(query);
-    if (query.trim() === '') {
-      setSearchResults([]);
-    } else {
-      const results = allUsers.filter((u) =>
-        u.username.toLowerCase().includes(query.toLowerCase())
-      );
-      setSearchResults(results);
-    }
-  };
-
-  const addFriend = (username) => {
-    Toast.show({
-      type: 'success',
-      text1: 'Friend Request Sent',
-      text2: `You have sent a friend request to ${username}.`,
-    });
-  };
-
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -211,7 +143,6 @@ export default function Profile() {
         } 
       } catch (err) {
         console.error('Error fetching user data:', err);
-        setError('Failed to fetch user data.');
       } finally {
         setLoading(false);
       }
@@ -219,6 +150,226 @@ export default function Profile() {
 
     fetchUserData();
   }, []);
+
+  useEffect(() => {
+    const fetchFriends = async () => {
+      try {
+        const currentUser = auth.currentUser;
+        if (!currentUser) return;
+
+        const friendsRef = collection(db, 'users', currentUser.uid, 'friends');
+        const friendsSnapshot = await getDocs(friendsRef);
+
+        const friendIds = [];
+        friendsSnapshot.forEach((docSnap) => {
+          friendIds.push(docSnap.data().friendId);
+        });
+
+        const friendsData = [];
+        for (const friendId of friendIds) {
+          const friendDoc = await getDoc(doc(db, 'users', friendId));
+          if (friendDoc.exists()) {
+            friendsData.push({ id: friendDoc.id, ...friendDoc.data() });
+          }
+        }
+
+        setFriends(friendsData);
+      } catch (error) {
+        console.error('Error fetching friends:', error);
+        Toast.show({
+          type: 'error',
+          text1: 'Error',
+          text2: 'Could not fetch friends. Please try again.',
+          position: 'top',
+          visibilityTime: 5000,
+          autoHide: true,
+        });
+      }
+    };
+
+    if (friendsModalVisible) {
+      fetchFriends();
+    }
+  }, [friendsModalVisible]);
+
+  const [sentRequests, setSentRequests] = useState([]);
+  const [receivedRequests, setReceivedRequests] = useState([]);
+
+  useEffect(() => {
+    const fetchFriendRequests = async () => {
+      const currentUser = auth.currentUser;
+      if (!currentUser) return;
+
+      try {
+        const sentRef = collection(db, 'users', currentUser.uid, 'friendRequests');
+        const qSent = firestoreQuery(sentRef, where('status', '==', 'pending'));
+        const sentSnapshot = await getDocs(qSent);
+        const sent = sentSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setSentRequests(sent);
+        const receivedRef = collection(db, 'users', currentUser.uid, 'friendRequests');
+        const qReceived = firestoreQuery(receivedRef, where('status', '==', 'pending'));
+        const receivedSnapshot = await getDocs(qReceived);
+        const received = receivedSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setReceivedRequests(received);
+      } catch (error) {
+        console.error('Error fetching friend requests:', error);
+      }
+    };
+
+    if (friendsModalVisible) {
+      fetchFriendRequests();
+    }
+  }, [friendsModalVisible]);
+
+  const createQuery = (collectionRef, ...conditions) => {
+    return firestoreQuery(collectionRef, ...conditions);
+  };
+
+  const debouncedHandleSearch = useRef(
+    debounce((input) => {
+      handleSearch(input);
+    }, 500) 
+  ).current;
+
+  const handleSearchInput = (text) => {
+    setSearchQuery(text);
+    debouncedHandleSearch(text);
+  };
+
+  const handleSearch = async (input) => {
+    if (input.trim() === '') {
+      setSearchResults([]);
+      return;
+    }
+
+    try {
+      setLoadingUsers(true);
+
+      const q = createQuery(
+        collection(db, 'users'),
+        where('username_lowercase', '>=', input.toLowerCase()),
+        where('username_lowercase', '<=', input.toLowerCase() + '\uf8ff')
+      );
+
+      const querySnapshot = await getDocs(q);
+
+      const fetchedUsers = [];
+      querySnapshot.forEach((docSnap) => {
+        if (docSnap.id !== auth.currentUser.uid) { 
+          fetchedUsers.push({ id: docSnap.id, ...docSnap.data() });
+        }
+      });
+
+      setSearchResults(fetchedUsers);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    } finally {
+      setLoadingUsers(false);
+    }
+  };
+
+  const getRelationshipStatus = (otherUserId) => {
+    if (friends.some(friend => friend.id === otherUserId)) {
+      return 'friends';
+    }
+
+    if (sentRequests.some(request => request.to === otherUserId && request.status === 'pending')) {
+      return 'pendingSent';
+    }
+
+    if (receivedRequests.some(request => request.from === otherUserId && request.status === 'pending')) {
+      return 'pendingReceived';
+    }
+    return 'none';
+  };
+
+  const handleAddFriend = async (otherUserId) => {
+    try {
+      const currentUser = auth.currentUser;
+      if (!currentUser) {
+        throw new Error('No user is currently logged in.');
+      }
+
+      const currentUserId = currentUser.uid;
+
+      const friendRequestsRef = collection(db, 'users', otherUserId, 'friendRequests');
+
+      const q = firestoreQuery(
+        friendRequestsRef,
+        where('from', '==', currentUserId),
+        where('status', '==', 'pending')
+      );
+      const querySnapshot = await getDocs(q);
+
+      if (!querySnapshot.empty) {
+        Toast.show({
+          type: 'info',
+          text1: 'Request Already Sent',
+          text2: 'You have already sent a friend request to this user.',
+          position: 'top',
+          visibilityTime: 5000,
+          autoHide: true,
+        });
+        return;
+      }
+
+      await addDoc(friendRequestsRef, {
+        from: currentUserId,
+        to: otherUserId,
+        status: 'pending',
+        requestedAt: new Date(),
+      });
+
+      setSentRequests((prev) => [...prev, { to: otherUserId, status: 'pending' }]);
+
+      Toast.show({
+        type: 'success',
+        text1: 'Friend Request Sent',
+        text2: 'Your friend request has been sent.',
+        position: 'top',
+        visibilityTime: 5000,
+        autoHide: true,
+      });
+    } catch (error) {
+      console.error('Error sending friend request:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Could not send friend request. Please try again.',
+        position: 'top',
+        visibilityTime: 5000,
+        autoHide: true,
+      });
+    }
+  };
+
+  const handleRemoveFriend = async (otherUserId) => {
+    try {
+      const currentUserFriendDoc = doc(db, 'users', auth.currentUser.uid, 'friends', otherUserId);
+      await deleteDoc(currentUserFriendDoc);
+
+      setFriends((prev) => prev.filter(friend => friend.id !== otherUserId));
+
+      Toast.show({
+        type: 'success',
+        text1: 'Friend Removed',
+        text2: 'You have removed this friend.',
+        position: 'top',
+        visibilityTime: 5000,
+        autoHide: true,
+      });
+    } catch (error) {
+      console.error('Error removing friend:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Could not remove friend. Please try again.',
+        position: 'top',
+        visibilityTime: 5000,
+        autoHide: true,
+      });
+    }
+  };
 
   const handleEdit = async () => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -332,6 +483,14 @@ export default function Profile() {
     }
   };
 
+  const openNotificationsModal = () => {
+    setNotificationsModalVisible(true);
+  };
+
+  const closeNotificationsModal = () => {
+    setNotificationsModalVisible(false);
+  };
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -355,7 +514,7 @@ export default function Profile() {
               <MaterialIcons name="group" size={28} color="#fff" />
               {friendsCount >= 0 && (
                 <View style={styles.badge}>
-                  <Text style={styles.badgeText}>69</Text>
+                  <Text style={styles.badgeText}>{friendsCount}</Text>
                 </View>
               )}
             </TouchableOpacity>
@@ -368,7 +527,7 @@ export default function Profile() {
           </Animated.View>
 
           <Animated.View style={{ transform: [{ translateX: icon4TranslateX }] }}>
-            <TouchableOpacity style={styles.headerIcon} onPress={() => console.log('Notifications')}>
+            <TouchableOpacity style={styles.headerIcon} onPress={openNotificationsModal}>
               <Ionicons name="notifications" size={28} color="#fff" />
             </TouchableOpacity>
           </Animated.View>
@@ -400,22 +559,23 @@ export default function Profile() {
             </TouchableOpacity>
           </Animated.View>
         </Animated.View>
+
         <Animated.Text
-            style={[
-              styles.username,
-              {
-                transform: [
-                  { scale: usernameScale },
-                  { translateX: usernameTranslateX },
-                  { translateY: usernameTranslateY },
-                ],
-              },
-            ]}
-          >
-            {username}
-          </Animated.Text>
+          style={[
+            styles.username,
+            {
+              transform: [
+                { scale: usernameScale },
+                { translateX: usernameTranslateX },
+                { translateY: usernameTranslateY },
+              ],
+            },
+          ]}
+        >
+          {username}
+        </Animated.Text>
       </Animated.View>
-          
+      
       <Animated.ScrollView
         contentContainerStyle={styles.mainContent}
         style={{ marginTop: 110 }}
@@ -432,19 +592,21 @@ export default function Profile() {
             placeholder="Search for users"
             placeholderTextColor="#999"
             value={searchQuery}
-            onChangeText={handleSearch}
+            onChangeText={handleSearchInput}
           />
         </View>
 
         {searchQuery.trim() !== '' && (
           <View style={styles.dropdown}>
+            {loadingUsers && <ActivityIndicator size="small" color="#6a0dad" />}
             {searchResults.length > 0 ? (
               <FlatList
                 data={searchResults}
+                scrollEnabled={false}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
                   <TouchableOpacity style={styles.dropdownItem} onPress={() => {/* handle user selection */}}>
-                    <Image source={{ uri: item.profilePicture }} style={styles.dropdownImage} />
+                    <Image source={{ uri: item.profilePictureUrl || DEFAULT_PROFILE_PICTURE_URL }} style={styles.dropdownImage} />
                     <Text style={styles.dropdownText}>{item.username}</Text>
                   </TouchableOpacity>
                 )}
@@ -462,6 +624,7 @@ export default function Profile() {
             <FlatList
               data={recentActivities}
               keyExtractor={(item) => item.id}
+              scrollEnabled={false}
               renderItem={({ item }) => (
                 <View style={styles.activityItem}>
                   <Feather name="activity" size={20} color="#6a0dad" />
@@ -481,6 +644,7 @@ export default function Profile() {
             <Text style={styles.recentActivityTitle}>Recent Activity</Text>
             <FlatList
               data={recentActivities}
+              scrollEnabled={false}
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
                 <View style={styles.activityItem}>
@@ -501,6 +665,7 @@ export default function Profile() {
             <Text style={styles.recentActivityTitle}>Recent Activity</Text>
             <FlatList
               data={recentActivities}
+              scrollEnabled={false}
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
                 <View style={styles.activityItem}>
@@ -537,47 +702,154 @@ export default function Profile() {
                 placeholder="Search Users"
                 placeholderTextColor="#999"
                 value={searchQuery}
-                onChangeText={handleSearch}
+                onChangeText={handleSearchInput}
+                accessible={true}
+                accessibilityLabel="Search Users"
               />
             </View>
 
-            {searchQuery.trim() !== '' && (
-              <View style={styles.dropdown}>
-                {searchResults.length > 0 ? (
-                  <FlatList
-                    data={searchResults}
-                    keyExtractor={(item) => item.id}
-                    renderItem={({ item }) => (
-                      <TouchableOpacity style={styles.dropdownItem} onPress={() => {/* Handle user selection */}}>
-                        <Image source={{ uri: item.profilePicture }} style={styles.dropdownImage} />
-                        <Text style={styles.dropdownText}>{item.username}</Text>
+            {loadingUsers && <ActivityIndicator size="large" color="#6a0dad" style={{ marginVertical: 10 }} />}
+            {searchQuery.trim() !== '' ? (
+              searchResults.length > 0 ? (
+                <FlatList
+                  data={searchResults}
+                  keyExtractor={(item) => item.id}
+                  renderItem={({ item }) => {
+                    const relationshipStatus = getRelationshipStatus(item.id);
+
+                    const renderButton = () => {
+                      switch (relationshipStatus) {
+                        case 'friends':
+                          return (
+                            <TouchableOpacity
+                              style={styles.removeButton}
+                              onPress={() => handleRemoveFriend(item.id)}
+                              accessible={true}
+                              accessibilityLabel={`Remove ${item.username} from friends`}
+                            >
+                              <Text style={styles.buttonText}>Remove Friend</Text>
+                            </TouchableOpacity>
+                          );
+                        case 'pendingSent':
+                          return (
+                            <TouchableOpacity
+                              style={styles.pendingButton}
+                              onPress={() => handleCancelRequest(item.id)}
+                              accessible={true}
+                              accessibilityLabel={`Cancel friend request to ${item.username}`}
+                            >
+                              <Text style={styles.buttonText}>Pending</Text>
+                            </TouchableOpacity>
+                          );
+                        case 'pendingReceived':
+                          return (
+                            <View style={styles.pendingContainer}>
+                              <TouchableOpacity
+                                style={styles.acceptButton}
+                                onPress={() => handleAcceptRequest(item.id)}
+                                accessible={true}
+                                accessibilityLabel={`Accept friend request from ${item.username}`}
+                              >
+                                <Text style={styles.buttonText}>Accept</Text>
+                              </TouchableOpacity>
+                              <TouchableOpacity
+                                style={styles.rejectButton}
+                                onPress={() => handleRejectRequest(item.id)}
+                                accessible={true}
+                                accessibilityLabel={`Reject friend request from ${item.username}`}
+                              >
+                                <Text style={styles.buttonText}>Reject</Text>
+                              </TouchableOpacity>
+                            </View>
+                          );
+                        default:
+                          return (
+                            <TouchableOpacity
+                              style={styles.addButton}
+                              onPress={() => handleAddFriend(item.id)} 
+                              accessible={true}
+                              accessibilityLabel={`Add ${item.username} as a friend`}
+                            >
+                              <Text style={styles.buttonText}>Add Friend</Text>
+                            </TouchableOpacity>
+                          );
+                      }
+                    };
+
+                    return (
+                      <View style={styles.searchResultItem}>
+                        <Image
+                          source={{ uri: item.profilePictureUrl || DEFAULT_PROFILE_PICTURE_URL }}
+                          style={styles.searchResultImage}
+                        />
+                        <Text style={styles.searchResultName}>{item.username}</Text>
+                        {renderButton()}
+                      </View>
+                    );
+                  }}
+                />
+              ) : (
+                <Text style={styles.noUsersText}>No users found.</Text>
+              )
+            ) : (
+              friends.length > 0 ? (
+                <FlatList
+                  data={friends}
+                  keyExtractor={(item) => item.id}
+                  renderItem={({ item }) => (
+                    <View style={styles.friendItem}>
+                      <Image
+                        source={{ uri: item.profilePictureUrl || DEFAULT_PROFILE_PICTURE_URL }}
+                        style={styles.friendImage}
+                      />
+                      <Text style={styles.friendName}>{item.username}</Text>
+                      <TouchableOpacity
+                        style={styles.removeButton}
+                        onPress={() => handleRemoveFriend(item.id)}
+                        accessible={true}
+                        accessibilityLabel={`Remove ${item.username} from friends`}
+                      >
+                        <Text style={styles.buttonText}>Remove Friend</Text>
                       </TouchableOpacity>
-                    )}
-                  />
-                ) : (
-                  <Text style={styles.noUsersText}>No users found.</Text>
-                )}
-              </View>
+                    </View>
+                  )}
+                  contentContainerStyle={{ paddingBottom: 20 }}
+                />
+              ) : (
+                <Text style={styles.noUsersText}>No friends found.</Text>
+              )
             )}
 
-            {searchQuery.trim() === '' && (
-              <FlatList
-                data={user.friendsList}
-                keyExtractor={(item) => item.id}
-                renderItem={({ item }) => (
-                  <View style={styles.friendItem}>
-                    <Image
-                      source={{ uri: item.profilePicture }}
-                      style={styles.friendImage}
-                    />
-                    <Text style={styles.friendName}>{item.username}</Text>
-                  </View>
-                )}
-                contentContainerStyle={{ paddingBottom: 20 }}
-              />
-            )}
+            <TouchableOpacity 
+              onPress={closeFriendsModal} 
+              style={styles.closeButton}
+              accessible={true}
+              accessibilityLabel="Close Friends Modal"
+            >
+              <Text style={styles.closeButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
 
-            <TouchableOpacity onPress={closeFriendsModal} style={styles.closeButton}>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={notificationsModalVisible}
+        onRequestClose={closeNotificationsModal}
+      >
+        <View style={styles.modalBackground}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Notifications</Text>
+
+            <Notifications />
+
+            <TouchableOpacity 
+              onPress={closeNotificationsModal} 
+              style={styles.closeButton}
+              accessible={true}
+              accessibilityLabel="Close Notifications Modal"
+            >
               <Text style={styles.closeButtonText}>Close</Text>
             </TouchableOpacity>
           </View>
