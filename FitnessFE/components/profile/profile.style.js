@@ -15,7 +15,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 30,
     width: '90%',
-    flexDirection: 'row',
+    flexDirection: 'column',
     justifyContent: 'space-between',
     alignItems: 'center',
     zIndex: 1,
@@ -49,9 +49,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   profilePictureContainer: {
-    position: 'relative',
-    marginBottom: 15,
-    marginTop: 100
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 125,
+    marginBottom: 50,
+    left: 20
   },
   profilePicture: {
     width: 150,
@@ -61,18 +63,23 @@ const styles = StyleSheet.create({
     borderWidth: 3,
   },
   editIcon: {
-    position: 'absolute',
-    bottom: 10,
-    right: 5,
+    width: 30,
+    height: 30,    
+    bottom: 40,
+    left: 55,
     backgroundColor: '#6a0dad',
-    borderRadius: 20,
-    padding: 5,
+    borderRadius: 15,
+    padding: 8,
   },
   username: {
     fontSize: 24,
     color: '#fff',
     fontWeight: '700',
-    marginBottom: 15,
+    left: 20,
+    marginTop: 25,
+    textAlign: 'center',
+    maxWidth: 200,
+    overflow: 'scroll'
   },
   searchBarContainer: {
     flexDirection: 'row',
@@ -83,6 +90,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     width: '90%',
     marginBottom: 20,
+    marginTop: 325
   },
   searchIcon: {
     marginRight: 10,

@@ -38,7 +38,7 @@ export default function Login() {
         if (!email.includes('@')) {
             try {
                 const usernamesRef = collection(db, 'users');
-                const q = query(usernamesRef, where('username', '==', emailOrUsername));
+                const q = query(usernamesRef, where('username', '==', emailOrUsername.trim()));
                 const querySnapshot = await getDocs(q);
                 if (querySnapshot.empty) {
                     Toast.show({

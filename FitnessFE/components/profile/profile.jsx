@@ -1,20 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  View, 
-  Text, 
-  TouchableOpacity, 
-  Image, 
-  Modal, 
-  FlatList, 
-  TextInput, 
-  ActivityIndicator,
-  Animated, 
-  ScrollView
-} from 'react-native';
+import { View, Text, TouchableOpacity, Image, Modal, FlatList, TextInput, ActivityIndicator, Animated } from 'react-native';
+import TextTicker from 'react-native-text-ticker';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as ImagePicker from 'expo-image-picker';
 import { MaterialIcons, Ionicons, Feather } from '@expo/vector-icons';
-import { auth, db } from '../config/firebase-config';
-import { getDoc, doc } from 'firebase/firestore';
+import { auth, db, storage } from '../config/firebase-config';
+import { getDoc, doc, updateDoc } from 'firebase/firestore';
+import { getStorage, uploadBytes, getDownloadURL, ref } from 'firebase/storage';
 import { useNavigation } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 import styles from './profile.style';
@@ -38,9 +30,9 @@ export default function Profile() {
     extrapolate: 'clamp',
   });
 
-  const headerOpacity = scrollY.interpolate({
-    inputRange: [0, 100],
-    outputRange: [1, 0.9],
+  const editButtonOpacity = scrollY.interpolate({
+    inputRange: [0, 140],
+    outputRange: [1, 0],
     extrapolate: 'clamp',
   });
 
@@ -99,43 +91,61 @@ export default function Profile() {
   ];
 
   const profileScale = scrollY.interpolate({
-    inputRange: [0, 100],
-    outputRange: [1, 0.4],
+    inputRange: [0, 240],
+    outputRange: [1, 0.3],
     extrapolate: 'clamp',
   });
   
   const profileTranslateX = scrollY.interpolate({
-    inputRange: [0, 100],
-    outputRange: [0, -400],
+    inputRange: [0, 240],
+    outputRange: [0, -550],
     extrapolate: 'clamp',
   });
   
   const profileTranslateY = scrollY.interpolate({
-    inputRange: [0, 100],
-    outputRange: [0, -50],
+    inputRange: [0, 240],
+    outputRange: [0, -470],
+    extrapolate: 'clamp',
+  });
+
+  const usernameScale = scrollY.interpolate({
+    inputRange: [0, 240],
+    outputRange: [1, 0.8],
+    extrapolate: 'clamp',
+  });
+  
+  const usernameTranslateX = scrollY.interpolate({
+    inputRange: [0, 240],
+    outputRange: [0, -125],
+    extrapolate: 'clamp',
+  });
+  
+  const usernameTranslateY = scrollY.interpolate({
+    inputRange: [0, 240],
+    outputRange: [0, -290],
     extrapolate: 'clamp',
   });
 
   const icon1TranslateX = scrollY.interpolate({
-    inputRange: [0, 100],
+    inputRange: [0, 240],
     outputRange: [0, 190],
     extrapolate: 'clamp',
   });
   
   const icon2TranslateX = scrollY.interpolate({
-    inputRange: [0, 100],
+    inputRange: [0, 240],
     outputRange: [0, 140], 
     extrapolate: 'clamp',
   });
   
   const icon3TranslateX = scrollY.interpolate({
-    inputRange: [0, 100],
+    inputRange: [0, 240],
     outputRange: [0, 90], 
     extrapolate: 'clamp',
   });
   
   const icon4TranslateX = scrollY.interpolate({
-    inputRange: [0, 100],
+    inputRange: [0, 240],
     outputRange: [0, 40],
     extrapolate: 'clamp',
   });
@@ -210,6 +220,93 @@ export default function Profile() {
     fetchUserData();
   }, []);
 
+  const handleEdit = async () => {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      
+    if (!permissionResult.granted) {
+        Toast.show({
+            type: 'error',
+            text1: 'Permission Denied',
+            text2: 'We need permission to access your gallery.',
+            position: 'top',
+            visibilityTime: 5000,
+            autoHide: true, 
+        });
+        return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 1,
+    });
+
+    if (!result.canceled) {
+
+      const imageUri = result.uri || (result.assets && result.assets[0].uri);
+      
+      if (imageUri) {
+          setProfilePicture(imageUri);
+          
+          try {
+            const currentUser = auth.currentUser;
+            
+            if (!currentUser) {
+              throw new Error('No user is currently logged in.');
+            }
+            
+            const userId = currentUser.uid;            
+            const timestamp = Date.now();
+            const fileExtension = imageUri.substring(imageUri.lastIndexOf('.') + 1);
+            const fileName = `profile_${timestamp}.${fileExtension}`;
+            const storageRef = ref(storage, `profilePictures/${userId}/${fileName}`);
+            const response = await fetch(imageUri);
+            const blob = await response.blob();
+            await uploadBytes(storageRef, blob);
+            const downloadURL = await getDownloadURL(storageRef);
+            const userDocRef = doc(db, 'users', userId);
+            await updateDoc(userDocRef, {
+              profilePictureUrl: downloadURL,
+            });
+            
+            setProfilePicture(downloadURL);
+            
+            Toast.show({
+              type: 'success',
+              text1: 'Profile Picture Updated',
+              text2: 'Your profile picture has been successfully updated.',
+              position: 'top',
+              visibilityTime: 5000,
+              autoHide: true,
+            });
+            
+          } catch (error) {
+            console.error('Error uploading image:', error);
+            Toast.show({
+              type: 'error',
+              text1: 'Upload Failed',
+              text2: 'There was an error updating your profile picture. Please try again.',
+              position: 'top',
+              visibilityTime: 5000,
+              autoHide: true,
+            });
+          }
+          
+      } else {
+          console.error('Error: Image URI is undefined');
+          Toast.show({
+              type: 'error',
+              text1: 'Image Selection Error',
+              text2: 'There was an issue selecting your image. Please try again.',
+              position: 'top',
+              visibilityTime: 5000,
+              autoHide: true, 
+          });
+      }
+    }
+  }
+
   const handleLogout = async () => {
     try {
       await auth.signOut();
@@ -245,7 +342,7 @@ export default function Profile() {
 
   return (
     <View style={styles.container}>
-      <Animated.View style={[styles.header, { height: HEADER_HEIGHT, opacity: headerOpacity }]}>
+      <Animated.View style={[styles.header, { height: HEADER_HEIGHT }]}>
         <View style={styles.headerLeft}>
           <Animated.View style={{ transform: [{ translateX: icon1TranslateX }] }}>
             <TouchableOpacity style={styles.headerIcon} onPress={handleLogout}>
@@ -265,28 +362,18 @@ export default function Profile() {
           </Animated.View>
 
           <Animated.View style={{ transform: [{ translateX: icon3TranslateX }] }}>
-            <TouchableOpacity style={styles.headerIcon} onPress={() => navigation.navigate('Settings')}>
+            <TouchableOpacity style={styles.headerIcon} onPress={() => console.log('Settings')}>
               <MaterialIcons name="settings" size={28} color="#fff" />
             </TouchableOpacity>
           </Animated.View>
 
           <Animated.View style={{ transform: [{ translateX: icon4TranslateX }] }}>
-            <TouchableOpacity style={styles.headerIcon} onPress={() => navigation.navigate('Notifications')}>
+            <TouchableOpacity style={styles.headerIcon} onPress={() => console.log('Notifications')}>
               <Ionicons name="notifications" size={28} color="#fff" />
             </TouchableOpacity>
           </Animated.View>
         </View>
-      </Animated.View>
 
-      <Animated.ScrollView
-        contentContainerStyle={styles.mainContent}
-        style={{ marginTop: 100 }}
-        scrollEventThrottle={16}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: true }
-        )}
-      >
         <Animated.View
           style={[
             styles.profilePictureContainer,
@@ -307,13 +394,37 @@ export default function Profile() {
               setProfilePicture(DEFAULT_PROFILE_PICTURE_URL);
             }}
           />
-          <TouchableOpacity style={styles.editIcon} onPress={() => {/* edit functionality */}}>
-            <MaterialIcons name="edit" size={24} color="#fff" />
-          </TouchableOpacity>
+          <Animated.View style={{ opacity: editButtonOpacity }}>
+            <TouchableOpacity style={styles.editIcon} onPress={handleEdit}>
+              <MaterialIcons name="edit" size={14} color="#fff" />
+            </TouchableOpacity>
+          </Animated.View>
         </Animated.View>
-
-        <Text style={styles.username}>{username}</Text>
-
+        <Animated.Text
+            style={[
+              styles.username,
+              {
+                transform: [
+                  { scale: usernameScale },
+                  { translateX: usernameTranslateX },
+                  { translateY: usernameTranslateY },
+                ],
+              },
+            ]}
+          >
+            {username}
+          </Animated.Text>
+      </Animated.View>
+          
+      <Animated.ScrollView
+        contentContainerStyle={styles.mainContent}
+        style={{ marginTop: 110 }}
+        scrollEventThrottle={16}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: true }
+        )}
+      >
         <View style={styles.searchBarContainer}>
           <MaterialIcons name="search" size={24} color="#6a0dad" style={styles.searchIcon} />
           <TextInput
@@ -345,6 +456,7 @@ export default function Profile() {
         )}
 
         {searchQuery.trim() === '' && (
+          <>
           <View style={styles.recentActivityContainer}>
             <Text style={styles.recentActivityTitle}>Recent Activity</Text>
             <FlatList
@@ -364,6 +476,47 @@ export default function Profile() {
               }
             />
           </View>
+
+          <View style={styles.recentActivityContainer}>
+            <Text style={styles.recentActivityTitle}>Recent Activity</Text>
+            <FlatList
+              data={recentActivities}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <View style={styles.activityItem}>
+                  <Feather name="activity" size={20} color="#6a0dad" />
+                  <View style={styles.activityTextContainer}>
+                    <Text style={styles.activityText}>{item.activity}</Text>
+                    <Text style={styles.activityTimestamp}>{item.timestamp}</Text>
+                  </View>
+                </View>
+              )}
+              ListEmptyComponent={
+                <Text style={styles.noActivitiesText}>No recent activities.</Text>
+              }
+            />
+          </View>
+
+          <View style={styles.recentActivityContainer}>
+            <Text style={styles.recentActivityTitle}>Recent Activity</Text>
+            <FlatList
+              data={recentActivities}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <View style={styles.activityItem}>
+                  <Feather name="activity" size={20} color="#6a0dad" />
+                  <View style={styles.activityTextContainer}>
+                    <Text style={styles.activityText}>{item.activity}</Text>
+                    <Text style={styles.activityTimestamp}>{item.timestamp}</Text>
+                  </View>
+                </View>
+              )}
+              ListEmptyComponent={
+                <Text style={styles.noActivitiesText}>No recent activities.</Text>
+              }
+            />
+          </View>
+          </>
         )}
       </Animated.ScrollView>
 
