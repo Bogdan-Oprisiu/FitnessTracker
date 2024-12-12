@@ -5,13 +5,18 @@ import { LinearGradient } from 'expo-linear-gradient';
 import * as ImagePicker from 'expo-image-picker';
 import { MaterialIcons, Ionicons, Feather } from '@expo/vector-icons';
 import { auth, db, storage } from '../config/firebase-config';
-import { getDoc, doc, updateDoc, query as firestoreQuery, where, getDocs, collection, addDoc, deleteDoc } from 'firebase/firestore';
+import { getDoc, doc, updateDoc, query, where, getDocs, collection, addDoc, deleteDoc, onSnapshot, writeBatch, increment, serverTimestamp } from 'firebase/firestore';
 import { getStorage, uploadBytes, getDownloadURL, ref } from 'firebase/storage';
 import { debounce } from 'lodash';
 import { useNavigation } from '@react-navigation/native';
 import Notifications from './notifications/notifications';
 import Toast from 'react-native-toast-message';
 import styles from './profile.style';
+import useFriends from './useFriends';
+import useNotifications from './useNotifications';
+import { logRecentActivity } from './activity-logger';
+import { handleFriendRequestResponse } from './logActivityAndNotifications';
+import RecentActivities from './recent-activities/recent-activities';
 
 export default function Profile() {
   const DEFAULT_PROFILE_PICTURE_URL = 'https://firebasestorage.googleapis.com/v0/b/YOUR_PROJECT_ID.appspot.com/o/defaultProfilePictures%2Fdefault-profile-picture.jpg?alt=media&token=YOUR_TOKEN';
@@ -24,9 +29,6 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [searchResults, setSearchResults] = useState([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
-  const [friends, setFriends] = useState([]);
-  const [recentActivities, setRecentActivities] = useState([]);
-  const [notificationsModalVisible, setNotificationsModalVisible] = useState(false);
   const scrollY = useRef(new Animated.Value(0)).current;
   const HEADER_HEIGHT = 60;
 
@@ -151,47 +153,8 @@ export default function Profile() {
     fetchUserData();
   }, []);
 
-  useEffect(() => {
-    const fetchFriends = async () => {
-      try {
-        const currentUser = auth.currentUser;
-        if (!currentUser) return;
-
-        const friendsRef = collection(db, 'users', currentUser.uid, 'friends');
-        const friendsSnapshot = await getDocs(friendsRef);
-
-        const friendIds = [];
-        friendsSnapshot.forEach((docSnap) => {
-          friendIds.push(docSnap.data().friendId);
-        });
-
-        const friendsData = [];
-        for (const friendId of friendIds) {
-          const friendDoc = await getDoc(doc(db, 'users', friendId));
-          if (friendDoc.exists()) {
-            friendsData.push({ id: friendDoc.id, ...friendDoc.data() });
-          }
-        }
-
-        setFriends(friendsData);
-      } catch (error) {
-        console.error('Error fetching friends:', error);
-        Toast.show({
-          type: 'error',
-          text1: 'Error',
-          text2: 'Could not fetch friends. Please try again.',
-          position: 'top',
-          visibilityTime: 5000,
-          autoHide: true,
-        });
-      }
-    };
-
-    if (friendsModalVisible) {
-      fetchFriends();
-    }
-  }, [friendsModalVisible]);
-
+  const { friends, loading: loadingFriends } = useFriends();
+  const { notifications, loadingNotifications, markNotificationsAsRead } = useNotifications();
   const [sentRequests, setSentRequests] = useState([]);
   const [receivedRequests, setReceivedRequests] = useState([]);
 
@@ -201,18 +164,35 @@ export default function Profile() {
       if (!currentUser) return;
 
       try {
-        const sentRef = collection(db, 'users', currentUser.uid, 'friendRequests');
-        const qSent = firestoreQuery(sentRef, where('status', '==', 'pending'));
+        const sentRef = collection(db, 'friendships');
+        const qSent = query(
+          sentRef,
+          where('status', '==', 'pending'),
+          where('user1', '==', currentUser.uid)
+        );
         const sentSnapshot = await getDocs(qSent);
         const sent = sentSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         setSentRequests(sent);
-        const receivedRef = collection(db, 'users', currentUser.uid, 'friendRequests');
-        const qReceived = firestoreQuery(receivedRef, where('status', '==', 'pending'));
+
+        const receivedRef = collection(db, 'friendships');
+        const qReceived = query(
+          receivedRef,
+          where('status', '==', 'pending'),
+          where('user2', '==', currentUser.uid)
+        );
         const receivedSnapshot = await getDocs(qReceived);
         const received = receivedSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         setReceivedRequests(received);
       } catch (error) {
         console.error('Error fetching friend requests:', error);
+        Toast.show({
+          type: 'error',
+          text1: 'Error',
+          text2: 'Could not fetch friend requests.',
+          position: 'top',
+          visibilityTime: 5000,
+          autoHide: true,
+        });
       }
     };
 
@@ -222,7 +202,7 @@ export default function Profile() {
   }, [friendsModalVisible]);
 
   const createQuery = (collectionRef, ...conditions) => {
-    return firestoreQuery(collectionRef, ...conditions);
+    return query(collectionRef, ...conditions);
   };
 
   const debouncedHandleSearch = useRef(
@@ -241,43 +221,102 @@ export default function Profile() {
       setSearchResults([]);
       return;
     }
-
+  
     try {
       setLoadingUsers(true);
-
-      const q = createQuery(
+  
+      const q = query(
         collection(db, 'users'),
         where('username_lowercase', '>=', input.toLowerCase()),
         where('username_lowercase', '<=', input.toLowerCase() + '\uf8ff')
       );
-
+  
       const querySnapshot = await getDocs(q);
-
+  
       const fetchedUsers = [];
-      querySnapshot.forEach((docSnap) => {
-        if (docSnap.id !== auth.currentUser.uid) { 
-          fetchedUsers.push({ id: docSnap.id, ...docSnap.data() });
+  
+      for (const userDoc of querySnapshot.docs) {
+        if (userDoc.id === auth.currentUser.uid) continue;
+  
+        const userData = userDoc.data();
+  
+        let friendshipId = null;
+        let status = 'none'; 
+  
+        const friendshipQ1 = query(
+          collection(db, 'friendships'),
+          where('user1', '==', auth.currentUser.uid),
+          where('user2', '==', userDoc.id)
+        );
+  
+        const friendshipSnapshot1 = await getDocs(friendshipQ1);
+  
+        if (!friendshipSnapshot1.empty) {
+          const friendshipDoc = friendshipSnapshot1.docs[0];
+          friendshipId = friendshipDoc.id;
+          status = friendshipDoc.data().status;
+        } else {
+          const friendshipQ2 = query(
+            collection(db, 'friendships'),
+            where('user1', '==', userDoc.id),
+            where('user2', '==', auth.currentUser.uid)
+          );
+  
+          const friendshipSnapshot2 = await getDocs(friendshipQ2);
+  
+          if (!friendshipSnapshot2.empty) {
+            const friendshipDoc = friendshipSnapshot2.docs[0];
+            friendshipId = friendshipDoc.id;
+            status = friendshipDoc.data().status;
+          }
         }
-      });
-
+  
+        let relationshipStatus = 'none';
+        if (status === 'accepted') {
+          relationshipStatus = 'friends';
+        } else if (status === 'pending') {
+          if (friendshipSnapshot1.empty === false) {
+            relationshipStatus = 'pendingSent';
+          } else {
+            relationshipStatus = 'pendingReceived';
+          }
+        }
+  
+        fetchedUsers.push({
+          id: userDoc.id,
+          username: userData.username,
+          profilePictureUrl: userData.profilePictureUrl || DEFAULT_PROFILE_PICTURE_URL,
+          friendshipId: friendshipId,
+          relationshipStatus: relationshipStatus,
+        });
+      }
+  
       setSearchResults(fetchedUsers);
     } catch (error) {
       console.error('Error fetching users:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Could not search users. Please try again.',
+        position: 'top',
+        visibilityTime: 5000,
+        autoHide: true,
+      });
     } finally {
       setLoadingUsers(false);
     }
   };
 
   const getRelationshipStatus = (otherUserId) => {
-    if (friends.some(friend => friend.id === otherUserId)) {
+    if (friends.some(friend => friend.friendUserId === otherUserId)) {
       return 'friends';
     }
 
-    if (sentRequests.some(request => request.to === otherUserId && request.status === 'pending')) {
+    if (sentRequests.some(request => request.user2 === otherUserId && request.status === 'pending')) {
       return 'pendingSent';
     }
 
-    if (receivedRequests.some(request => request.from === otherUserId && request.status === 'pending')) {
+    if (receivedRequests.some(request => request.user1 === otherUserId && request.status === 'pending')) {
       return 'pendingReceived';
     }
     return 'none';
@@ -289,38 +328,43 @@ export default function Profile() {
       if (!currentUser) {
         throw new Error('No user is currently logged in.');
       }
-
-      const currentUserId = currentUser.uid;
-
-      const friendRequestsRef = collection(db, 'users', otherUserId, 'friendRequests');
-
-      const q = firestoreQuery(
-        friendRequestsRef,
-        where('from', '==', currentUserId),
-        where('status', '==', 'pending')
+    
+      const friendshipsRef = collection(db, 'friendships');
+      const q = query(
+        friendshipsRef, 
+        where('user1', 'in', [currentUser.uid, otherUserId]),
+        where('user2', 'in', [currentUser.uid, otherUserId])
       );
       const querySnapshot = await getDocs(q);
-
+    
       if (!querySnapshot.empty) {
         Toast.show({
           type: 'info',
           text1: 'Request Already Sent',
-          text2: 'You have already sent a friend request to this user.',
+          text2: "You already sent a friend request or you're already friends.",
           position: 'top',
           visibilityTime: 5000,
           autoHide: true,
         });
         return;
       }
-
-      await addDoc(friendRequestsRef, {
-        from: currentUserId,
-        to: otherUserId,
+    
+      await addDoc(friendshipsRef, {
+        user1: currentUser.uid,
+        user2: otherUserId,
         status: 'pending',
-        requestedAt: new Date(),
+        createdAt: new Date(),
       });
+    
+      const otherUserDoc = await getDoc(doc(db, 'users', otherUserId));
+      const otherUsername = otherUserDoc.exists() ? otherUserDoc.data().username : 'Unknown User';
 
-      setSentRequests((prev) => [...prev, { to: otherUserId, status: 'pending' }]);
+      await handleFriendRequestResponse(
+        otherUserId,
+        `Received friend request from ${username}`,
+        `Sent friend request to ${otherUsername}`,
+        'friendRequestReceived'
+      );
 
       Toast.show({
         type: 'success',
@@ -330,6 +374,7 @@ export default function Profile() {
         visibilityTime: 5000,
         autoHide: true,
       });
+    
     } catch (error) {
       console.error('Error sending friend request:', error);
       Toast.show({
@@ -343,13 +388,52 @@ export default function Profile() {
     }
   };
 
-  const handleRemoveFriend = async (otherUserId) => {
+  const handleRemoveFriend = async (friendshipId) => {
     try {
-      const currentUserFriendDoc = doc(db, 'users', auth.currentUser.uid, 'friends', otherUserId);
-      await deleteDoc(currentUserFriendDoc);
+      const currentUser = auth.currentUser;
+      if (!currentUser) {
+        throw new Error('No user is currently logged in.');
+      }
+  
+      const friendshipRef = doc(db, 'friendships', friendshipId);
+      const friendshipDoc = await getDoc(friendshipRef);
+  
+      if (!friendshipDoc.exists()) {
+        throw new Error('Friendship document does not exist.');
+      }
+  
+      const data = friendshipDoc.data();
+      const user1Id = data.user1;
+      const user2Id = data.user2;
+  
+      const user1Ref = doc(db, 'users', user1Id);
+      const user2Ref = doc(db, 'users', user2Id);
+  
+      const batch = writeBatch(db);
+  
+      batch.delete(friendshipRef);
+  
+      batch.update(user1Ref, {
+        friendsCount: increment(-1),
+      });
+  
+      batch.update(user2Ref, {
+        friendsCount: increment(-1),
+      });
+  
+      await batch.commit();
+  
+      const otherUserId = currentUser.uid === user1Id ? user2Id : user1Id;
+      const otherUserDoc = await getDoc(doc(db, 'users', otherUserId));
+      const otherUsername = otherUserDoc.exists() ? otherUserDoc.data().username : 'Unknown User';
 
-      setFriends((prev) => prev.filter(friend => friend.id !== otherUserId));
-
+      await handleFriendRequestResponse(
+        otherUserId,
+        `${username} removed you from friends`,
+        `Removed ${otherUsername} from friends`,
+        'friendRemoved'
+      );
+  
       Toast.show({
         type: 'success',
         text1: 'Friend Removed',
@@ -358,12 +442,123 @@ export default function Profile() {
         visibilityTime: 5000,
         autoHide: true,
       });
+  
     } catch (error) {
       console.error('Error removing friend:', error);
       Toast.show({
         type: 'error',
         text1: 'Error',
         text2: 'Could not remove friend. Please try again.',
+        position: 'top',
+        visibilityTime: 5000,
+        autoHide: true,
+      });
+    }
+  };  
+
+  const handleAcceptRequest = async (friendshipId, fromUserId) => {
+    try {
+      const friendshipRef = doc(db, 'friendships', friendshipId);
+      await updateDoc(friendshipRef, {
+        status: 'accepted',
+        respondedAt: serverTimestamp(),
+      });
+  
+      const friendshipDoc = await getDoc(friendshipRef);
+      if (!friendshipDoc.exists()) throw new Error('Friendship document does not exist.');
+      const data = friendshipDoc.data();
+      const currentUserId = auth.currentUser.uid;
+      const friendUserId = data.user1 === currentUserId ? data.user2 : data.user1;
+  
+      const currentUserDocRef = doc(db, 'users', currentUserId);
+      const friendUserDocRef = doc(db, 'users', friendUserId);
+  
+      await updateDoc(currentUserDocRef, {
+        friendsCount: increment(1),
+      });
+  
+      await updateDoc(friendUserDocRef, {
+        friendsCount: increment(1),
+      });
+    
+      const friendDoc = await getDoc(doc(db, 'users', friendUserId));
+      const friendUsername = friendDoc.exists() ? friendDoc.data().username : 'Unknown User';
+
+      const currentUserDoc = await getDoc(doc(db, 'users', currentUserId));
+      const currentUsername = currentUserDoc.exists() ? currentUserDoc.data().username : 'Unknown User';
+
+      await handleFriendRequestResponse(
+        fromUserId, 
+        `${currentUsername} Accepted Your Friend Request`,
+        `Accepted Friend Request from ${friendUsername}`,  
+        'friendRequestAccepted'
+      );
+      await logRecentActivity(currentUserId, 'Friend Request Accepted', friendUserId, friendUsername);
+      await logRecentActivity(friendUserId, 'Friend Request Accepted', currentUserId, currentUsername);
+    
+      Toast.show({
+        type: 'success',
+        text1: 'Friend Added',
+        text2: 'You are now friends.',
+        position: 'top',
+        visibilityTime: 5000,
+        autoHide: true,
+      });
+    } catch (error) {
+      console.error('Error accepting friend request:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Could not accept friend request. Please try again.',
+        position: 'top',
+        visibilityTime: 5000,
+        autoHide: true,
+      });
+    }
+  };
+
+  const handleRejectRequest = async (friendshipId, fromUserId) => {
+    try {
+      const friendshipRef = doc(db, 'friendships', friendshipId);
+      const friendshipDoc = await getDoc(friendshipRef);
+      if (!friendshipDoc.exists()) {
+        throw new Error('Friendship document does not exist.');
+      }
+      const data = friendshipDoc.data();
+      const currentUserId = auth.currentUser.uid;
+      const friendUserId = data.user1 === currentUserId ? data.user2 : data.user1;
+  
+      await deleteDoc(friendshipRef);
+    
+      const friendDoc = await getDoc(doc(db, 'users', friendUserId));
+      const friendUsername = friendDoc.exists() ? friendDoc.data().username : 'Unknown User';
+  
+      const currentUserDoc = await getDoc(doc(db, 'users', currentUserId));
+      const currentUsername = currentUserDoc.exists() ? currentUserDoc.data().username : 'Unknown User';
+
+      await handleFriendRequestResponse(
+        fromUserId, 
+        `${currentUsername} Rejected Your Friend Request`, 
+        `Rejected Friend Request from ${friendUsername}`, 
+        'friendRequestRejected'
+      );
+      await logRecentActivity(currentUserId, 'Friend Request Rejected', friendUserId, friendUsername);
+      await logRecentActivity(friendUserId, 'Friend Request Rejected', currentUserId, currentUsername);
+    
+      Toast.show({
+        type: 'info',
+        text1: 'Friend Request Rejected',
+        text2: 'You have rejected this friend request.',
+        position: 'top',
+        visibilityTime: 5000,
+        autoHide: true,
+      });
+    } catch (error) {
+      console.error('Error rejecting friend request:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Could not reject friend request. Please try again.',
         position: 'top',
         visibilityTime: 5000,
         autoHide: true,
@@ -483,14 +678,6 @@ export default function Profile() {
     }
   };
 
-  const openNotificationsModal = () => {
-    setNotificationsModalVisible(true);
-  };
-
-  const closeNotificationsModal = () => {
-    setNotificationsModalVisible(false);
-  };
-
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -501,20 +688,20 @@ export default function Profile() {
 
   return (
     <View style={styles.container}>
-      <Animated.View style={[styles.header, { height: HEADER_HEIGHT }]}>
+      <Animated.View style={[styles.header, {height: HEADER_HEIGHT}]}>
         <View style={styles.headerLeft}>
           <Animated.View style={{ transform: [{ translateX: icon1TranslateX }] }}>
             <TouchableOpacity style={styles.headerIcon} onPress={handleLogout}>
-              <MaterialIcons name="logout" size={28} color="#fff" />
+              <MaterialIcons name="logout" size={28} color="#6a0dad" />
             </TouchableOpacity>
           </Animated.View>
 
           <Animated.View style={{ transform: [{ translateX: icon2TranslateX }] }}>
             <TouchableOpacity style={styles.headerIcon} onPress={openFriendsModal}>
-              <MaterialIcons name="group" size={28} color="#fff" />
-              {friendsCount >= 0 && (
+              <MaterialIcons name="group" size={28} color="#6a0dad" />
+              {friends.length >= 0 && (
                 <View style={styles.badge}>
-                  <Text style={styles.badgeText}>{friendsCount}</Text>
+                  <Text style={styles.badgeText}>{friends.length}</Text>
                 </View>
               )}
             </TouchableOpacity>
@@ -522,14 +709,24 @@ export default function Profile() {
 
           <Animated.View style={{ transform: [{ translateX: icon3TranslateX }] }}>
             <TouchableOpacity style={styles.headerIcon} onPress={() => console.log('Settings')}>
-              <MaterialIcons name="settings" size={28} color="#fff" />
+              <MaterialIcons name="settings" size={28} color="#6a0dad" />
             </TouchableOpacity>
           </Animated.View>
 
           <Animated.View style={{ transform: [{ translateX: icon4TranslateX }] }}>
-            <TouchableOpacity style={styles.headerIcon} onPress={openNotificationsModal}>
-              <Ionicons name="notifications" size={28} color="#fff" />
-            </TouchableOpacity>
+          <TouchableOpacity 
+            onPress={() => navigation.navigate('Notifications')} 
+            style={styles.headerIcon}
+            accessible={true}
+            accessibilityLabel="Open Notifications"
+          >
+            <Ionicons name="notifications-outline" size={28} color="#6a0dad" />
+            {notifications.some(n => !n.isRead) && (
+              <View style={styles.notificationBadge}>
+                <Text style={styles.badgeText}>{notifications.filter(n => !n.isRead).length}</Text>
+              </View>
+            )}
+          </TouchableOpacity>
           </Animated.View>
         </View>
 
@@ -618,70 +815,10 @@ export default function Profile() {
         )}
 
         {searchQuery.trim() === '' && (
-          <>
           <View style={styles.recentActivityContainer}>
             <Text style={styles.recentActivityTitle}>Recent Activity</Text>
-            <FlatList
-              data={recentActivities}
-              keyExtractor={(item) => item.id}
-              scrollEnabled={false}
-              renderItem={({ item }) => (
-                <View style={styles.activityItem}>
-                  <Feather name="activity" size={20} color="#6a0dad" />
-                  <View style={styles.activityTextContainer}>
-                    <Text style={styles.activityText}>{item.activity}</Text>
-                    <Text style={styles.activityTimestamp}>{item.timestamp}</Text>
-                  </View>
-                </View>
-              )}
-              ListEmptyComponent={
-                <Text style={styles.noActivitiesText}>No recent activities.</Text>
-              }
-            />
+            <RecentActivities />
           </View>
-
-          <View style={styles.recentActivityContainer}>
-            <Text style={styles.recentActivityTitle}>Recent Activity</Text>
-            <FlatList
-              data={recentActivities}
-              scrollEnabled={false}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => (
-                <View style={styles.activityItem}>
-                  <Feather name="activity" size={20} color="#6a0dad" />
-                  <View style={styles.activityTextContainer}>
-                    <Text style={styles.activityText}>{item.activity}</Text>
-                    <Text style={styles.activityTimestamp}>{item.timestamp}</Text>
-                  </View>
-                </View>
-              )}
-              ListEmptyComponent={
-                <Text style={styles.noActivitiesText}>No recent activities.</Text>
-              }
-            />
-          </View>
-
-          <View style={styles.recentActivityContainer}>
-            <Text style={styles.recentActivityTitle}>Recent Activity</Text>
-            <FlatList
-              data={recentActivities}
-              scrollEnabled={false}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => (
-                <View style={styles.activityItem}>
-                  <Feather name="activity" size={20} color="#6a0dad" />
-                  <View style={styles.activityTextContainer}>
-                    <Text style={styles.activityText}>{item.activity}</Text>
-                    <Text style={styles.activityTimestamp}>{item.timestamp}</Text>
-                  </View>
-                </View>
-              )}
-              ListEmptyComponent={
-                <Text style={styles.noActivitiesText}>No recent activities.</Text>
-              }
-            />
-          </View>
-          </>
         )}
       </Animated.ScrollView>
 
@@ -716,6 +853,7 @@ export default function Profile() {
                   keyExtractor={(item) => item.id}
                   renderItem={({ item }) => {
                     const relationshipStatus = getRelationshipStatus(item.id);
+                    const friendshipId = item.friendshipId;
 
                     const renderButton = () => {
                       switch (relationshipStatus) {
@@ -723,7 +861,21 @@ export default function Profile() {
                           return (
                             <TouchableOpacity
                               style={styles.removeButton}
-                              onPress={() => handleRemoveFriend(item.id)}
+                              onPress={() => {
+                                const friendship = friends.find(f => f.friendUserId === item.id);
+                                if (friendship) {
+                                  handleRemoveFriend(friendship.friendshipId);
+                                } else {
+                                  Toast.show({
+                                    type: 'error',
+                                    text1: 'Error',
+                                    text2: 'Friendship data not found.',
+                                    position: 'top',
+                                    visibilityTime: 5000,
+                                    autoHide: true,
+                                  });
+                                }
+                              }}
                               accessible={true}
                               accessibilityLabel={`Remove ${item.username} from friends`}
                             >
@@ -734,8 +886,7 @@ export default function Profile() {
                           return (
                             <TouchableOpacity
                               style={styles.pendingButton}
-                              onPress={() => handleCancelRequest(item.id)}
-                              accessible={true}
+                              accessible={false}
                               accessibilityLabel={`Cancel friend request to ${item.username}`}
                             >
                               <Text style={styles.buttonText}>Pending</Text>
@@ -746,7 +897,7 @@ export default function Profile() {
                             <View style={styles.pendingContainer}>
                               <TouchableOpacity
                                 style={styles.acceptButton}
-                                onPress={() => handleAcceptRequest(item.id)}
+                                onPress={() => handleAcceptRequest(friendshipId, item.id)}
                                 accessible={true}
                                 accessibilityLabel={`Accept friend request from ${item.username}`}
                               >
@@ -754,7 +905,7 @@ export default function Profile() {
                               </TouchableOpacity>
                               <TouchableOpacity
                                 style={styles.rejectButton}
-                                onPress={() => handleRejectRequest(item.id)}
+                                onPress={() => handleRejectRequest(friendshipId, item.id)}
                                 accessible={true}
                                 accessibilityLabel={`Reject friend request from ${item.username}`}
                               >
@@ -795,7 +946,7 @@ export default function Profile() {
               friends.length > 0 ? (
                 <FlatList
                   data={friends}
-                  keyExtractor={(item) => item.id}
+                  keyExtractor={(item) => item.friendshipId}
                   renderItem={({ item }) => (
                     <View style={styles.friendItem}>
                       <Image
@@ -805,7 +956,7 @@ export default function Profile() {
                       <Text style={styles.friendName}>{item.username}</Text>
                       <TouchableOpacity
                         style={styles.removeButton}
-                        onPress={() => handleRemoveFriend(item.id)}
+                        onPress={() => handleRemoveFriend(item.friendshipId)}
                         accessible={true}
                         accessibilityLabel={`Remove ${item.username} from friends`}
                       >
@@ -825,30 +976,6 @@ export default function Profile() {
               style={styles.closeButton}
               accessible={true}
               accessibilityLabel="Close Friends Modal"
-            >
-              <Text style={styles.closeButtonText}>Close</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={notificationsModalVisible}
-        onRequestClose={closeNotificationsModal}
-      >
-        <View style={styles.modalBackground}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>Notifications</Text>
-
-            <Notifications />
-
-            <TouchableOpacity 
-              onPress={closeNotificationsModal} 
-              style={styles.closeButton}
-              accessible={true}
-              accessibilityLabel="Close Notifications Modal"
             >
               <Text style={styles.closeButtonText}>Close</Text>
             </TouchableOpacity>

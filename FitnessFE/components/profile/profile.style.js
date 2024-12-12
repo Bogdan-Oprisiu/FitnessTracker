@@ -361,6 +361,104 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  notificationsButton: {
+    position: 'absolute',
+    top: 40,
+    right: 20,
+    zIndex: 10,
+  },
+  notificationBadge: {
+    position: 'absolute',
+    top: -5,
+    right: -5,
+    backgroundColor: '#ff3b30',
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  badgeText: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: 'bold',
+  },
+  notificationsModalContainer: {
+    width: '90%',
+    backgroundColor: '#222',
+    borderRadius: 20,
+    padding: 20,
+    maxHeight: '80%',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  notificationItem: {
+    paddingVertical: 10,
+    paddingHorizontal: 5,
+    borderBottomColor: '#e0e0e0',
+    borderBottomWidth: 1,
+  },
+  readNotification: {
+    backgroundColor: '#3f3f3f3',
+  },
+  unreadNotification: {
+    backgroundColor: '#777',
+  },
+  notificationText: {
+    fontSize: 16,
+    color: '#ccc',
+  },
+  notificationTimestamp: {
+    fontSize: 12,
+    color: '#ccc',
+    marginTop: 2,
+  },
+  noNotificationsText: {
+    textAlign: 'center',
+    color: '#ddd',
+    fontSize: 16,
+    marginTop: 20,
+  },
+  closeButton: {
+    marginTop: 20,
+    backgroundColor: '#6a0dad',
+    paddingVertical: 10,
+    borderRadius: 25,
+    alignItems: 'center',
+  },
+  closeButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  notificationsTabsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginVertical: 15,
+    borderBottomColor: '#6a0dad',
+  },
+  notificationTab: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+  },
+  activeNotificationTab: {
+    borderBottomWidth: 3,
+    borderBottomColor: '#6a0dad',
+  },
+  notificationTabText: {
+    fontSize: 16,
+    color: '#aaa',
+  },
+  activeNotificationTabText: {
+    color: '#6a0dad',
+    fontWeight: 'bold',
+  },
 });
 
 export default styles;

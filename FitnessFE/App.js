@@ -20,6 +20,7 @@ import AddExercise from './components/workouts-page/add-exercise/add-exercise';
 import MuscleGroupExercises from './components/workouts-page/add-exercise/strength-exercises/muscle-grouped-exercises/muscle-grouped-exercises';
 import DifficultyFilteredExercises from './components/workouts-page/add-exercise/difficulty-filtered-exercises/difficulty-filtered-exercises';
 import AddPersonalizedWorkout from './components/workouts-page/add-personalized-workout/add-personalized-workout';
+import Notifications from './components/profile/notifications/notifications';
 
 const Stack = createNativeStackNavigator();
 
@@ -98,6 +99,11 @@ export default function App() {
                 <Stack.Screen
                   name='AddPersonalizedWorkout'
                   component={AddPersonalizedWorkout}
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name='Notifications'
+                  component={Notifications}
                   options={{ headerShown: false }}
                 />
               </Stack.Navigator>

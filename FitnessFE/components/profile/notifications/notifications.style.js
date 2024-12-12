@@ -1,69 +1,119 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Dimensions } from 'react-native';
+
+const { width, height } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#000',
+    paddingTop: 10,
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginTop: 50,
+    marginBottom: 25,
+    color: '#ccc',
+  },
+  tabsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 10,
+  },
+  tab: {
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+    backgroundColor: '#ccc',
+  },
+  activeTab: {
+    backgroundColor: '#6a0dad',
+  },
+  tabText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  activeTabText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
   listContainer: {
-    padding: 10,
+    paddingBottom: 20,
   },
   notificationItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    backgroundColor: '#333',
+    borderRadius: 8,
+    padding: 12,
+    marginVertical: 5,
+    marginHorizontal: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 5,
+    elevation: 2,
   },
-  profileImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#ddd',
+  readCard: {
+    backgroundColor: '#333',
   },
-  notificationTextContainer: {
+  unreadCard: {
+    borderWidth: 3,
+    borderLeftColor: '#6a0dad'
+  },
+  iconContainer: {
+    marginRight: 12,
+  },
+  notificationContent: {
     flex: 1,
-    marginLeft: 10,
   },
-  notificationText: {
+  notificationMessage: {
     fontSize: 16,
     color: '#ccc',
   },
-  buttonContainer: {
+  notificationTimestamp: {
+    fontSize: 12,
+    color: '#888',
+    marginTop: 4,
+  },
+  actionButtonsContainer: {
     flexDirection: 'row',
-    marginTop: 5,
   },
   acceptButton: {
     backgroundColor: '#4CAF50',
     paddingVertical: 6,
     paddingHorizontal: 12,
-    borderRadius: 20,
+    borderRadius: 4,
+    marginRight: 5,
+    justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 10,
   },
-  declineButton: {
-    backgroundColor: '#f44336',
+  rejectButton: {
+    backgroundColor: '#F44336',
     paddingVertical: 6,
     paddingHorizontal: 12,
-    borderRadius: 20,
+    borderRadius: 4,
+    justifyContent: 'center',
     alignItems: 'center',
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '600',
   },
   loadingContainer: {
     flex: 1,
-    alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'center',
   },
   noNotificationsContainer: {
     flex: 1,
-    alignItems: 'center',
     justifyContent: 'center',
-    padding: 20,
+    alignItems: 'center',
   },
   noNotificationsText: {
-    fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
+    fontSize: 18,
+    color: '#888',
+  },
+  separator: {
+    height: 1,
+    backgroundColor: '#444',
+    marginHorizontal: 10,
   },
 });
 
