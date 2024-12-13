@@ -13,6 +13,7 @@ import { db, auth } from '../config/firebase-config';
 import { collection, query, where, getDocs, onSnapshot, doc, getDoc } from 'firebase/firestore';
 import { useRoute } from '@react-navigation/native';
 import Widget from '../widgets-template';
+import DateWorkoutsModal from './date-workouts-modal/date-workouts-modal';
 import styles from './home.style';
 
 const { width } = Dimensions.get('window');
@@ -34,7 +35,8 @@ export default function Home() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const backgroundOpacity = useRef(new Animated.Value(0)).current;
   const modalOpacity = useRef(new Animated.Value(0)).current;
-  const backgroundImage = require('../../assets/images/home-background3.webp')
+  const backgroundImage = require('../../assets/images/home-background3.webp');
+  const [isDateWorkoutsModalVisible, setIsDateWorkoutsModalVisible] = useState(false);
 
   useEffect(() => {
     if (workoutsCompleted >= goal && confettiRef.current) {
@@ -163,8 +165,7 @@ export default function Home() {
 
   const handleDayPress = (day) => {
     setSelectedDate(day.dateString);
-    openModal();
-    fetchWorkoutsForDate(day.dateString);
+    setIsDateWorkoutsModalVisible(true);
   };
 
   const imageOpacity = scrollY.interpolate({
@@ -397,50 +398,11 @@ export default function Home() {
           </Modal>
         )}
 
-        {modalVisible && (
-          <Modal
-            transparent={true}
-            visible={modalVisible}
-            onRequestClose={closeModal}
-          >
-            <View style={styles.modalBackground}>
-            <Animated.View style={[styles.backgroundOverlay, { opacity: backgroundOpacity }]} />
-
-            <Animated.View style={[styles.modalContainer, { opacity: modalOpacity }]}>
-              <Text style={styles.modalTitle}>
-                Workouts Completed on {selectedDate}
-              </Text>
-              {loading ? (
-                <ActivityIndicator size="large" color="#6a0dad" />
-              ) : error ? (
-                <Text style={styles.errorText}>{error}</Text>
-              ) : workoutsForDate.length === 0 ? (
-                <Text style={styles.noWorkoutsText}>No workouts completed on this day.</Text>
-              ) : (
-                <FlatList
-                  data={workoutsForDate}
-                  keyExtractor={(item) => item.id}
-                  style={{ maxHeight: 350 }}
-                  renderItem={({ item }) => (
-                    <View style={styles.workoutItem}>
-                      <Text style={styles.workoutName}>{item.name}</Text>
-                      <Text style={styles.workoutDetails}>{item.description}</Text>
-                      <Text style={styles.workoutDetails}>Type: {item.type}</Text>
-                      <Text style={styles.workoutDetails}>Difficulty: {item.difficulty}</Text>
-                    </View>
-                  )}
-                />
-              )}
-              <TouchableOpacity
-                onPress={closeModal}
-                style={styles.closeButton}
-              >
-                <Text style={styles.closeButtonText}>Close</Text>
-              </TouchableOpacity>
-            </Animated.View>
-          </View>
-          </Modal>
-        )}
+        <DateWorkoutsModal
+          visible={isDateWorkoutsModalVisible}
+          onClose={() => setIsDateWorkoutsModalVisible(false)}
+          selectedDate={selectedDate}
+        />
       </Animated.ScrollView>
     </View>
   );

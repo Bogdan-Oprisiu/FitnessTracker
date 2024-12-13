@@ -17,6 +17,7 @@ import useNotifications from './useNotifications';
 import { logRecentActivity } from './activity-logger';
 import { handleFriendRequestResponse } from './logActivityAndNotifications';
 import RecentActivities from './recent-activities/recent-activities';
+import FriendsWorkouts from './friends-workouts/friends-workouts';
 
 export default function Profile() {
   const DEFAULT_PROFILE_PICTURE_URL = 'https://firebasestorage.googleapis.com/v0/b/YOUR_PROJECT_ID.appspot.com/o/defaultProfilePictures%2Fdefault-profile-picture.jpg?alt=media&token=YOUR_TOKEN';
@@ -815,10 +816,17 @@ export default function Profile() {
         )}
 
         {searchQuery.trim() === '' && (
-          <View style={styles.recentActivityContainer}>
-            <Text style={styles.recentActivityTitle}>Recent Activity</Text>
-            <RecentActivities />
-          </View>
+          <>
+            <View style={styles.recentActivityContainer}>
+              <Text style={styles.recentActivityTitle}>Recent Activity</Text>
+              <RecentActivities />
+            </View>
+
+            <View style={styles.recentActivityContainer}>
+              <Text style={styles.recentActivityTitle}>Friends Workouts</Text>
+              <FriendsWorkouts />
+            </View>
+          </>
         )}
       </Animated.ScrollView>
 
