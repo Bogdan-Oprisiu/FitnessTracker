@@ -7,6 +7,7 @@ import { collection, getDocs, addDoc, serverTimestamp, doc, deleteDoc } from 'fi
 import { db, auth } from '../config/firebase-config';
 import styles from './workouts.style';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { handleActivityTracker } from '../profile/logActivityAndNotifications';
 
 const { height } = Dimensions.get('window');
 
@@ -159,6 +160,8 @@ export default function Workouts() {
       await deleteDoc(doc(db, docPath));
       const updatedWorkouts = workouts.filter((_, i) => i !== index);
       setWorkouts(updatedWorkouts);
+
+      handleActivityTracker(`You deleted the workout ${workoutToDelete.name} from your workouts list`);
     } catch (error) {
       console.error("Error deleting workout:", error);
       Alert.alert("Error", "Failed to delete workout. Please try again.");

@@ -41,7 +41,7 @@ const FriendsWorkouts = () => {
   const [selectedFriendName, setSelectedFriendName] = useState('');
   const [selectedFriendProfilePicture, setSelectedFriendProfilePicture] = useState('');
   
-  const noFriendsSelectedText = "Select a friend to view their workouts in the last week.\nTo view a complete workout history check the calendar on the home tab.";
+  const noFriendsSelectedText = "Select a friend to view their workouts in the last week.\n\nTo view a complete workout history check the calendar on the home tab.";
 
   const getOneWeekAgoTimestamp = () => {
     const now = new Date();

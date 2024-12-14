@@ -20,12 +20,11 @@ const { width } = Dimensions.get('window');
 
 export default function Home() {
   const route = useRoute();
-  const { workoutsCompleted, setWorkoutsCompleted, goal, completeWorkout } = useWorkout();
+  const { workoutsCompleted, setWorkoutsCompleted, goal, completeWorkout, confettiRef } = useWorkout();
   const [confettiVisible, setConfettiVisible] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
   const [markedDates, setMarkedDates] = useState({});
   const [completedDays, setCompletedDays] = useState([]);
-  const confettiRef = useRef(null);
   const scrollY = useRef(new Animated.Value(0)).current;
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDate, setSelectedDate] = useState('');
@@ -39,15 +38,18 @@ export default function Home() {
   const [isDateWorkoutsModalVisible, setIsDateWorkoutsModalVisible] = useState(false);
 
   useEffect(() => {
-    if (workoutsCompleted >= goal && confettiRef.current) {
-      setConfettiVisible(true);
-      confettiRef.current.startConfetti();
-      setTimeout(() => {
+  if (goal && workoutsCompleted >= goal && confettiRef.current) {
+    confettiRef.current.startConfetti();
+    setConfettiVisible(true);
+    setTimeout(() => {
+      if (confettiRef.current) {
         confettiRef.current.stopConfetti();
         setConfettiVisible(false);
-      }, 5000);
-    }
-  }, [workoutsCompleted, goal]);
+      }
+    }, 5000);
+  }
+}, [workoutsCompleted, goal]);
+
 
   const toggleCalendar = () => {
     setShowCalendar(!showCalendar);
@@ -86,82 +88,24 @@ export default function Home() {
     });
   };
 
-  const fetchWorkoutsForDate = async (date) => {
-    setLoading(true);
-    setError('');
-    setWorkoutsForDate([]);
+  useEffect(() => {
+    if (route.params?.newCompletionDate) {
+      const newDate = route.params.newCompletionDate.toISOString().split('T')[0];
+      const completedDate = new Date(route.params.newCompletionDate);
+      const dayName = completedDate.toLocaleDateString('en-US', { weekday: 'short' });
 
-    try {
-      const user = auth.currentUser;
-      if (!user) {
-        setError('User not authenticated.');
-        setLoading(false);
-        return;
-      }
+      setMarkedDates((prevDates) => ({
+        ...prevDates,
+        [newDate]: { marked: true, dotColor: '#6a0dad' },
+      }));
 
-      const startOfDay = new Date(date);
-      startOfDay.setHours(0, 0, 0, 0);
+      setCompletedDays((prevDays) => [...prevDays, dayName]);
 
-      const endOfDay = new Date(date);
-      endOfDay.setHours(23, 59, 59, 999);
-
-      const completedWorkoutsRef = collection(db, 'users', user.uid, 'completed_workouts');
-      const completedWorkoutsQuery = query(
-        completedWorkoutsRef,
-        where('dateCompleted', '>=', startOfDay),
-        where('dateCompleted', '<=', endOfDay)
-      );
-
-      const completedWorkoutsSnapshot = await getDocs(completedWorkoutsQuery);
-
-      if (completedWorkoutsSnapshot.empty) {
-        setWorkoutsForDate([]);
-        setLoading(false);
-        return;
-      }
-
-      const workouts = [];
-
-      for (const docSnap of completedWorkoutsSnapshot.docs) {
-        const data = docSnap.data();
-        const workoutId = data.workoutId;
-        const source = data.source;
-
-        let workoutDocRef;
-
-        if (source === 'default') {
-          workoutDocRef = doc(db, 'default_workouts', workoutId);
-        } else if (source === 'personalized') {
-          workoutDocRef = doc(db, 'users', user.uid, 'personalized_workouts', workoutId);
-        } else {
-          console.warn(`Unknown source '${source}' for workoutId '${workoutId}'`);
-          continue;
-        }
-
-        const workoutSnapshot = await getDoc(workoutDocRef);
-
-        if (workoutSnapshot.exists()) {
-          const workoutData = workoutSnapshot.data();
-          workouts.push({
-            id: workoutSnapshot.id,
-            name: workoutData.name,
-            description: workoutData.description,
-            type: workoutData.type.charAt(0).toUpperCase() + workoutData.type.slice(1),
-            difficulty: workoutData.difficulty.charAt(0).toUpperCase() + workoutData.difficulty.slice(1)
-          });
-        } else {
-          console.warn(`Workout with id '${workoutId}' not found in '${source}_workouts'`);
-        }
-      }
-
-      setWorkoutsForDate(workouts);
-    } catch (err) {
-      console.error('Error fetching workouts for date:', err);
-      setError('Failed to fetch workouts. Please try again.');
-    } finally {
-      setLoading(false);
+      navigation.setParams({ newCompletionDate: null });
     }
-  };
+  }, [route.params?.newCompletionDate]);
+
+  useEffect(() => {}, [workoutsCompleted]);
 
   const handleDayPress = (day) => {
     setSelectedDate(day.dateString);
@@ -312,7 +256,7 @@ export default function Home() {
           <Text style={styles.goalText}>Weekly Goal:</Text>
           <Text style={styles.goalNumbers}>{workoutsCompleted}/{goal}</Text>
           <Progress.Bar
-            progress={workoutsCompleted / goal}
+            progress={goal ? workoutsCompleted / goal : 0}
             width={width * 0.5}
             color="#6a0dad"
             unfilledColor="#d3d3d3"
@@ -343,7 +287,7 @@ export default function Home() {
           <View style={{ position: 'relative' }}>
             <Progress.Circle
               size={300}
-              progress={workoutsCompleted / goal}
+              progress={goal ? workoutsCompleted / goal : 0}
               showsText={false}
               color="#6a0dad"
               thickness={22}

@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, Image, Modal, FlatList, TextInput, ActivityIndicator, Animated } from 'react-native';
+import React, { useState, useEffect, useRef, memo } from 'react';
+import { aView, Text, TouchableOpacity, Image, Modal, FlatList, TextInput, ActivityIndicator, Animated } from 'react-native';
 import TextTicker from 'react-native-text-ticker';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as ImagePicker from 'expo-image-picker';
@@ -18,6 +18,171 @@ import { logRecentActivity } from './activity-logger';
 import { handleFriendRequestResponse } from './logActivityAndNotifications';
 import RecentActivities from './recent-activities/recent-activities';
 import FriendsWorkouts from './friends-workouts/friends-workouts';
+import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
+
+const FriendsRouteComponent = memo(({ 
+  filteredFriends, 
+  handleRemoveFriend, 
+  friendsLoading, 
+  friendsSearchQuery, 
+  setFriendsSearchQuery 
+}) => (
+  <View style={styles.tabContainer}>
+    <View style={styles.searchBarContainer}>
+      <MaterialIcons name="search" size={24} color="#6a0dad" style={styles.searchIcon} />
+      <TextInput
+        style={styles.searchBar}
+        placeholder="Search your friends"
+        placeholderTextColor="#999"
+        value={friendsSearchQuery}
+        onChangeText={setFriendsSearchQuery}
+        accessible={true}
+        accessibilityLabel="Search your friends"
+      />
+    </View>
+    {friendsLoading ? (
+      <ActivityIndicator size="large" color="#6a0dad" />
+    ) : (
+      <FlatList
+        data={filteredFriends}
+        keyExtractor={(item) => item.friendshipId}
+        renderItem={({ item }) => (
+          <View style={styles.friendItem}>
+            <Image
+              source={{ uri: item.profilePictureUrl || DEFAULT_PROFILE_PICTURE_URL }}
+              style={styles.friendImage}
+            />
+            <Text style={styles.friendName}>{item.username}</Text>
+            <TouchableOpacity
+              style={styles.removeButton}
+              onPress={() => handleRemoveFriend(item.friendshipId)}
+              accessible={true}
+              accessibilityLabel={`Remove ${item.username} from friends`}
+            >
+              <Text style={styles.buttonText}>Remove Friend</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+        ListEmptyComponent={<Text style={styles.noUsersText}>No friends found.</Text>}
+      />
+    )}
+  </View>
+));
+
+const AllUsersRouteComponent = memo(({ 
+  filteredAllUsers, 
+  handleAddFriend, 
+  handleRemoveFriend, 
+  handleAcceptRequest, 
+  handleRejectRequest, 
+  allUsersLoading, 
+  allUsersSearchQuery, 
+  setAllUsersSearchQuery,
+  getRelationshipStatus,
+  hasSearchedAllUsers 
+}) => (
+  <View style={styles.tabContainer}>
+    <View style={styles.searchBarContainer}>
+      <MaterialIcons name="search" size={24} color="#6a0dad" style={styles.searchIcon} />
+      <TextInput
+        style={styles.searchBar}
+        placeholder="Search all users"
+        placeholderTextColor="#999"
+        value={allUsersSearchQuery}
+        onChangeText={setAllUsersSearchQuery}
+        accessible={true}
+        accessibilityLabel="Search all users"
+      />
+    </View>
+    {allUsersLoading ? (
+      <ActivityIndicator size="large" color="#6a0dad" />
+    ) : (
+      <FlatList
+        data={filteredAllUsers}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => {
+          const relationshipStatus = getRelationshipStatus(item.id);
+          const friendshipId = item.friendshipId;
+
+          const renderButton = () => {
+            switch (relationshipStatus) {
+              case 'friends':
+                return (
+                  <TouchableOpacity
+                    style={styles.removeButton}
+                    onPress={() => handleRemoveFriend(friendshipId)}
+                    accessible={true}
+                    accessibilityLabel={`Remove ${item.username} from friends`}
+                  >
+                    <Text style={styles.buttonText}>Remove Friend</Text>
+                  </TouchableOpacity>
+                );
+              case 'pendingSent':
+                return (
+                  <TouchableOpacity
+                    style={styles.pendingButton}
+                    accessible={false}
+                    accessibilityLabel={`Friend request sent to ${item.username}`}
+                  >
+                    <Text style={styles.buttonText}>Pending</Text>
+                  </TouchableOpacity>
+                );
+              case 'pendingReceived':
+                return (
+                  <View style={styles.pendingContainer}>
+                    <TouchableOpacity
+                      style={styles.acceptButton}
+                      onPress={() => handleAcceptRequest(friendshipId, item.id)}
+                      accessible={true}
+                      accessibilityLabel={`Accept friend request from ${item.username}`}
+                    >
+                      <Text style={styles.buttonText}>Accept</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.rejectButton}
+                      onPress={() => handleRejectRequest(friendshipId, item.id)}
+                      accessible={true}
+                      accessibilityLabel={`Reject friend request from ${item.username}`}
+                    >
+                      <Text style={styles.buttonText}>Reject</Text>
+                    </TouchableOpacity>
+                  </View>
+                );
+              default:
+                return (
+                  <TouchableOpacity
+                    style={styles.addButton}
+                    onPress={() => handleAddFriend(item.id)}
+                    accessible={true}
+                    accessibilityLabel={`Add ${item.username} as a friend`}
+                  >
+                    <Text style={styles.buttonText}>Add Friend</Text>
+                  </TouchableOpacity>
+                );
+            }
+          };
+
+          return (
+            <View style={styles.searchResultItem}>
+              <Image
+                source={{ uri: item.profilePictureUrl || DEFAULT_PROFILE_PICTURE_URL }}
+                style={styles.searchResultImage}
+              />
+              <Text style={styles.searchResultName}>{item.username}</Text>
+              {renderButton()}
+            </View>
+          );
+        }}
+        ListEmptyComponent={
+          hasSearchedAllUsers ? (
+            <Text style={styles.noUsersText}>No users found.</Text>
+          ) : null
+        }
+      />
+    )}
+  </View>
+));
+
 
 export default function Profile() {
   const DEFAULT_PROFILE_PICTURE_URL = 'https://firebasestorage.googleapis.com/v0/b/YOUR_PROJECT_ID.appspot.com/o/defaultProfilePictures%2Fdefault-profile-picture.jpg?alt=media&token=YOUR_TOKEN';
@@ -32,6 +197,42 @@ export default function Profile() {
   const [loadingUsers, setLoadingUsers] = useState(false);
   const scrollY = useRef(new Animated.Value(0)).current;
   const HEADER_HEIGHT = 60;
+
+  const [tabIndex, setTabIndex] = useState(0);
+  const [routes] = useState([
+    { key: 'friends', title: 'Friends' },
+    { key: 'allUsers', title: 'All Users' },
+  ]);
+
+  const [friendsSearchQuery, setFriendsSearchQuery] = useState('');
+  const [allUsersSearchQuery, setAllUsersSearchQuery] = useState('');
+  const [hasSearchedAllUsers, setHasSearchedAllUsers] = useState(false);
+  const [filteredFriends, setFilteredFriends] = useState([]);
+  const [filteredAllUsers, setFilteredAllUsers] = useState([]);
+  const [friendsLoading, setFriendsLoading] = useState(false);
+  const [allUsersLoading, setAllUsersLoading] = useState(false);
+
+  useEffect(() => {
+    if (friendsSearchQuery.trim() === '') {
+      setFilteredFriends(friends);
+    } else {
+      const filtered = friends.filter(friend =>
+        friend.username.toLowerCase().includes(friendsSearchQuery.toLowerCase())
+      );
+      setFilteredFriends(filtered);
+    }
+  }, [friendsSearchQuery, friends]);
+
+  useEffect(() => {
+    if (allUsersSearchQuery.trim() === '') {
+      setFilteredAllUsers(searchResults);
+    } else {
+      const filtered = searchResults.filter(user =>
+        user.username.toLowerCase().includes(allUsersSearchQuery.toLowerCase())
+      );
+      setFilteredAllUsers(filtered);
+    }
+  }, [allUsersSearchQuery, searchResults]);
 
   const headerHeight = scrollY.interpolate({
     inputRange: [0, 100],
@@ -111,29 +312,30 @@ export default function Profile() {
 
   const closeFriendsModal = () => {
     setFriendsModalVisible(false);
-    setSearchQuery('');
+    setFriendsSearchQuery('');
+    setAllUsersSearchQuery('');
     setSearchResults([]);
   };
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const currentUser = auth.currentUser;
+    const currentUser = auth.currentUser;
 
-        if (!currentUser) {
-          setLoading(false);
-          return;
-        }
+    if (!currentUser) {
+      setLoading(false);
+      return;
+    }
 
-        const uid = currentUser.uid;
+    const uid = currentUser.uid;
+    const userDocRef = doc(db, 'users', uid);
 
-        const userDocRef = doc(db, 'users', uid);
+    setLoading(true);
 
-        const userDocSnap = await getDoc(userDocRef);
-
-        if (userDocSnap.exists()) {
-          const userData = userDocSnap.data();
-          setUsername(userData.username);
+    const unsubscribe = onSnapshot(
+      userDocRef,
+      (docSnap) => {
+        if (docSnap.exists()) {
+          const userData = docSnap.data();
+          setUsername(userData.username || '');
 
           if (typeof userData.profilePictureUrl === 'string' && userData.profilePictureUrl.startsWith('http')) {
             setProfilePicture(userData.profilePictureUrl);
@@ -143,15 +345,19 @@ export default function Profile() {
           }
 
           setFriendsCount(userData.friendsCount || 0);
-        } 
-      } catch (err) {
-        console.error('Error fetching user data:', err);
-      } finally {
+        } else {
+          console.warn(`User document for UID ${uid} does not exist.`);
+        }
+
+        setLoading(false);
+      },
+      (error) => {
+        console.error('Error listening to user data:', error);
         setLoading(false);
       }
-    };
+    );
 
-    fetchUserData();
+    return () => unsubscribe();
   }, []);
 
   const { friends, loading: loadingFriends } = useFriends();
@@ -213,9 +419,16 @@ export default function Profile() {
   ).current;
 
   const handleSearchInput = (text) => {
-    setSearchQuery(text);
+    setAllUsersSearchQuery(text);
+    if (text.trim() !== '') {
+      setHasSearchedAllUsers(true);
+    } else {
+      setHasSearchedAllUsers(false);
+      setFilteredAllUsers([]); 
+    }
     debouncedHandleSearch(text);
   };
+  
 
   const handleSearch = async (input) => {
     if (input.trim() === '') {
@@ -292,6 +505,7 @@ export default function Profile() {
         });
       }
   
+      console.log('Fetched Users:', fetchedUsers);
       setSearchResults(fetchedUsers);
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -306,7 +520,7 @@ export default function Profile() {
     } finally {
       setLoadingUsers(false);
     }
-  };
+  };  
 
   const getRelationshipStatus = (otherUserId) => {
     if (friends.some(friend => friend.friendUserId === otherUserId)) {
@@ -687,6 +901,63 @@ export default function Profile() {
     );
   }
 
+  const FriendsRouteComponentInstance = (
+    <FriendsRouteComponent
+      filteredFriends={filteredFriends}
+      handleRemoveFriend={handleRemoveFriend}
+      friendsLoading={friendsLoading}
+      friendsSearchQuery={friendsSearchQuery}
+      setFriendsSearchQuery={setFriendsSearchQuery}
+    />
+  );
+
+  const AllUsersRouteComponentInstance = (
+    <AllUsersRouteComponent
+      filteredAllUsers={filteredAllUsers}
+      handleAddFriend={handleAddFriend}
+      handleRemoveFriend={handleRemoveFriend}
+      handleAcceptRequest={handleAcceptRequest}
+      handleRejectRequest={handleRejectRequest}
+      allUsersLoading={allUsersLoading}
+      allUsersSearchQuery={allUsersSearchQuery}
+      setAllUsersSearchQuery={setAllUsersSearchQuery}
+      getRelationshipStatus={getRelationshipStatus}
+    />
+  );
+
+const renderScene = ({ route }) => {
+  switch (route.key) {
+    case 'friends':
+      return (
+        <FriendsRouteComponent
+          filteredFriends={filteredFriends}
+          handleRemoveFriend={handleRemoveFriend}
+          friendsLoading={friendsLoading}
+          friendsSearchQuery={friendsSearchQuery}
+          setFriendsSearchQuery={setFriendsSearchQuery}
+        />
+      );
+    case 'allUsers':
+      return (
+        <AllUsersRouteComponent
+          filteredAllUsers={filteredAllUsers}
+          handleAddFriend={handleAddFriend}
+          handleRemoveFriend={handleRemoveFriend}
+          handleAcceptRequest={handleAcceptRequest}
+          handleRejectRequest={handleRejectRequest}
+          allUsersLoading={allUsersLoading}
+          allUsersSearchQuery={allUsersSearchQuery}
+          setAllUsersSearchQuery={handleSearchInput}
+          getRelationshipStatus={getRelationshipStatus}
+          hasSearchedAllUsers={hasSearchedAllUsers}
+        />
+      );
+    default:
+      return null;
+  }
+};
+
+
   return (
     <View style={styles.container}>
       <Animated.View style={[styles.header, {height: HEADER_HEIGHT}]}>
@@ -709,25 +980,25 @@ export default function Profile() {
           </Animated.View>
 
           <Animated.View style={{ transform: [{ translateX: icon3TranslateX }] }}>
-            <TouchableOpacity style={styles.headerIcon} onPress={() => console.log('Settings')}>
+            <TouchableOpacity style={styles.headerIcon} onPress={() => navigation.navigate('SettingsScreen')}>
               <MaterialIcons name="settings" size={28} color="#6a0dad" />
             </TouchableOpacity>
           </Animated.View>
 
           <Animated.View style={{ transform: [{ translateX: icon4TranslateX }] }}>
-          <TouchableOpacity 
-            onPress={() => navigation.navigate('Notifications')} 
-            style={styles.headerIcon}
-            accessible={true}
-            accessibilityLabel="Open Notifications"
-          >
-            <Ionicons name="notifications-outline" size={28} color="#6a0dad" />
-            {notifications.some(n => !n.isRead) && (
-              <View style={styles.notificationBadge}>
-                <Text style={styles.badgeText}>{notifications.filter(n => !n.isRead).length}</Text>
-              </View>
-            )}
-          </TouchableOpacity>
+            <TouchableOpacity 
+              onPress={() => navigation.navigate('Notifications')} 
+              style={styles.headerIcon}
+              accessible={true}
+              accessibilityLabel="Open Notifications"
+            >
+              <Ionicons name="notifications-outline" size={28} color="#6a0dad" />
+              {notifications.some(n => !n.isRead) && (
+                <View style={styles.notificationBadge}>
+                  <Text style={styles.badgeText}>{notifications.filter(n => !n.isRead).length}</Text>
+                </View>
+              )}
+            </TouchableOpacity>
           </Animated.View>
         </View>
 
@@ -783,51 +1054,15 @@ export default function Profile() {
           { useNativeDriver: true }
         )}
       >
-        <View style={styles.searchBarContainer}>
-          <MaterialIcons name="search" size={24} color="#6a0dad" style={styles.searchIcon} />
-          <TextInput
-            style={styles.searchBar}
-            placeholder="Search for users"
-            placeholderTextColor="#999"
-            value={searchQuery}
-            onChangeText={handleSearchInput}
-          />
+        <View style={styles.recentActivityContainer}>
+          <Text style={styles.recentActivityTitle}>Recent Activity</Text>
+          <RecentActivities />
         </View>
 
-        {searchQuery.trim() !== '' && (
-          <View style={styles.dropdown}>
-            {loadingUsers && <ActivityIndicator size="small" color="#6a0dad" />}
-            {searchResults.length > 0 ? (
-              <FlatList
-                data={searchResults}
-                scrollEnabled={false}
-                keyExtractor={(item) => item.id}
-                renderItem={({ item }) => (
-                  <TouchableOpacity style={styles.dropdownItem} onPress={() => {/* handle user selection */}}>
-                    <Image source={{ uri: item.profilePictureUrl || DEFAULT_PROFILE_PICTURE_URL }} style={styles.dropdownImage} />
-                    <Text style={styles.dropdownText}>{item.username}</Text>
-                  </TouchableOpacity>
-                )}
-              />
-            ) : (
-              <Text style={styles.noUsersText}>No users found.</Text>
-            )}
-          </View>
-        )}
-
-        {searchQuery.trim() === '' && (
-          <>
-            <View style={styles.recentActivityContainer}>
-              <Text style={styles.recentActivityTitle}>Recent Activity</Text>
-              <RecentActivities />
-            </View>
-
-            <View style={styles.recentActivityContainer}>
-              <Text style={styles.recentActivityTitle}>Friends Workouts</Text>
-              <FriendsWorkouts />
-            </View>
-          </>
-        )}
+        <View style={styles.friendsWorkoutsContainer}>
+          <Text style={styles.friendsWorkoutsTitle}>Friends Workouts</Text>
+          <FriendsWorkouts />
+        </View>
       </Animated.ScrollView>
 
       <Modal
@@ -838,147 +1073,23 @@ export default function Profile() {
       >
         <View style={styles.modalBackground}>
           <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>Your Friends</Text>
-
-            <View style={styles.modalSearchBarContainer}>
-              <MaterialIcons name="search" size={24} color="#6a0dad" style={styles.modalSearchIcon} />
-              <TextInput
-                style={styles.modalSearchBar}
-                placeholder="Search Users"
-                placeholderTextColor="#999"
-                value={searchQuery}
-                onChangeText={handleSearchInput}
-                accessible={true}
-                accessibilityLabel="Search Users"
-              />
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Friends & Users</Text>
             </View>
-
-            {loadingUsers && <ActivityIndicator size="large" color="#6a0dad" style={{ marginVertical: 10 }} />}
-            {searchQuery.trim() !== '' ? (
-              searchResults.length > 0 ? (
-                <FlatList
-                  data={searchResults}
-                  keyExtractor={(item) => item.id}
-                  renderItem={({ item }) => {
-                    const relationshipStatus = getRelationshipStatus(item.id);
-                    const friendshipId = item.friendshipId;
-
-                    const renderButton = () => {
-                      switch (relationshipStatus) {
-                        case 'friends':
-                          return (
-                            <TouchableOpacity
-                              style={styles.removeButton}
-                              onPress={() => {
-                                const friendship = friends.find(f => f.friendUserId === item.id);
-                                if (friendship) {
-                                  handleRemoveFriend(friendship.friendshipId);
-                                } else {
-                                  Toast.show({
-                                    type: 'error',
-                                    text1: 'Error',
-                                    text2: 'Friendship data not found.',
-                                    position: 'top',
-                                    visibilityTime: 5000,
-                                    autoHide: true,
-                                  });
-                                }
-                              }}
-                              accessible={true}
-                              accessibilityLabel={`Remove ${item.username} from friends`}
-                            >
-                              <Text style={styles.buttonText}>Remove Friend</Text>
-                            </TouchableOpacity>
-                          );
-                        case 'pendingSent':
-                          return (
-                            <TouchableOpacity
-                              style={styles.pendingButton}
-                              accessible={false}
-                              accessibilityLabel={`Cancel friend request to ${item.username}`}
-                            >
-                              <Text style={styles.buttonText}>Pending</Text>
-                            </TouchableOpacity>
-                          );
-                        case 'pendingReceived':
-                          return (
-                            <View style={styles.pendingContainer}>
-                              <TouchableOpacity
-                                style={styles.acceptButton}
-                                onPress={() => handleAcceptRequest(friendshipId, item.id)}
-                                accessible={true}
-                                accessibilityLabel={`Accept friend request from ${item.username}`}
-                              >
-                                <Text style={styles.buttonText}>Accept</Text>
-                              </TouchableOpacity>
-                              <TouchableOpacity
-                                style={styles.rejectButton}
-                                onPress={() => handleRejectRequest(friendshipId, item.id)}
-                                accessible={true}
-                                accessibilityLabel={`Reject friend request from ${item.username}`}
-                              >
-                                <Text style={styles.buttonText}>Reject</Text>
-                              </TouchableOpacity>
-                            </View>
-                          );
-                        default:
-                          return (
-                            <TouchableOpacity
-                              style={styles.addButton}
-                              onPress={() => handleAddFriend(item.id)} 
-                              accessible={true}
-                              accessibilityLabel={`Add ${item.username} as a friend`}
-                            >
-                              <Text style={styles.buttonText}>Add Friend</Text>
-                            </TouchableOpacity>
-                          );
-                      }
-                    };
-
-                    return (
-                      <View style={styles.searchResultItem}>
-                        <Image
-                          source={{ uri: item.profilePictureUrl || DEFAULT_PROFILE_PICTURE_URL }}
-                          style={styles.searchResultImage}
-                        />
-                        <Text style={styles.searchResultName}>{item.username}</Text>
-                        {renderButton()}
-                      </View>
-                    );
-                  }}
+            <TabView
+              navigationState={{ index: tabIndex, routes }}
+              renderScene={renderScene}
+              onIndexChange={setTabIndex}
+              renderTabBar={props => (
+                <TabBar
+                  {...props}
+                  indicatorStyle={{ backgroundColor: '#6a0dad' }}
+                  style={{ backgroundColor: '#1a1a1a' }}
+                  labelStyle={{ color: '#fff', fontWeight: 'bold' }}
+                  activeColor='#6a0dad'
                 />
-              ) : (
-                <Text style={styles.noUsersText}>No users found.</Text>
-              )
-            ) : (
-              friends.length > 0 ? (
-                <FlatList
-                  data={friends}
-                  keyExtractor={(item) => item.friendshipId}
-                  renderItem={({ item }) => (
-                    <View style={styles.friendItem}>
-                      <Image
-                        source={{ uri: item.profilePictureUrl || DEFAULT_PROFILE_PICTURE_URL }}
-                        style={styles.friendImage}
-                      />
-                      <Text style={styles.friendName}>{item.username}</Text>
-                      <TouchableOpacity
-                        style={styles.removeButton}
-                        onPress={() => handleRemoveFriend(item.friendshipId)}
-                        accessible={true}
-                        accessibilityLabel={`Remove ${item.username} from friends`}
-                      >
-                        <Text style={styles.buttonText}>Remove Friend</Text>
-                      </TouchableOpacity>
-                    </View>
-                  )}
-                  contentContainerStyle={{ paddingBottom: 20 }}
-                />
-              ) : (
-                <Text style={styles.noUsersText}>No friends found.</Text>
-              )
-            )}
-
+              )}
+            />
             <TouchableOpacity 
               onPress={closeFriendsModal} 
               style={styles.closeButton}

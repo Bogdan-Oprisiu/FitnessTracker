@@ -1,100 +1,40 @@
-import { StyleSheet, Dimensions } from 'react-native';
-
-const { width, height } = Dimensions.get('window');
+import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
-    paddingTop: 10,
+    padding: 20,
+    backgroundColor: '#1a1a1a',
   },
   title: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: 'bold',
-    textAlign: 'center',
+    color: '#6a0dad',
+    marginBottom: 20,
     marginTop: 50,
-    marginBottom: 25,
-    color: '#ccc',
+    textAlign: 'center'
   },
   tabsContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginBottom: 10,
+    marginBottom: 20,
   },
   tab: {
-    paddingVertical: 8,
-    paddingHorizontal: 20,
-    borderRadius: 20,
-    backgroundColor: '#ccc',
+    flex: 1,
+    paddingVertical: 10,
+    backgroundColor: '#333',
+    marginHorizontal: 5,
+    borderRadius: 5,
+    alignItems: 'center',
   },
   activeTab: {
     backgroundColor: '#6a0dad',
   },
   tabText: {
+    color: '#fff',
     fontSize: 16,
-    color: '#333',
   },
   activeTabText: {
-    color: '#fff',
     fontWeight: 'bold',
-  },
-  listContainer: {
-    paddingBottom: 20,
-  },
-  notificationItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#333',
-    borderRadius: 8,
-    padding: 12,
-    marginVertical: 5,
-    marginHorizontal: 10,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 5,
-    elevation: 2,
-  },
-  readCard: {
-    backgroundColor: '#333',
-  },
-  unreadCard: {
-    borderWidth: 3,
-    borderLeftColor: '#6a0dad'
-  },
-  iconContainer: {
-    marginRight: 12,
-  },
-  notificationContent: {
-    flex: 1,
-  },
-  notificationMessage: {
-    fontSize: 16,
-    color: '#ccc',
-  },
-  notificationTimestamp: {
-    fontSize: 12,
-    color: '#888',
-    marginTop: 4,
-  },
-  actionButtonsContainer: {
-    flexDirection: 'row',
-  },
-  acceptButton: {
-    backgroundColor: '#4CAF50',
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 4,
-    marginRight: 5,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  rejectButton: {
-    backgroundColor: '#F44336',
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 4,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   loadingContainer: {
     flex: 1,
@@ -107,13 +47,76 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   noNotificationsText: {
-    fontSize: 18,
-    color: '#888',
+    color: '#ccc',
+    fontSize: 16,
   },
-  separator: {
-    height: 1,
-    backgroundColor: '#444',
-    marginHorizontal: 10,
+  listContainer: {
+    paddingBottom: 20,
+  },
+  notificationItem: {
+    flexDirection: 'row',
+    backgroundColor: '#2c2c2c',
+    borderRadius: 5,
+    padding: 15,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  readCard: {
+    opacity: 1,
+  },
+  unreadCard: {
+    opacity: 1,
+  },
+  iconContainer: {
+    marginRight: 15,
+  },
+  notificationContent: {
+    flex: 1,
+  },
+  notificationMessage: {
+    color: '#fff',
+    fontSize: 16,
+    marginBottom: 5,
+  },
+  notificationTimestamp: {
+    color: '#aaa',
+    fontSize: 12,
+  },
+  actionButtonsContainer: {
+    flexDirection: 'row',
+    marginLeft: 10,
+  },
+  acceptButton: {
+    backgroundColor: '#4CAF50',
+    padding: 10,
+    borderRadius: 5,
+    marginRight: 5,
+  },
+  rejectButton: {
+    backgroundColor: '#F44336',
+    padding: 10,
+    borderRadius: 5,
+  },
+  rowBack: {
+    alignItems: 'center',
+    backgroundColor: '#ff4d4d',
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    paddingRight: 15,
+    borderRadius: 5,
+    marginBottom: 11,
+    marginLeft: 10
+  },
+  deleteButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 75,
+    height: '100%',
+  },
+  backTextWhite: {
+    color: '#fff',
+    marginTop: 5,
   },
 });
 

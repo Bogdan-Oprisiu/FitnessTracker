@@ -7,6 +7,7 @@ import { getDoc, doc, collection, deleteDoc, query, orderBy, getDocs, updateDoc,
 import { db, auth } from '../../config/firebase-config';
 import styles from './edit-workout.style';
 import { ScrollView } from 'react-native-gesture-handler';
+import { logRecentActivity } from '../../profile/activity-logger';
 
 export default function EditWorkout({ route }) {
   const { workout } = route.params;
@@ -21,12 +22,17 @@ export default function EditWorkout({ route }) {
   const [workoutDescription, setWorkoutDescription] = useState(workout.description || '');
   const [isEditingName, setIsEditingName] = useState(false);
   const [isEditingDescription, setIsEditingDescription] = useState(false);
+  const [hasEdited, setHasEdited] = useState(false);
   const [fadeAnim] = useState(new Animated.Value(0));
   const user = auth.currentUser;
   const basePath =
     workout.source === 'personalized' && user
       ? `users/${user.uid}/personalized_workouts/${workout.id}`
       : `default_workouts/${workout.id}`;
+
+  useEffect(() => {
+    setHasEdited(false);
+  }, []);
 
   useEffect(() => {
     const fetchExercises = async () => {
@@ -91,6 +97,10 @@ export default function EditWorkout({ route }) {
           `${basePath}/exercise_id/${exercise.id}`
         );
         await updateDoc(exerciseDocRef, { sets: exercise.sets });
+        if (!hasEdited) {
+          logRecentActivity(`You have edited the workout ${workoutName}`)
+          setHasEdited(true);
+        }
         console.log('Exercise sets updated in Firestore');
       } catch (error) {
         console.error('Error updating exercise sets:', error);
@@ -157,6 +167,11 @@ export default function EditWorkout({ route }) {
       const workoutDocRef = doc(db, basePath);
       await updateDoc(workoutDocRef, { name: workoutName });
       console.log('Workout name updated successfully in Firestore.');
+
+      if (!hasEdited) {
+        logRecentActivity(`You have edited the workout ${workoutName}`)
+        setHasEdited(true);
+      }
     } catch (error) {
       console.error('Error updating workout name:', error);
       Alert.alert('Error', 'Failed to update workout name. Please try again.');
@@ -170,6 +185,10 @@ export default function EditWorkout({ route }) {
     try {
       const workoutDocRef = doc(db, basePath);
       await updateDoc(workoutDocRef, { description: workoutDescription });
+      if (!hasEdited) {
+        logRecentActivity(`You have edited the workout ${workoutName}`)
+        setHasEdited(true);
+      }
     } catch (error) {
       console.error('Error updating workout description:', error);
       alert('Failed to update workout description.');
@@ -295,6 +314,10 @@ export default function EditWorkout({ route }) {
       );
       await deleteDoc(exerciseDocRef);
       console.log('Exercise deleted from Firestore');
+      if (!hasEdited) {
+        logRecentActivity(`You have edited the workout ${workoutName}`)
+        setHasEdited(true);
+      }
     } catch (error) {
       console.error('Error deleting exercise:', error);
       Alert.alert('Error', 'Failed to delete exercise. Please try again.');
@@ -325,6 +348,10 @@ export default function EditWorkout({ route }) {
     
           await batch.commit();
           console.log('Exercise order updated in Firebase successfully');
+          if (!hasEdited) {
+            logRecentActivity(`You have edited the workout ${workoutName}`)
+            setHasEdited(true);
+          }
         } catch (error) {
           console.error('Error updating exercise order in Firebase:', error);
         }

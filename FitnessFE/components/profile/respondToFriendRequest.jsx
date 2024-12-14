@@ -43,18 +43,7 @@ export const acceptFriendRequest = async (friendshipId, fromUserId) => {
       await updateDoc(friendUserDocRef, {
         friendsCount: increment(1),
       });
-  
-      const friendsRefCurrent = collection(db, 'users', currentUserId, 'friends');
-      await addDoc(friendsRefCurrent, {
-        friendId: friendUserId,
-        since: serverTimestamp(),
-      });
-  
-      const friendsRefFriend = collection(db, 'users', friendUserId, 'friends');
-      await addDoc(friendsRefFriend, {
-        friendId: currentUserId,
-        since: serverTimestamp(),
-      });
+
   
       await handleFriendRequestResponse(
         fromUserId, 

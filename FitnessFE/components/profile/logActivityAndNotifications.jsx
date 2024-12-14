@@ -62,3 +62,27 @@ export const handleFriendRequestResponse = async (targetUserId, senderAction, ta
     console.error('Error handling friend request response:', error);
   }
 };
+
+export const handleActivityTracker = async (action) => {
+  try {
+    const currentUser = auth.currentUser;
+    if (!currentUser) throw new Error('No user is currently logged in.');
+
+    const currentUserId = currentUser.uid;
+
+    const currentUserDoc = await getDoc(doc(db, 'users', currentUserId));
+    const currentUsername = currentUserDoc.exists() ? currentUserDoc.data().username : 'Unknown User';
+
+    const recentActivitiesRef = collection(db, 'users', currentUserId, 'recentActivities');
+
+    await addDoc(recentActivitiesRef, {
+      action: action,
+      targetUserId: currentUserId,
+      targetUsername: currentUsername,
+      timestamp: serverTimestamp(),
+    });
+
+  } catch (error) {
+    console.error('Error handling friend request response:', error);
+  }
+}

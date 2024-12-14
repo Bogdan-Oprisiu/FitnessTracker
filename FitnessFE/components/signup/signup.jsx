@@ -126,7 +126,8 @@ export default function Signup() {
                         username_lowercase: username.toLowerCase(),
                         email,
                         profilePictureUrl,
-                        friendsCount: 0
+                        friendsCount: 0,
+                        weeklyGoal: 5
                     });
     
                     Toast.show({

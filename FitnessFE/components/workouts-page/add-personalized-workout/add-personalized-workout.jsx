@@ -4,6 +4,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { doc, setDoc, collection, onSnapshot, deleteDoc, getDoc } from 'firebase/firestore';
 import { db, auth } from '../../config/firebase-config';
 import styles from './add-personalized-workout.style';
+import { handleActivityTracker } from '../../profile/logActivityAndNotifications';
 
 export default function AddPersonalizedWorkout({ navigation, route }) {
   const { workoutId, userId } = route.params;
@@ -122,6 +123,7 @@ export default function AddPersonalizedWorkout({ navigation, route }) {
       });
 
       Alert.alert('Success', 'Workout saved successfully!');
+      handleActivityTracker(`You created the workout ${workoutName}`);
       navigation.goBack();
     } catch (error) {
       console.error("Error saving workout:", error);

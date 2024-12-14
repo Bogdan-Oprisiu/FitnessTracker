@@ -1,25 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { 
-  View, 
-  Text, 
-  TouchableOpacity, 
-  FlatList, 
-  ActivityIndicator, 
-  Alert 
-} from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator, Alert, Dimensions } from 'react-native';
+import { SwipeListView } from 'react-native-swipe-list-view';
 import { Ionicons } from '@expo/vector-icons';
 import { db, auth } from '../../config/firebase-config';
-import { 
-  collection, 
-  query, 
-  where, 
-  onSnapshot, 
-  doc, 
-  getDoc, 
-  getDocs,
-  writeBatch, 
-  orderBy 
-} from 'firebase/firestore';
+import { collection, query, where, onSnapshot, doc, getDoc, getDocs,writeBatch, orderBy, deleteDoc } from 'firebase/firestore';
 import Toast from 'react-native-toast-message';
 import styles from './notifications.style';
 import { acceptFriendRequest, rejectFriendRequest } from '../respondToFriendRequest';
@@ -31,6 +15,12 @@ const Notifications = () => {
   const [loading, setLoading] = useState(true);
   const [selectedTab, setSelectedTab] = useState('New');
   const userCache = useRef({});
+
+  const screenWidth = Dimensions.get('window').width;
+
+  const deletingRowsRef = useRef(new Set());
+
+  const rowMapRef = useRef({});
 
   useEffect(() => {
     const currentUser = auth.currentUser;
@@ -190,6 +180,8 @@ const Notifications = () => {
         return <Ionicons name="close-circle" size={24} color="#F44336" />;
       case 'friendRemoved':
         return <Ionicons name="close-circle" size={24} color="#F44336" />;
+      case 'workoutCompleted':
+        return <Ionicons name="fitness" size={24} color="#FF5722" />;
       default:
         return <Ionicons name="notifications" size={24} color="#6a0dad" />;
     }
@@ -285,18 +277,60 @@ const Notifications = () => {
     );
   };
 
+  const handleDeleteNotification = async (notificationId) => {
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      Alert.alert('Error', 'User not authenticated.');
+      return;
+    }
+
+    try {
+      const notificationRef = doc(db, 'users', currentUser.uid, 'notifications', notificationId);
+      await deleteDoc(notificationRef);
+      setNotifications((prevNotifications) => 
+        prevNotifications.filter(notification => notification.id !== notificationId)
+      );
+      Toast.show({
+        type: 'success',
+        text1: 'Notification Deleted',
+        text2: 'The notification has been deleted successfully.',
+        position: 'top',
+        visibilityTime: 3000,
+        autoHide: true,
+      });
+
+      if (rowMapRef.current[notificationId]) {
+        rowMapRef.current[notificationId].closeRow();
+      }
+
+    } catch (error) {
+      console.error('Error deleting notification:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Could not delete the notification. Please try again.',
+        position: 'top',
+        visibilityTime: 5000,
+        autoHide: true,
+      });
+    }
+  };
+
   const renderItem = ({ item }) => (
-    <TouchableOpacity 
-      style={[styles.notificationItem, item.isRead ? styles.readCard : styles.unreadCard]} 
-      onPress={() => handleNotificationPress(item)}
-      accessible={true}
-      accessibilityLabel={`View details of notification from ${item.fromUsername}`}
-    >
+    <View style={[
+      styles.notificationItem, 
+      item.isRead ? styles.readCard : styles.unreadCard
+    ]}>
       <View style={styles.iconContainer}>
         {getNotificationIcon(item.type)}
       </View>
       <View style={styles.notificationContent}>
-        <Text style={styles.notificationMessage}>{item.message}</Text>
+        <Text style={[
+          styles.notificationMessage, 
+          !item.isRead && styles.unreadNotificationMessage
+        ]}>
+          {item.message}
+        </Text>
         <Text style={styles.notificationTimestamp}>
           {item.timestamp?.toDate().toLocaleString()}
         </Text>
@@ -321,12 +355,63 @@ const Notifications = () => {
           </TouchableOpacity>
         </View>
       )}
-    </TouchableOpacity>
+    </View>
   );
 
-  const renderSeparator = () => (
-    <View style={styles.separator} />
+
+  const renderHiddenItem = (data, rowMap) => (
+    <View style={styles.rowBack}>
+      <TouchableOpacity
+        style={styles.deleteButton}
+        onPress={() => onDeleteRow(data.item.id)}
+        accessible={true}
+        accessibilityLabel="Delete notification"
+      >
+        <Ionicons name="trash" size={24} color="#fff" />
+        <Text style={styles.backTextWhite}>Delete</Text>
+      </TouchableOpacity>
+    </View>
   );
+
+  const closeRow = (rowMap, rowKey) => {
+    if (rowMap[rowKey]) {
+      rowMap[rowKey].closeRow();
+    }
+  };
+
+  const onDeleteRow = (rowKey) => {
+    if (deletingRowsRef.current.has(rowKey)) {
+      return;
+    }
+
+    deletingRowsRef.current.add(rowKey);
+
+    setTimeout(() => {
+      Alert.alert(
+        'Delete Notification',
+        'Are you sure you want to delete this notification?',
+        [
+          { 
+            text: 'Cancel', 
+            style: 'cancel', 
+            onPress: () => {
+              deletingRowsRef.current.delete(rowKey);
+              closeRow(rowMapRef.current, rowKey);
+            } 
+          },
+          { 
+            text: 'Delete', 
+            style: 'destructive', 
+            onPress: () => {
+              handleDeleteNotification(rowKey);
+              deletingRowsRef.current.delete(rowKey);
+            } 
+          },
+        ],
+        { cancelable: true }
+      );
+    }, 300);
+  };
 
   return (
     <View style={styles.container}>
@@ -363,15 +448,35 @@ const Notifications = () => {
             </Text>
           </View>
         ) : (
-          <FlatList
+          <SwipeListView
             data={notifications}
             keyExtractor={(item) => item.id}
             renderItem={renderItem}
-            ItemSeparatorComponent={renderSeparator}
-            contentContainerStyle={styles.listContainer}
+            renderHiddenItem={renderHiddenItem}
+            rightOpenValue={-100}
+            disableRightSwipe
+            onRowDidOpen={(rowKey) => {
+              console.log('Row opened', rowKey);
+            }}
+            onSwipeValueChange={(swipeData) => {
+              const { key, value } = swipeData;
+              if (value < -screenWidth / 3 && !rowMapRef.current[key]) {
+                onDeleteRow(key);
+              }
+            }}
+            onRowOpen={(rowKey, rowMap) => {
+              rowMapRef.current[rowKey] = rowMap[rowKey];
+            }}
+            onRowClose={(rowKey) => {
+              delete rowMapRef.current[rowKey];
+            }}
+            previewRowKey={'0'}
+            previewOpenValue={-40}
+            previewOpenDelay={3000}
           />
         )
       )}
+      <Toast />
     </View>
   );
 };
