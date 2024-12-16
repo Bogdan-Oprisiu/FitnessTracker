@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, memo } from 'react';
-import { aView, Text, TouchableOpacity, Image, Modal, FlatList, TextInput, ActivityIndicator, Animated } from 'react-native';
+import { View, Text, TouchableOpacity, Image, Modal, FlatList, TextInput, ActivityIndicator, Animated } from 'react-native';
 import TextTicker from 'react-native-text-ticker';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as ImagePicker from 'expo-image-picker';
@@ -15,7 +15,7 @@ import styles from './profile.style';
 import useFriends from './useFriends';
 import useNotifications from './useNotifications';
 import { logRecentActivity } from './activity-logger';
-import { handleFriendRequestResponse } from './logActivityAndNotifications';
+import { handleActivityTracker, handleFriendRequestResponse } from './logActivityAndNotifications';
 import RecentActivities from './recent-activities/recent-activities';
 import FriendsWorkouts from './friends-workouts/friends-workouts';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
@@ -832,6 +832,8 @@ export default function Profile() {
             });
             
             setProfilePicture(downloadURL);
+
+            handleActivityTracker('You updated your profile picture');
             
             Toast.show({
               type: 'success',
@@ -900,30 +902,6 @@ export default function Profile() {
       </View>
     );
   }
-
-  const FriendsRouteComponentInstance = (
-    <FriendsRouteComponent
-      filteredFriends={filteredFriends}
-      handleRemoveFriend={handleRemoveFriend}
-      friendsLoading={friendsLoading}
-      friendsSearchQuery={friendsSearchQuery}
-      setFriendsSearchQuery={setFriendsSearchQuery}
-    />
-  );
-
-  const AllUsersRouteComponentInstance = (
-    <AllUsersRouteComponent
-      filteredAllUsers={filteredAllUsers}
-      handleAddFriend={handleAddFriend}
-      handleRemoveFriend={handleRemoveFriend}
-      handleAcceptRequest={handleAcceptRequest}
-      handleRejectRequest={handleRejectRequest}
-      allUsersLoading={allUsersLoading}
-      allUsersSearchQuery={allUsersSearchQuery}
-      setAllUsersSearchQuery={setAllUsersSearchQuery}
-      getRelationshipStatus={getRelationshipStatus}
-    />
-  );
 
 const renderScene = ({ route }) => {
   switch (route.key) {

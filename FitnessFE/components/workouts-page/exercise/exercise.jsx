@@ -25,7 +25,24 @@ export default function ExercisePage({ route }) {
   const currentExercise = exercises[currentExerciseIndex];
   const [isReadyToProceed, setIsReadyToProceed] = useState(false);
   const [isExtraWait, setIsExtraWait] = useState(false);
+  const [activeTime, setActiveTime] = useState(0);
+  const timerRef = useRef(null);
   const fadeAnim = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    if (!timerRef.current) {
+      timerRef.current = setInterval(() => {
+        setActiveTime(prev => prev + 1);
+      }, 1000);
+    }
+
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, []);
 
   useEffect(() => {
     let timerInterval;
@@ -91,6 +108,11 @@ export default function ExercisePage({ route }) {
   }
 
   const handleFinishWorkout = async () => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+
     try{
       const user = auth.currentUser;
       if (!user) {
@@ -103,7 +125,8 @@ export default function ExercisePage({ route }) {
       await addDoc(completedWorkoutsRef, {
         workoutId: workoutId,
         dateCompleted: new Date(),
-        source: source
+        source: source,
+        activeTime: activeTime,
       });
 
       await completeWorkout();
@@ -183,6 +206,10 @@ export default function ExercisePage({ route }) {
           </Text>
           <AnimatedHeart heartRate={heartRate} />
         </View>
+
+        <Text style={styles.activeTime}>
+          Active Time: {Math.floor(activeTime / 60)}:{('0' + (activeTime % 60)).slice(-2)}
+        </Text>
 
         <Animated.View style={{ opacity: fadeAnim, flex: 1 }}>
           {isResting ? (
@@ -290,5 +317,4 @@ export default function ExercisePage({ route }) {
     </SafeAreaView>
   );
 }
-
 

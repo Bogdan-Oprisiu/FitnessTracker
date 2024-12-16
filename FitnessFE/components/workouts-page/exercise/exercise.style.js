@@ -30,6 +30,14 @@ const styles = StyleSheet.create({
     color: '#fff',
     marginRight: 8,
   },
+  activeTime: {
+    fontSize: 20,
+    color: '#fff',
+    textAlign: 'center',
+    marginVertical: 10,
+    marginTop: 65,
+    right: 10
+  },  
   contentContainer: {
     flex: 1,
     justifyContent: 'center',
