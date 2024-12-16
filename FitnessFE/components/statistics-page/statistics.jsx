@@ -8,7 +8,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import styles from './statistics.style';
 import AnimatedHeart from '../animated-components/heart-animation';
 import { db, auth } from '../config/firebase-config';
-import { collection, doc, onSnapshot, getDoc } from 'firebase/firestore';
+import { collection, doc, onSnapshot, getDoc, query, orderBy, limit } from 'firebase/firestore';
 import { format } from 'date-fns';
 
 const { width: screenWidth } = Dimensions.get('window');
@@ -146,8 +146,10 @@ export default function Statistics() {
         const userId = user.uid;
 
         const completedWorkoutsRef = collection(db, 'users', userId, 'completed_workouts');
+        
+        const q = query(completedWorkoutsRef, orderBy('dateCompleted', 'desc'), limit(30));
 
-        const unsubscribe = onSnapshot(completedWorkoutsRef, (snapshot) => {
+        const unsubscribe = onSnapshot(q, (snapshot) => {
             try {
                 const dailyActiveTime = {};
 
@@ -155,20 +157,52 @@ export default function Statistics() {
                     const { activeTime, dateCompleted } = doc.data();
                     if (activeTime && dateCompleted) {
                         const dateObj = dateCompleted.toDate();
-                        const dateStr = format(dateObj, 'MM/dd/yyyy'); 
+                        
+                        const dateStrISO = format(dateObj, 'yyyy-MM-dd');
+                        
+                        const dateStrLabel = format(dateObj, 'MMM dd, yyyy');
 
-                        if (dailyActiveTime[dateStr]) {
-                            dailyActiveTime[dateStr] += activeTime / 60; 
+                        if (dailyActiveTime[dateStrISO]) {
+                            dailyActiveTime[dateStrISO].activeTime += activeTime / 60;
                         } else {
-                            dailyActiveTime[dateStr] = activeTime / 60;
+                            dailyActiveTime[dateStrISO] = {
+                                dateLabel: dateStrLabel,
+                                activeTime: activeTime / 60,
+                            };
                         }
                     }
                 });
 
-                const sortedDates = Object.keys(dailyActiveTime).sort((a, b) => new Date(a) - new Date(b));
+                const dailyDataArray = Object.entries(dailyActiveTime).map(([dateISO, data]) => ({
+                    dateISO,
+                    dateLabel: data.dateLabel,
+                    activeTime: data.activeTime,
+                }));
 
-                const chartLabels = sortedDates;
-                const chartData = sortedDates.map(date => dailyActiveTime[date]);
+                dailyDataArray.sort((a, b) => {
+                    const parsedDateA = new Date(a.dateISO);
+                    const parsedDateB = new Date(b.dateISO);
+
+                    if (isNaN(parsedDateA) || isNaN(parsedDateB)) {
+                        console.warn(`Invalid date format: ${a.dateISO} or ${b.dateISO}`);
+                        return 0;
+                    }
+
+                    return parsedDateA - parsedDateB;
+                });
+
+                const chartLabels = dailyDataArray.map(entry => entry.dateLabel);
+                const chartData = dailyDataArray.map(entry => entry.activeTime);
+
+                console.log('Sorted Daily Data:', dailyDataArray);
+                console.log('Chart Labels:', chartLabels);
+                console.log('Chart Data:', chartData);
+
+                const calculateLabelRotation = (numLabels) => {
+                    if (numLabels > 7) return 45;
+                    if (numLabels > 4) return 30;
+                    return 0;
+                };
 
                 setDailyActiveTimeData({
                     labels: chartLabels,
@@ -176,7 +210,7 @@ export default function Statistics() {
                         {
                             data: chartData,
                             color: (opacity = 1) => `rgba(30, 144, 255, ${opacity})`,
-                            strokeWidth: 2,
+                            strokeWidth: 2, 
                         },
                     ],
                     legend: ["Daily Active Time (mins)"],
@@ -193,7 +227,7 @@ export default function Statistics() {
 
         return unsubscribe;
     };
-
+    
     const screenWidth = Dimensions.get('window').width;
 
     const textLeftPosition = scrollY.interpolate({
