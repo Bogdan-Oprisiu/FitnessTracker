@@ -151,6 +151,65 @@ const styles = StyleSheet.create({
         fontSize: 16,
         marginTop: 10,
     },
+    lineChartContainer: {
+        backgroundColor: '#1E1E1E',
+        padding: 20,
+        borderRadius: 20,
+        alignItems: 'center',
+        width: '90%',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 5,
+        elevation: 8,
+        marginBottom: 20,
+    },
+    noDataText: {
+        color: '#A9A9A9',
+        fontSize: 16,
+        marginTop: 10,
+    },
+    timeframeContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        width: '90%',
+        marginBottom: 20,
+    },
+    timeframeButton: {
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        borderRadius: 20,
+        backgroundColor: '#ffffff20',
+    },
+    timeframeButtonSelected: {
+        backgroundColor: '#6a0dad',
+    },
+    timeframeButtonText: {
+        color: '#FFFFFF',
+        fontSize: 14,
+        fontWeight: 'bold',
+    },
+    timeframeButtonTextSelected: {
+        color: '#FFFFFF',
+    },
+    infoPanel: {
+        position: 'absolute',
+        top: -50,
+        backgroundColor: '#6a0dad',
+        padding: 10,
+        borderRadius: 10,
+        alignItems: 'center',
+        width: '80%',
+    },
+    infoDate: {
+        color: '#FFFFFF',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    infoActiveTime: {
+        color: '#FFFFFF',
+        fontSize: 14,
+    },
 });
 
 export default styles;
