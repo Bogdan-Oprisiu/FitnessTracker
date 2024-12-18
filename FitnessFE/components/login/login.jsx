@@ -118,28 +118,39 @@ export default function Login() {
     }
 
     const redirectUri = AuthSession.makeRedirectUri({
-        scheme: 'com.fitnesstracker.fitnesstracker',
+        useProxy: true
     })
 
     const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
         clientId: Platform.select({
-            web: '751422930054-68qka6ull2l1dq8vj8tbmqorhml129tb.apps.googleusercontent.com',
-            android: '751422930054-qleip9po1p3iu1c6oa894jpd5opk6ri2.apps.googleusercontent.com',
-            ios: '751422930054-o25o9u2nv58v971pk23lanpgvq1srbp0.apps.googleusercontent.com',
+            web: '199396170118-ivstmkgg2shd5ep9m29pecgh7okf3ehh.apps.googleusercontent.com',
+            android: '199396170118-mq12vcrupdc58lkeio5kvln5mv09nm1l.apps.googleusercontent.com',
+            ios: '199396170118-tp7ubdn2fg2oo59qdqn2p7aes430sv70.apps.googleusercontent.com',
         }),
         redirectUri: redirectUri,
-        scopes: ['profile', 'email'],
-        
+        scopes: ['profile', 'email'],        
     });
 
     useEffect(() => {
-        console.log(response)
         if (response?.type === 'success') {
             const { id_token } = response.params;
             const credential = GoogleAuthProvider.credential(id_token);
-
+    
             signInWithCredential(auth, credential)
-                .then(() => {
+                .then(async (userCredential) => {
+                    const user = userCredential.user;
+                    const userDoc = await getDoc(doc(db, 'users', user.uid));
+                    
+                    if (!userDoc.exists()) {
+                        await setDoc(doc(db, 'users', user.uid), {
+                            email: user.email,
+                            username: user.displayName.replace(/\s+/g, ''),
+                            profilePictureUrl: user.photoURL,
+                            username_lowercase: user.displayName.replace(/\s+/g, '').toLowerCase(),
+                            weeklyGoal: 5
+                        });
+                    }
+    
                     Toast.show({
                         type: 'success',
                         text1: 'Login Successful',
@@ -148,6 +159,8 @@ export default function Login() {
                         visibilityTime: 5000,
                         autoHide: true,
                     });
+    
+                    navigation.navigate('MainTabs');
                 })
                 .catch((error) => {
                     Toast.show({
@@ -158,6 +171,7 @@ export default function Login() {
                         visibilityTime: 5000,
                         autoHide: true,
                     });
+                    console.error('Google Sign-In Error:', error);
                 });
         } else if (response?.type === 'dismiss') {
             Toast.show({
@@ -169,11 +183,11 @@ export default function Login() {
                 autoHide: true,
             });
         }
-    }, [response]);
+    }, [response]);    
 
     const loginWithGoogle = () => {
         if (request) {
-            promptAsync();
+            promptAsync({ useProxy: true });        
         } else {
             Toast.show({
                 type: 'error',

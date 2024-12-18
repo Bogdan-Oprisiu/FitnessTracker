@@ -34,6 +34,13 @@ const styles = StyleSheet.create({
         ...StyleSheet.absoluteFillObject,
     },
     header: {
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '100%',
+        paddingHorizontal: 20,
+    },
+    textAndIconContainer: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
@@ -68,8 +75,36 @@ const styles = StyleSheet.create({
         gap: 20,
         justifyContent: 'center',
         alignItems: 'center',
-        paddingTop: 50
+        paddingTop: 100
     },
+    timeframeContainer: {
+        backgroundColor: '#1E1E1E',
+        paddingVertical: 20,
+        paddingHorizontal: 20,
+        width: '100%',
+        borderRadius: 20,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginVertical: 10,
+        zIndex: 10
+      },
+      timeframeButton: {
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        backgroundColor: '#6a0dad',
+        borderRadius: 20,
+        marginHorizontal: 5,
+      },
+      timeframeButtonSelected: {
+        backgroundColor: '#1E90FF',
+      },
+      timeframeButtonText: {
+        color: '#FFFFFF',
+        fontSize: 14,
+      },
+      timeframeButtonTextSelected: {
+        fontWeight: 'bold',
+      },
     combinedWidget: {
         backgroundColor: '#1E1E1E',
         padding: 20,
@@ -130,85 +165,73 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     lineChartContainer: {
-        backgroundColor: '#1E1E1E',
-        padding: 20,
-        borderRadius: 20,
-        alignItems: 'center',
         width: '100%',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 5,
-        elevation: 8,
+        backgroundColor: '#1a1a1a',
+        borderRadius: 16,
+        padding: 10,
         marginBottom: 20,
     },
     lineChart: {
+        marginVertical: 8,
         borderRadius: 16,
-        paddingBottom: 20,
+    },
+    chartTitle: {
+        color: '#FFFFFF',
+        fontSize: 18,
+        marginBottom: 10,
+        textAlign: 'center',
     },
     noDataText: {
-        color: '#A9A9A9',
-        fontSize: 16,
-        marginTop: 10,
-    },
-    lineChartContainer: {
-        backgroundColor: '#1E1E1E',
-        padding: 20,
-        borderRadius: 20,
-        alignItems: 'center',
-        width: '90%',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 5,
-        elevation: 8,
-        marginBottom: 20,
-    },
-    noDataText: {
-        color: '#A9A9A9',
-        fontSize: 16,
-        marginTop: 10,
-    },
-    timeframeContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        width: '90%',
-        marginBottom: 20,
-    },
-    timeframeButton: {
-        paddingVertical: 8,
-        paddingHorizontal: 16,
-        borderRadius: 20,
-        backgroundColor: '#ffffff20',
-    },
-    timeframeButtonSelected: {
-        backgroundColor: '#6a0dad',
-    },
-    timeframeButtonText: {
         color: '#FFFFFF',
-        fontSize: 14,
-        fontWeight: 'bold',
+        fontSize: 16,
+        textAlign: 'center',
+        marginTop: 20,
     },
-    timeframeButtonTextSelected: {
-        color: '#FFFFFF',
-    },
-    infoPanel: {
+    modalOverlay: {
         position: 'absolute',
-        top: -50,
-        backgroundColor: '#6a0dad',
-        padding: 10,
-        borderRadius: 10,
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        justifyContent: 'center',
         alignItems: 'center',
-        width: '80%',
     },
-    infoDate: {
+    modalContainer: {
+        width: '80%',
+        backgroundColor: '#C2C2C',
+        borderRadius: 20,
+        padding: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+        left: 40,
+        top: 60
+    },
+    closeButton: {
+        position: 'absolute',
+        top: 10,
+        right: 10,
+        padding: 5,
+    },
+    closeButtonText: {
+        color: '#FFFFFF',
+        fontSize: 20,
+    },
+    modalTitle: {
+        color: '#FFFFFF',
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 10,
+    },
+    modalDate: {
         color: '#FFFFFF',
         fontSize: 16,
-        fontWeight: 'bold',
+        marginBottom: 5,
     },
-    infoActiveTime: {
+    modalValue: {
         color: '#FFFFFF',
-        fontSize: 14,
+        fontSize: 24,
+        fontWeight: 'bold',
     },
 });
 

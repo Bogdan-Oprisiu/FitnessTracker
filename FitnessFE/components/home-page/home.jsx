@@ -11,7 +11,7 @@ import WeeklyProgress from './weekly-progress/weekly-progress';
 import { useWorkout } from '../workout-provider';
 import { db, auth } from '../config/firebase-config';
 import { collection, query, where, getDocs, onSnapshot, doc, getDoc } from 'firebase/firestore';
-import { useRoute } from '@react-navigation/native';
+import { useRoute, useNavigation } from '@react-navigation/native';
 import Widget from '../widgets-template';
 import DateWorkoutsModal from './date-workouts-modal/date-workouts-modal';
 import styles from './home.style';
@@ -20,6 +20,7 @@ const { width } = Dimensions.get('window');
 
 export default function Home() {
   const route = useRoute();
+  const navigation = useNavigation();
   const { workoutsCompleted, setWorkoutsCompleted, goal, completeWorkout, confettiRef } = useWorkout();
   const [confettiVisible, setConfettiVisible] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
@@ -28,10 +29,6 @@ export default function Home() {
   const scrollY = useRef(new Animated.Value(0)).current;
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDate, setSelectedDate] = useState('');
-  const [workoutsForDate, setWorkoutsForDate] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const fadeAnim = useRef(new Animated.Value(0)).current;
   const backgroundOpacity = useRef(new Animated.Value(0)).current;
   const modalOpacity = useRef(new Animated.Value(0)).current;
   const backgroundImage = require('../../assets/images/home-background3.webp');
@@ -303,13 +300,11 @@ export default function Home() {
         </Animated.View>
 
         <View style={styles.widgetsContainer}>
-          <Widget title="Connect With Friends" iconName="group" fullWidth={true} />
-          <Widget title="Discover New Workouts" iconName="fitness-center" />
-          <Widget title="Ask GymBuddy Anything" iconName="smart-toy" />
-          <Widget title="Personalize Your Experience" iconName="person" />
-          <Widget title="Connect With Friends" iconName="group" />
-          <Widget title="Discover New Workouts" iconName="fitness-center" />
-          <Widget title="Connect With Friends" iconName="group" />
+          <Widget title="Connect With Friends" iconName="group" fullWidth={true} onPress={() => navigation.navigate('Profile', { openFriendsModalFromHome: true, setOpenFriendsModalFromHome: true })} />
+          <Widget title="Discover New Workouts" iconName="fitness-center" fullWidth={true} onPress={() => navigation.navigate('Workouts')} />
+          <Widget title="Ask GymBuddy Anything" iconName="smart-toy" fullWidth={true} />
+          <Widget title="Personalize Your Experience" iconName="person" fullWidth={true} onPress={() => navigation.navigate('Profile')} />
+          <Widget title="Check your detailed stats" iconName="analytics" fullWidth={true} onPress={() => navigation.navigate('Statistics')} />
         </View>
 
         {showCalendar && (

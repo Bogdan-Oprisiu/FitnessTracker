@@ -14,6 +14,7 @@ import Toast from 'react-native-toast-message';
 import styles from './profile.style';
 import useFriends from './useFriends';
 import useNotifications from './useNotifications';
+import { useRoute } from '@react-navigation/native';
 import { logRecentActivity } from './activity-logger';
 import { handleActivityTracker, handleFriendRequestResponse } from './logActivityAndNotifications';
 import RecentActivities from './recent-activities/recent-activities';
@@ -199,6 +200,8 @@ export default function Profile() {
   const HEADER_HEIGHT = 60;
 
   const [tabIndex, setTabIndex] = useState(0);
+  const route = useRoute();
+  const { openFriendsModalFromHome, setOpenFriendsModalFromHome } = route.params || {};
   const [routes] = useState([
     { key: 'friends', title: 'Friends' },
     { key: 'allUsers', title: 'All Users' },
@@ -306,9 +309,16 @@ export default function Profile() {
     extrapolate: 'clamp',
   });
 
+  useEffect(() => {
+    if (openFriendsModalFromHome) {
+      setFriendsModalVisible(true);
+      navigation.setParams({ openFriendsModalFromHome: false });
+    }
+  }, [openFriendsModalFromHome]);
+
   const openFriendsModal = () => {
     setFriendsModalVisible(true);
-  };
+  }
 
   const closeFriendsModal = () => {
     setFriendsModalVisible(false);
