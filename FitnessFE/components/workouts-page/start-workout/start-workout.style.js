@@ -4,6 +4,7 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     backgroundColor: 'black',
+    position: 'relative'
   },
   imageContainer: {
     position: 'relative',
@@ -21,7 +22,7 @@ const styles = StyleSheet.create({
   contentContainer: {
     alignItems: 'center',
     paddingTop: 20,
-    paddingBottom: 40,
+    paddingBottom: 25,
   },
   workoutName: {
     fontSize: 50,
@@ -29,7 +30,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 20,
+    paddingRight: 5
   },
+  workoutDescription: {
+    fontSize: 16,
+    color: '#aaa',
+    textAlign: 'center',
+    paddingHorizontal: 20,
+    lineHeight: 24,
+  },  
   startButton: {
     backgroundColor: '#6a0dad',
     paddingVertical: 12,
@@ -40,11 +49,14 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
-    textAlign: 'center'
+    textAlign: 'center',
   },
   pulseContainer: {
+    position: 'absolute',
+    bottom: -50,
+    left: 0,
+    right: 0,
     alignItems: 'center',
-    marginTop: 75,
   },
   swipeText: {
     color: '#6a0dad',
@@ -54,105 +66,149 @@ const styles = StyleSheet.create({
   exercisesContainer: {
     paddingHorizontal: 20,
     marginTop: -250,
-    paddingBottom: 40,
   },
   exercisesScrollView: {
     maxHeight: 600,
   },
   exerciseCard: {
+    flexDirection: 'column',
+    backgroundColor: '#444',
+    borderRadius: 15,
+    paddingVertical: 20,
+    paddingHorizontal: 15,
+    marginVertical: 10,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+  },
+  exerciseDetails: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#333',
-    borderRadius: 10,
-    padding: 20,
-    marginVertical: 10,
-  },
-  exerciseDetails: {
-    flex: 1,
   },
   exerciseText: {
     fontSize: 18,
     color: '#fff',
     fontWeight: 'bold',
   },
-  exerciseDuration: {
+  exerciseSets: {
     fontSize: 14,
     color: '#ccc',
   },
+  editModeDetails: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  textContainer: {
+    flex: 1,
+    flexDirection: 'column',
+  },
   startWorkoutContainerScrolled: {
     alignItems: 'center',
-    marginTop: 30,
   },
   startWorkoutButton: {
     backgroundColor: '#6a0dad',
+    marginTop: 10,
+    marginBottom: 10,
     paddingVertical: 12,
     paddingHorizontal: 30,
     borderRadius: 10,
-    width:'100%',
+    width: '100%',
   },
   startWorkoutText: {
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
-    textAlign: 'center'
+    textAlign: 'center',
   },
-  modalOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    justifyContent: 'center',
-    alignItems: 'center',
+  dropdownContent: {
+    marginTop: 15,
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#666',
   },
-  modalContainer: {
-    backgroundColor: '#333',
-    padding: 20,
-    borderRadius: 10,
-    width: '80%',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
+  descriptionWrapper: {
+    flex: 1,
+    justifyContent: 'space-between',
+    marginTop: 15,
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#666',
   },
-  modalContent: {
-    alignItems: 'center',
-  },
-  modalTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#666',
+  descriptionScrollView: {
+    flex: 1, 
     marginBottom: 10,
+    maxHeight: 160,
   },
-  modalDuration: {
+  descriptionContent: {
+    paddingBottom: 10,
+    paddingLeft: 7,
+    paddingRight: 7
+  },
+  exerciseDescription: {
     fontSize: 16,
-    color: '#777',
-    marginBottom: 20,
+    color: '#aaa',
+    lineHeight: 22,
+    textAlign: 'justify',
+  },
+  fixedButtonContainer: {
+    justifyContent: 'flex-end',
   },
   videoLinkButton: {
     backgroundColor: '#6a0dad',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    marginBottom: 15,
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: 'center',
   },
   videoLinkText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
   },
-  closeButton: {
+  startArrow: {
+    position: 'absolute',
+    top: 40,
+    right: 20,
+    zIndex: 10,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    padding: 10,
+    borderRadius: 50,
+  },  
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'black',
+  },
+  loadingText: {
+    marginTop: 20,
+    fontSize: 16,
+    color: '#6a0dad',
+    fontWeight: 'bold',
+  },
+  reorderButton: {
+    backgroundColor: '#6a0dad',
     paddingVertical: 10,
     paddingHorizontal: 20,
-    backgroundColor: '#ccc',
-    borderRadius: 5,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 10,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
   },
-  closeButtonText: {
+  reorderButtonText: {
+    color: '#fff', 
     fontSize: 16,
-    color: '#333',
     fontWeight: 'bold',
-  },    
+    textAlign: 'flex-start',
+  },
 });
 
 export default styles;
-

@@ -4,9 +4,9 @@ import { MaterialIcons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
 
-export default function Widget({ title, iconName, fullWidth = false }) {
+export default function Widget({ title, iconName, fullWidth = false, onPress }) {
   return (
-    <TouchableOpacity style={[styles.widgetContainer, fullWidth && styles.fullWidthContainer]}>
+    <TouchableOpacity style={[styles.widgetContainer, fullWidth && styles.fullWidthContainer]} onPress={onPress}>
       <MaterialIcons name={iconName} size={48} color="#6a0dad" />
       <Text style={styles.widgetText}>{title}</Text>
     </TouchableOpacity>

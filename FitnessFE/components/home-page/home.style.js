@@ -168,4 +168,62 @@ export default StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },  
+  modalBackground: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContainer: {
+    width: '85%',
+    backgroundColor: '#222',
+    borderRadius: 20,
+    padding: 20,
+    maxHeight: '80%',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    marginBottom: 15,
+    textAlign: 'center',
+    color: '#6a0dad',
+  },
+  workoutItem: {
+    marginBottom: 15,
+    padding: 10,
+    backgroundColor: '#555',
+    borderRadius: 10,
+  },
+  workoutName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#fff',
+  },
+  workoutDetails: {
+    fontSize: 14,
+    color: '#fff',
+    marginTop: 5,
+  },
+  closeButton: {
+    marginTop: 15,
+    backgroundColor: '#6a0dad',
+    padding: 10,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  closeButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  noWorkoutsText: {
+    textAlign: 'center',
+    fontSize: 16,
+    color: '#fff',
+  },
+  errorText: {
+    textAlign: 'center',
+    fontSize: 16,
+    color: 'red',
+  },
 });

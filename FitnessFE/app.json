@@ -13,16 +13,24 @@
     },
     "scheme": "com.fitnesstracker.fitnesstracker",
     "ios": {
-      "bundleIdentifier": "com.fitnesstracker.fitness-tracker",
+      "bundleIdentifier": "com.fitnesstracker.fitnessappubb",
       "supportsTablet": true,
       "config": {
-        "googleSignIn": {
-          "reservedClientId": "com.googleusercontent.apps.751422930054-o25o9u2nv58v971pk23lanpgvq1srbp0.apps.googleusercontent.com"
-        }
+      "googleSignIn": {
+        "reservedClientId": "com.googleusercontent.apps.751422930054-o25o9u2nv58v971pk23lanpgvq1srbp0.apps.googleusercontent.com"
+      }
+      },
+      "infoPlist": {
+      "NSCameraUsageDescription": "We need access to your camera to capture workout-related photos or videos.",
+      "NSMicrophoneUsageDescription": "We need access to your microphone for audio input during workouts.",
+      "NSLocationWhenInUseUsageDescription": "We need access to your location to track your outdoor workouts.",
+      "NSBluetoothAlwaysUsageDescription": "We need access to Bluetooth to connect to fitness devices like heart rate monitors.",
+      "NSBluetoothPeripheralUsageDescription": "We need access to Bluetooth peripherals for fitness device connectivity."
       }
     },
     "android": {
       "package": "com.fitnesstracker.fitnesstracker",
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"

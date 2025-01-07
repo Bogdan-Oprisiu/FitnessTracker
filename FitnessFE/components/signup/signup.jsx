@@ -12,7 +12,7 @@ import Toast from 'react-native-toast-message';
 import styles from "./signup.style";
 
 export default function Signup() {
-    const defaultProfilePicture = require('../../assets/images/default-profile-picture.jpg');
+    const DEFAULT_PROFILE_PICTURE_URL = 'https://firebasestorage.googleapis.com/v0/b/fitnesstracker-5909f.appspot.com/o/default-profile-picture.jpg?alt=media&token=9b3957c5-ca29-4a12-b81b-9700e5a21140';
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -112,7 +112,7 @@ export default function Signup() {
                 if (user.emailVerified) {
                     clearInterval(checkEmailVerification);
     
-                    let profilePictureUrl = defaultProfilePicture;
+                    let profilePictureUrl = DEFAULT_PROFILE_PICTURE_URL;
                     if (profilePicture) {
                         const profilePicRef = ref(storage, `profilePictures/${user.uid}`);
                         const img = await fetch(profilePicture);
@@ -123,8 +123,11 @@ export default function Signup() {
     
                     await setDoc(doc(db, 'users', user.uid), {
                         username,
+                        username_lowercase: username.toLowerCase(),
                         email,
                         profilePictureUrl,
+                        friendsCount: 0,
+                        weeklyGoal: 5
                     });
     
                     Toast.show({
@@ -224,8 +227,8 @@ export default function Signup() {
                 style={styles.imageBackground}
             >
                 <View style={styles.profilePictureContainer}>
-                    <Image source={profilePicture ? { uri: profilePicture } : defaultProfilePicture} style={styles.profilePicture} />
-                    <TouchableOpacity style={styles.editButton} onPress={selectFromGallery}>
+                <Image source={profilePicture ? { uri: profilePicture } : { uri: DEFAULT_PROFILE_PICTURE_URL }} style={styles.profilePicture} />
+                <TouchableOpacity style={styles.editButton} onPress={selectFromGallery}>
                         <Icon name="edit" size={20} color="#fff" />
                     </TouchableOpacity>
                 </View>

@@ -4,7 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import styles from './workout-card.style';
 
-export default function WorkoutCard({ name, exercises, duration, difficulty, type, onPress, onLongPress, showIcons, onDelete, onEdit }) {
+export default function WorkoutCard({ name, exercises, difficulty, type, onPress, onLongPress, showIcons, onDelete, onEdit }) {
   const actionBarHeight = useRef(new Animated.Value(0)).current;
   const contentShift = useRef(new Animated.Value(20)).current;
 
@@ -40,9 +40,9 @@ export default function WorkoutCard({ name, exercises, duration, difficulty, typ
 
   const renderStars = () => {
     let starCount = 0;
-    if (difficulty === 'Beginner') starCount = 1;
-    else if (difficulty === 'Intermediate') starCount = 2;
-    else if (difficulty === 'Advanced') starCount = 3;
+    if (difficulty.toLowerCase() === 'beginner') starCount = 1;
+    else if (difficulty.toLowerCase() === 'intermediate') starCount = 2;
+    else if (difficulty.toLowerCase() === 'advanced') starCount = 3;
 
     return (
       <View style={styles.starsContainer}>
@@ -73,7 +73,6 @@ export default function WorkoutCard({ name, exercises, duration, difficulty, typ
           <View style={styles.iconContainer}>{renderIcon()}</View>
           <Text style={styles.cardTitle}>{name}</Text>
           <Text style={styles.cardDetails}>Exercises: {exercises}</Text>
-          <Text style={styles.cardDetails}>Duration: {duration} mins</Text>
           <View style={styles.starsContainer}>{renderStars()}</View>
         </Animated.View>
 
@@ -87,7 +86,7 @@ export default function WorkoutCard({ name, exercises, duration, difficulty, typ
           ]}
         >
           <TouchableOpacity onPress={onDelete} style={styles.actionButton}>
-            <MaterialIcons name="remove-circle" size={24} color="red" />
+            <MaterialIcons name="delete" size={24} color="red" />
           </TouchableOpacity>
           <TouchableOpacity onPress={onEdit} style={styles.actionButton}>
             <MaterialIcons name="edit" size={24} color="yellow" />

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Animated, Dimensions, Modal, Image } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Animated, Dimensions, Modal, Image, ActivityIndicator, FlatList } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Progress from 'react-native-progress';
 import Confetti from 'react-native-confetti';
@@ -8,47 +8,105 @@ import { MaterialIcons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
 import { BlurView } from 'expo-blur';
 import WeeklyProgress from './weekly-progress/weekly-progress';
+import { useWorkout } from '../workout-provider';
+import { db, auth } from '../config/firebase-config';
+import { collection, query, where, getDocs, onSnapshot, doc, getDoc } from 'firebase/firestore';
+import { useRoute, useNavigation } from '@react-navigation/native';
 import Widget from '../widgets-template';
+import DateWorkoutsModal from './date-workouts-modal/date-workouts-modal';
 import styles from './home.style';
 
 const { width } = Dimensions.get('window');
 
 export default function Home() {
-  const [goal, setGoal] = useState(3); // weekly workout goal, default is 3
-  const [workoutsCompleted, setWorkoutsCompleted] = useState(0);
+  const route = useRoute();
+  const navigation = useNavigation();
+  const { workoutsCompleted, setWorkoutsCompleted, goal, completeWorkout, confettiRef } = useWorkout();
   const [confettiVisible, setConfettiVisible] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
-  const confettiRef = useRef(null);
+  const [markedDates, setMarkedDates] = useState({});
+  const [completedDays, setCompletedDays] = useState([]);
   const scrollY = useRef(new Animated.Value(0)).current;
-  const backgroundImage = require('../../assets/images/home-background3.webp')
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedDate, setSelectedDate] = useState('');
+  const backgroundOpacity = useRef(new Animated.Value(0)).current;
+  const modalOpacity = useRef(new Animated.Value(0)).current;
+  const backgroundImage = require('../../assets/images/home-background3.webp');
+  const [isDateWorkoutsModalVisible, setIsDateWorkoutsModalVisible] = useState(false);
 
   useEffect(() => {
-    if (workoutsCompleted >= goal && confettiRef.current) {
-      setConfettiVisible(true);
-      confettiRef.current.startConfetti();
-      setTimeout(() => {
+  if (goal && workoutsCompleted >= goal && confettiRef.current) {
+    confettiRef.current.startConfetti();
+    setConfettiVisible(true);
+    setTimeout(() => {
+      if (confettiRef.current) {
         confettiRef.current.stopConfetti();
         setConfettiVisible(false);
-      }, 5000);
-    }
-  }, [workoutsCompleted, goal]);
+      }
+    }, 5000);
+  }
+}, [workoutsCompleted, goal]);
 
-  const completeWorkout = () => {
-    if (workoutsCompleted < 7) {
-      setWorkoutsCompleted(workoutsCompleted + 1);
-      Toast.show({
-        type: 'success',
-        text1: 'Workout Completed',
-        text2: `You have completed ${workoutsCompleted + 1} out of ${goal} workouts!`,
-        position: 'top',
-        visibilityTime: 5000,
-        autoHide: true,
-      });
-    }
-  };
 
   const toggleCalendar = () => {
     setShowCalendar(!showCalendar);
+  };
+
+  const openModal = () => {
+    setModalVisible(true);
+    Animated.parallel([
+      Animated.timing(backgroundOpacity, {
+        toValue: 0.5,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+      Animated.timing(modalOpacity, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+
+  const closeModal = () => {
+    Animated.parallel([
+      Animated.timing(backgroundOpacity, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+      Animated.timing(modalOpacity, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      setModalVisible(false);
+    });
+  };
+
+  useEffect(() => {
+    if (route.params?.newCompletionDate) {
+      const newDate = route.params.newCompletionDate.toISOString().split('T')[0];
+      const completedDate = new Date(route.params.newCompletionDate);
+      const dayName = completedDate.toLocaleDateString('en-US', { weekday: 'short' });
+
+      setMarkedDates((prevDates) => ({
+        ...prevDates,
+        [newDate]: { marked: true, dotColor: '#6a0dad' },
+      }));
+
+      setCompletedDays((prevDays) => [...prevDays, dayName]);
+
+      navigation.setParams({ newCompletionDate: null });
+    }
+  }, [route.params?.newCompletionDate]);
+
+  useEffect(() => {}, [workoutsCompleted]);
+
+  const handleDayPress = (day) => {
+    setSelectedDate(day.dateString);
+    setIsDateWorkoutsModalVisible(true);
   };
 
   const imageOpacity = scrollY.interpolate({
@@ -68,6 +126,80 @@ export default function Home() {
     outputRange: [1, 0],
     extrapolate: 'clamp',
   });
+
+  useEffect(() => {
+    const subscribe = () => {
+      const user = auth.currentUser;
+      if (!user) {
+        console.log('No user is signed in');
+        return;
+      }
+
+      const completedWorkoutsRef = collection(db, 'users', user.uid, 'completed_workouts');
+      const q = query(completedWorkoutsRef);
+
+      const unsubscribe = onSnapshot(
+        q,
+        (querySnapshot) => {
+          const dates = {};
+          let countLastWeek = 0;
+
+          const now = new Date();
+          const oneWeekAgo = new Date();
+          oneWeekAgo.setDate(now.getDate() - 7);
+
+          const completedDaysSet = new Set();
+
+          querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            const dateCompleted = data.dateCompleted ? data.dateCompleted.toDate() : null;
+
+            if (dateCompleted) {
+              const dateStr = dateCompleted.toISOString().split('T')[0];
+              dates[dateStr] = { marked: true, dotColor: '#6a0dad' };
+
+              if (dateCompleted >= oneWeekAgo && dateCompleted <= now) {
+                const dayName = dateCompleted.toLocaleDateString('en-US', { weekday: 'short' }); // like 'Mon'
+                completedDaysSet.add(dayName);
+                countLastWeek += 1;
+              }
+            }
+          });
+
+          setMarkedDates(dates);
+          setWorkoutsCompleted(countLastWeek);
+          setCompletedDays(Array.from(completedDaysSet));
+
+          if (route.params?.newCompletionDate) {
+            const newDate = route.params.newCompletionDate.toISOString().split('T')[0];
+            dates[newDate] = { marked: true, dotColor: '#6a0dad' };
+            const newDateObj = new Date(route.params.newCompletionDate);
+            if (newDateObj >= oneWeekAgo && newDateObj <= now) {
+              setWorkoutsCompleted((prev) => prev + 1);
+              const newDayName = newDateObj.toLocaleDateString('en-US', { weekday: 'short' });
+              setCompletedDays((prev) => [...prev, newDayName]);
+            }
+            navigation.setParams({ newCompletionDate: null });
+          }
+        },
+        (error) => {
+          console.error('Error fetching completed workouts:', error);
+          Toast.show({
+            type: 'error',
+            text1: 'Error',
+            text2: 'Could not fetch completed workouts.',
+          });
+        }
+      );
+
+      return unsubscribe;
+    };
+
+    const unsubscribe = subscribe();
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, [route.params?.newCompletionDate]);
   
   return (
     <View style={{ flex: 1 }}>
@@ -121,7 +253,7 @@ export default function Home() {
           <Text style={styles.goalText}>Weekly Goal:</Text>
           <Text style={styles.goalNumbers}>{workoutsCompleted}/{goal}</Text>
           <Progress.Bar
-            progress={workoutsCompleted / goal}
+            progress={goal ? workoutsCompleted / goal : 0}
             width={width * 0.5}
             color="#6a0dad"
             unfilledColor="#d3d3d3"
@@ -152,7 +284,7 @@ export default function Home() {
           <View style={{ position: 'relative' }}>
             <Progress.Circle
               size={300}
-              progress={workoutsCompleted / goal}
+              progress={goal ? workoutsCompleted / goal : 0}
               showsText={false}
               color="#6a0dad"
               thickness={22}
@@ -164,21 +296,15 @@ export default function Home() {
             </View>
           </View>
 
-          <TouchableOpacity onPress={completeWorkout} style={styles.button}>
-            <Text style={styles.buttonText}>Complete Workout</Text>
-          </TouchableOpacity>
-
-          <WeeklyProgress onPress={toggleCalendar} />
+          <WeeklyProgress onPress={toggleCalendar} completedDays={completedDays} />
         </Animated.View>
 
         <View style={styles.widgetsContainer}>
-          <Widget title="Connect With Friends" iconName="group" fullWidth={true} />
-          <Widget title="Discover New Workouts" iconName="fitness-center" />
-          <Widget title="Ask GymBuddy Anything" iconName="smart-toy" />
-          <Widget title="Personalize Your Experience" iconName="person" />
-          <Widget title="Connect With Friends" iconName="group" />
-          <Widget title="Discover New Workouts" iconName="fitness-center" />
-          <Widget title="Connect With Friends" iconName="group" />
+          <Widget title="Connect With Friends" iconName="group" fullWidth={true} onPress={() => navigation.navigate('Profile', { openFriendsModalFromHome: true, setOpenFriendsModalFromHome: true })} />
+          <Widget title="Discover New Workouts" iconName="fitness-center" fullWidth={true} onPress={() => navigation.navigate('Workouts')} />
+          <Widget title="Ask GymBuddy Anything" iconName="smart-toy" fullWidth={true} />
+          <Widget title="Personalize Your Experience" iconName="person" fullWidth={true} onPress={() => navigation.navigate('Profile')} />
+          <Widget title="Check your detailed stats" iconName="analytics" fullWidth={true} onPress={() => navigation.navigate('Statistics')} />
         </View>
 
         {showCalendar && (
@@ -191,10 +317,7 @@ export default function Home() {
             <View style={styles.modalBackground}>
               <View style={styles.calendarContainer}>
                 <Calendar
-                  markedDates={{
-                    '2024-11-01': { marked: true, dotColor: '#6a0dad' },
-                    '2024-11-02': { marked: true, dotColor: '#6a0dad' },
-                  }}
+                  markedDates={markedDates}
                   theme={{
                     backgroundColor: '#1a1a1a',
                     calendarBackground: '#1a1a1a',
@@ -204,6 +327,7 @@ export default function Home() {
                     monthTextColor: '#6a0dad',
                     arrowColor: '#6a0dad',
                   }}
+                  onDayPress={handleDayPress}
                 />
                 <TouchableOpacity onPress={toggleCalendar} style={styles.closeButton}>
                   <Text style={styles.closeButtonText}>Close</Text>
@@ -212,6 +336,12 @@ export default function Home() {
             </View>
           </Modal>
         )}
+
+        <DateWorkoutsModal
+          visible={isDateWorkoutsModalVisible}
+          onClose={() => setIsDateWorkoutsModalVisible(false)}
+          selectedDate={selectedDate}
+        />
       </Animated.ScrollView>
     </View>
   );
