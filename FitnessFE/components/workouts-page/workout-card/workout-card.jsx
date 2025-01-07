@@ -4,7 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import styles from './workout-card.style';
 
-export default function WorkoutCard({ name, exercises, difficulty, type, onPress, onLongPress, showIcons, onDelete, onEdit }) {
+export default function WorkoutCard({ name, exercises, source, difficulty, type, onPress, onLongPress, showIcons, onDelete, onEdit }) {
   const actionBarHeight = useRef(new Animated.Value(0)).current;
   const contentShift = useRef(new Animated.Value(20)).current;
 
@@ -60,7 +60,7 @@ export default function WorkoutCard({ name, exercises, difficulty, type, onPress
     <TouchableOpacity
       style={styles.cardContainer}
       onPress={onPress}
-      onLongPress={onLongPress}
+      onLongPress={source === 'default' ? null : onLongPress}
       activeOpacity={0.8}
     >
       <LinearGradient

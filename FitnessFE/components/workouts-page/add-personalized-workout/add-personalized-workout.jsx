@@ -120,6 +120,7 @@ export default function AddPersonalizedWorkout({ navigation, route }) {
         description: workoutDescription,
         difficulty: majorityDifficulty || 'unknown',
         type: majorityType || 'unknown',
+        source: 'personalized',
       });
 
       Alert.alert('Success', 'Workout saved successfully!');

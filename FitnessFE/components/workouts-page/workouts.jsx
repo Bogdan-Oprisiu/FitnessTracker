@@ -303,6 +303,7 @@ export default function Workouts() {
               <WorkoutCard
                 name={workout.name}
                 exercises={workout.exerciseCount}
+                source={workout.source}
                 difficulty={workout.difficulty}
                 type={workout.type}
                 onPress={() => handleWorkoutPress(index)}
