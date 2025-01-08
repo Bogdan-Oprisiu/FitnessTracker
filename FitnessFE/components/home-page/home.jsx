@@ -302,7 +302,7 @@ export default function Home() {
         <View style={styles.widgetsContainer}>
           <Widget title="Connect With Friends" iconName="group" fullWidth={true} onPress={() => navigation.navigate('Profile', { openFriendsModalFromHome: true, setOpenFriendsModalFromHome: true })} />
           <Widget title="Discover New Workouts" iconName="fitness-center" fullWidth={true} onPress={() => navigation.navigate('Workouts')} />
-          <Widget title="Ask GymBuddy Anything" iconName="smart-toy" fullWidth={true} onPress={() => navigation.navigate('GymBuddy')}/>
+          <Widget title="Ask GymBuddy Anything" iconName="smart-toy" fullWidth={true} onPress={() => navigation.navigate('GymBuddyTabs')}/>
           <Widget title="Personalize Your Experience" iconName="person" fullWidth={true} onPress={() => navigation.navigate('Profile')} />
           <Widget title="Check your detailed stats" iconName="analytics" fullWidth={true} onPress={() => navigation.navigate('Statistics')} />
         </View>

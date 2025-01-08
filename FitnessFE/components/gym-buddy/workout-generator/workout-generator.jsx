@@ -1,20 +1,15 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  ScrollView,
-  StyleSheet,
-  Alert,
-} from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { collection, doc, getDocs, setDoc } from 'firebase/firestore';
-import { db, auth } from '../../config/firebase-config';
+import { db, auth } from '../../../config/firebase-config';
+import styles from './workout-generator.style';
 
-const gemini = new GoogleGenerativeAI('AIzaSyB0Aw0_aUe1Ifef70UVf3kKq6a89hbSssY');
+const geminiApiKey = process.env.EXPO_PUBLIC_GOOGLE_GENERATIVE_AI_KEY;
 
-const GymBuddy = () => {
+const gemini = new GoogleGenerativeAI(geminiApiKey);
+
+const WorkoutGenerator = () => {
   const [selectedType, setSelectedType] = useState('');
   const [selectedFocus, setSelectedFocus] = useState('');
   const [selectedDifficulty, setSelectedDifficulty] = useState('');
@@ -30,15 +25,10 @@ const GymBuddy = () => {
     const userId = currentUser.uid;
   
     try {
-      // Fetch exercises
       const defaultExercises = await fetchDefaultExercises();
   
       const allExercises = [...defaultExercises];
-  
-      // Print all exercises in the database
-      console.log('All Exercises in Database:', allExercises);
-  
-      // Construct the Gemini prompt
+    
       const prompt = `
         You are a fitness assistant tasked with creating personalized workout plans.
         All exercises must be selected **only** from the provided database. Use the "name" field for exercise names.
@@ -58,7 +48,6 @@ const GymBuddy = () => {
         Ensure each exercise has a "name" that matches the provided database names.
       `;
   
-      // Generate the workout using Gemini
       const model = gemini.getGenerativeModel({
         model: 'gemini-1.5-flash',
         generationConfig: {
@@ -77,7 +66,6 @@ const GymBuddy = () => {
       const workoutPlan = cleanAndParseResponse(rawResponse, allExercises);
       console.log('Parsed Workout Plan:', workoutPlan);
   
-      // Save workout
       await saveWorkoutForUser(userId, workoutPlan);
       Alert.alert('Success', 'Workout saved successfully!');
     } catch (error) {
@@ -89,7 +77,6 @@ const GymBuddy = () => {
   const cleanAndParseResponse = (rawResponse, allExercises) => {
     const parsedResponse = JSON.parse(rawResponse);
   
-    // Map exercise IDs to names if "name" is actually an ID
     const exercises = parsedResponse.exercises.map((exercise) => {
       const matchedExercise = allExercises.find(
         (ex) => ex.id === exercise.name || ex.name === exercise.name
@@ -97,7 +84,7 @@ const GymBuddy = () => {
       if (matchedExercise) {
         return {
           id: matchedExercise.id,
-          name: matchedExercise.name, // Use the name from the database
+          name: matchedExercise.name,
           sets: exercise.sets || 1,
           duration: exercise.duration || null,
         };
@@ -118,7 +105,6 @@ const GymBuddy = () => {
       console.log(`Checking ${type} at path "${subPath}"...`);
   
     try {
-      // Fetch strength exercises grouped by muscle group
       const fetchFromStrength = async () => {
         const muscleGroups = [
           'abdominals', 'abductors', 'adductors', 'biceps', 'calves', 'chest', 'forearms', 'glutes', 'hamstrings',
@@ -141,7 +127,6 @@ const GymBuddy = () => {
         }
       };
   
-      // Fetch cardio and stretching exercises grouped by difficulty level
       const fetchFromCardioOrStretching = async (type) => {
         const levels = ['beginner', 'intermediate', 'advanced'];
   
@@ -161,7 +146,6 @@ const GymBuddy = () => {
         }
       };
   
-      // Fetch all exercises
       await fetchFromStrength();
       await fetchFromCardioOrStretching('cardio');
       await fetchFromCardioOrStretching('stretching');
@@ -254,39 +238,4 @@ const GymBuddy = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#f5f5f5',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  label: {
-    fontSize: 16,
-    marginBottom: 5,
-  },
-  input: {
-    height: 40,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 20,
-  },
-  generateButton: {
-    backgroundColor: '#007bff',
-    paddingVertical: 10,
-    borderRadius: 5,
-    alignItems: 'center',
-  },
-  generateButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-});
-
-export default GymBuddy;
+export default WorkoutGenerator;
