@@ -1,0 +1,202 @@
+{
+  "stretching": [
+    {
+      "name": "Standing Hamstring Stretch",
+      "difficulty": "beginner",
+      "instructions": "Stand upright and place one heel on a low stool or step. Keep your leg straight and toes pointed up. Lean forward slightly from the hips until you feel a stretch in the back of your thigh.",
+      "equipment": "body_only",
+      "muscle_groups": ["hamstrings"]
+    },
+    {
+      "name": "Quadriceps Stretch",
+      "difficulty": "beginner",
+      "instructions": "Stand on one leg, holding onto a wall or chair for balance. Bend your other knee, bringing your heel toward your glutes. Grasp your ankle and gently pull to feel a stretch in the front of your thigh.",
+      "equipment": "body_only",
+      "muscle_groups": ["quadriceps"]
+    },
+    {
+      "name": "Calf Stretch",
+      "difficulty": "beginner",
+      "instructions": "Stand facing a wall with one foot forward and the other back. Keep both feet flat and toes pointed forward. Bend your front knee while keeping the back leg straight until you feel a stretch in the back calf.",
+      "equipment": "body_only",
+      "muscle_groups": ["calves"]
+    },
+    {
+      "name": "Chest Stretch",
+      "difficulty": "beginner",
+      "instructions": "Stand tall and clasp your hands behind your back. Straighten your arms and gently lift them upward while squeezing your shoulder blades together to stretch the chest muscles.",
+      "equipment": "body_only",
+      "muscle_groups": ["chest"]
+    },
+    {
+      "name": "Shoulder Stretch",
+      "difficulty": "beginner",
+      "instructions": "Bring one arm across your body at shoulder height. Use the opposite hand to gently press the arm toward your chest, feeling a stretch in the shoulder.",
+      "equipment": "body_only",
+      "muscle_groups": ["shoulders"]
+    },
+    {
+      "name": "Triceps Stretch",
+      "difficulty": "beginner",
+      "instructions": "Raise one arm overhead and bend the elbow, reaching your hand down your back. Use the opposite hand to gently press the elbow, deepening the stretch in the back of the upper arm.",
+      "equipment": "body_only",
+      "muscle_groups": ["triceps"]
+    },
+    {
+      "name": "Butterfly Stretch",
+      "difficulty": "beginner",
+      "instructions": "Sit on the floor with the soles of your feet together and knees bent out to the sides. Hold your feet and gently press your knees toward the floor to stretch the inner thighs.",
+      "equipment": "body_only",
+      "muscle_groups": ["inner_thighs", "hips"]
+    },
+    {
+      "name": "Seated Forward Bend",
+      "difficulty": "intermediate",
+      "instructions": "Sit on the floor with legs extended straight. Hinge at the hips and reach forward toward your toes, keeping your back straight, to stretch the hamstrings and lower back.",
+      "equipment": "body_only",
+      "muscle_groups": ["hamstrings", "lower_back"]
+    },
+    {
+      "name": "Cat-Cow Stretch",
+      "difficulty": "beginner",
+      "instructions": "Begin on your hands and knees with a neutral spine. Inhale, arch your back (Cow Pose), lifting your head and tailbone. Exhale, round your spine (Cat Pose), tucking your chin and pelvis. Repeat for several breaths.",
+      "equipment": "body_only",
+      "muscle_groups": ["spine", "back"]
+    },
+    {
+      "name": "Child's Pose",
+      "difficulty": "beginner",
+      "instructions": "Kneel on the floor, sit back on your heels, and extend your arms forward, lowering your torso between your thighs. Relax and hold the stretch.",
+      "equipment": "body_only",
+      "muscle_groups": ["back", "hips"]
+    },
+    {
+      "name": "Downward-Facing Dog",
+      "difficulty": "intermediate",
+      "instructions": "Start on your hands and knees. Lift your hips toward the ceiling, straightening your legs and forming an inverted V-shape. Press your heels toward the floor and relax your head between your arms.",
+      "equipment": "body_only",
+      "muscle_groups": ["hamstrings", "calves", "shoulders"]
+    },
+    {
+      "name": "Pigeon Pose",
+      "difficulty": "intermediate",
+      "instructions": "From a plank position, bring one knee forward and place it behind your wrist, with the shin angled under your torso. Extend the opposite leg straight back. Lower your torso over the bent leg to deepen the stretch.",
+      "equipment": "body_only",
+      "muscle_groups": ["hips", "glutes"]
+    },
+    {
+      "name": "Seated Spinal Twist",
+      "difficulty": "intermediate",
+      "instructions": "Sit on the floor with legs extended. Bend one knee and cross it over the opposite leg. Twist your torso toward the bent knee, placing the opposite elbow outside the knee for leverage.",
+      "equipment": "body_only",
+      "muscle_groups": ["spine", "back"]
+    },
+    {
+      "name": "Neck Stretch",
+      "difficulty": "beginner",
+      "instructions": "Sit or stand upright. Gently tilt your head to one side, bringing your ear toward your shoulder. Hold the stretch, then repeat on the other side.",
+      "equipment": "body_only",
+      "muscle_groups": ["neck"]
+    },
+    {
+      "name": "Hip Flexor Stretch",
+      "difficulty": "beginner",
+      "instructions": "Kneel on one knee with the other foot in front, forming a 90-degree angle. Shift your weight forward until you feel a stretch in the front of the hip on the kneeling side.",
+      "equipment": "body_only",
+      "muscle_groups": ["hip_flexors"]
+    },
+    {
+      "name": "Side Stretch",
+      "difficulty": "beginner",
+      "instructions": "Stand with feet hip-width apart. Raise one arm overhead and lean to the opposite side, feeling a stretch along the side of your torso. Repeat on the other side.",
+      "equipment": "body_only",
+      "muscle_groups": ["obliques", "lats"]
+    },
+    {
+      "name": "Standing IT Band Stretch",
+      "difficulty": "beginner",
+      "instructions": "Stand upright and cross one leg behind the other. Lean toward the side of the front leg, feeling a stretch along the outer thigh and hip.",
+      "equipment": "body_only",
+      "muscle_groups": ["iliotibial_band", "outer_thigh"]
+    },
+    {
+      "name": "Forearm Stretch",
+      "difficulty": "beginner",
+      "instructions": "Extend one arm in front with the palm facing up. Use the opposite hand to gently pull the fingers back toward you, stretching the forearm muscles.",
+      "equipment": "body_only",
+      "muscle_groups": ["forearms"]
+    },
+    {
+      "name": "Wrist Flexor Stretch",
+      "difficulty": "beginner",
+      "instructions": "Extend one arm in front with the palm facing up. Use the opposite hand to gently pull the fingers back toward your body to stretch the wrist flexors.",
+      "equipment": "body_only",
+      "muscle_groups": ["forearms"]
+    },
+    {
+      "name": "Wrist Extensor Stretch",
+      "difficulty": "beginner",
+      "instructions": "Extend one arm in front with the palm facing down. Use the opposite hand to gently pull the fingers back toward your body to stretch the wrist extensors.",
+      "equipment": "body_only",
+      "muscle_groups": ["forearms"]
+    },
+    {
+      "name": "Upper Back Stretch",
+      "difficulty": "beginner",
+      "instructions": "Extend your arms in front of you, clasping your hands together. Round your upper back as you reach forward, feeling a stretch between your shoulder blades.",
+      "equipment": "body_only",
+      "muscle_groups": ["upper_back"]
+    },
+    {
+      "name": "Lat Stretch",
+      "difficulty": "beginner",
+      "instructions": "Extend one arm overhead and lean to the opposite side. Hold the stretch, then switch to the other side.",
+      "equipment": "body_only",
+      "muscle_groups": ["lats"]
+    },
+    {
+      "name": "Scalene Stretch",
+      "difficulty": "beginner",
+      "instructions": "Sit or stand tall. Tilt your head to one side and slightly back to stretch the muscles on the front and side of your neck.",
+      "equipment": "body_only",
+      "muscle_groups": ["neck"]
+    },
+    {
+      "name": "Groin Stretch",
+      "difficulty": "beginner",
+      "instructions": "Sit on the floor with your legs apart. Slowly lean forward from the hips to stretch the inner thigh and groin area.",
+      "equipment": "body_only",
+      "muscle_groups": ["groin"]
+    },
+    {
+      "name": "Side-Lying Quadriceps Stretch",
+      "difficulty": "beginner",
+      "instructions": "Lie on one side. Bend the top knee and grasp your ankle, pulling your heel toward your glutes to stretch the front of your thigh.",
+      "equipment": "body_only",
+      "muscle_groups": ["quadriceps"]
+    },
+    {
+      "name": "Standing Side Stretch",
+      "difficulty": "beginner",
+      "instructions": "Stand with feet together. Raise one arm overhead and gently lean to the opposite side, feeling a stretch along the side of your body.",
+      "equipment": "body_only",
+      "muscle_groups": ["obliques", "lats"]
+    },
+    {
+      "name": "Back Extension Stretch",
+      "difficulty": "beginner",
+      "instructions": "Lie face down with hands on the floor under your shoulders. Gently press your upper body off the ground, arching your back to stretch your abs and spine.",
+      "equipment": "body_only",
+      "muscle_groups": ["lower_back", "abs"]
+    },
+    {
+      "name": "Cobra Stretch",
+      "difficulty": "beginner",
+      "instructions": "Lie face down with hands under shoulders. Gently press your upper body up, keeping your pelvis on the floor, to stretch your abs and lower back.",
+      "equipment": "body_only",
+      "muscle_groups": ["lower_back", "abs"]
+    }
+  ]
+}
+
+ 
