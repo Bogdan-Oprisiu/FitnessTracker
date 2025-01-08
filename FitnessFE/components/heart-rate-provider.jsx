@@ -63,7 +63,7 @@ export const HeartRateProvider = ({ children }) => {
                         return;
                     }
 
-                    if (scannedDevice && scannedDevice.name === 'Polar Sense B2245D2F') {
+                    if (scannedDevice && (scannedDevice.name === 'Polar Sense B2245D2F' || scannedDevice.name === 'Polar Sense A6FC0B2E' || scannedDevice.name === 'Polar Sense AE0F792F' || scannedDevice.name === 'Polar Sense B220A320')) {
                         console.log("Device found:", scannedDevice.name);
                         bleManager.stopDeviceScan();
 
