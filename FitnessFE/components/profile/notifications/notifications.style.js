@@ -6,13 +6,21 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#1a1a1a',
   },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  backButton: {
+    marginTop: 30,
+  },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     color: '#6a0dad',
     marginBottom: 20,
     marginTop: 50,
-    textAlign: 'center'
+    textAlign: 'center',
+    flex: 1
   },
   tabsContainer: {
     flexDirection: 'row',

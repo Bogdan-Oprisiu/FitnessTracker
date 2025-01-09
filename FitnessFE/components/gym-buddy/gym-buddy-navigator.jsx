@@ -3,7 +3,7 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { StyleSheet } from 'react-native';
 import Chat from './chat/chat'; 
-import WorkoutGenerator from './workout-generator/workout-generator';
+import Generator from './workout-generator/workout-generator';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -17,7 +17,7 @@ export default function GymBuddyTabs() {
           let iconName;
           if (route.name === 'Chat') {
             iconName = 'chat';
-          } else if (route.name === 'WorkoutGenerator') {
+          } else if (route.name === 'Generator') {
             iconName = 'dumbbell';
           }
           return <MaterialCommunityIcons name={iconName} color={color} size={24} />;
@@ -31,7 +31,7 @@ export default function GymBuddyTabs() {
       })}
     >
       <Tab.Screen name="Chat" component={Chat} />
-      <Tab.Screen name="WorkoutGenerator" component={WorkoutGenerator} />
+      <Tab.Screen name="Generator" component={Generator} />
     </Tab.Navigator>
   );
 }

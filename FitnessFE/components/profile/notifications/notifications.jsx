@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, ActivityIndicator, Alert, Dimensions } fr
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { Ionicons } from '@expo/vector-icons';
 import { db, auth } from '../../config/firebase-config';
+import { useNavigation } from '@react-navigation/native';
 import { collection, query, where, onSnapshot, doc, getDoc, getDocs,writeBatch, orderBy, deleteDoc } from 'firebase/firestore';
 import Toast from 'react-native-toast-message';
 import styles from './notifications.style';
@@ -15,12 +16,10 @@ const Notifications = () => {
   const [loading, setLoading] = useState(true);
   const [selectedTab, setSelectedTab] = useState('New');
   const userCache = useRef({});
-
   const screenWidth = Dimensions.get('window').width;
-
   const deletingRowsRef = useRef(new Set());
-
   const rowMapRef = useRef({});
+  const navigation = useNavigation();
 
   useEffect(() => {
     const currentUser = auth.currentUser;
@@ -415,7 +414,17 @@ const Notifications = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Notifications</Text>
+      <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+          accessibilityLabel="Go back to main tabs"
+          activeOpacity={0.7}
+        >
+          <Ionicons name="arrow-back" size={24} color="#6a0dad" />
+        </TouchableOpacity>
+        <Text style={styles.title}>Notifications</Text>
+      </View>
 
       <View style={styles.tabsContainer}>
         <TouchableOpacity

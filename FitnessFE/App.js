@@ -24,7 +24,7 @@ import Notifications from './components/profile/notifications/notifications';
 import SettingsScreen from './components/profile/settings-screen/settings-screen';
 import GymBuddyTabs from './components/gym-buddy/gym-buddy-navigator';
 import Chat from './components/gym-buddy/chat/chat';
-import WorkoutGenerator from './components/gym-buddy/workout-generator/workout-generator';
+import Generator from './components/gym-buddy/workout-generator/workout-generator';
 
 const Stack = createNativeStackNavigator();
 
@@ -126,8 +126,8 @@ export default function App() {
                   options={{ headerShown: false }}
                 />
                 <Stack.Screen
-                  name='WorkoutGenerator'
-                  component={WorkoutGenerator}
+                  name='Generator'
+                  component={Generator}
                   options={{ headerShown: false }}
                 />
               </Stack.Navigator>
