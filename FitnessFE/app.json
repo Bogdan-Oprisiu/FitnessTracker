@@ -2,6 +2,10 @@
   "expo": {
     "name": "fitness-tracker",
     "slug": "fitness-tracker",
+    "androidStatusBar": {
+      "backgroundColor": "#00000000",
+      "translucent": true
+    },
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -15,17 +19,13 @@
     "ios": {
       "bundleIdentifier": "com.fitnesstracker.fitnessappubb",
       "supportsTablet": true,
-      "config": {
-      "googleSignIn": {
-        "reservedClientId": "com.googleusercontent.apps.751422930054-o25o9u2nv58v971pk23lanpgvq1srbp0.apps.googleusercontent.com"
-      }
-      },
       "infoPlist": {
-      "NSCameraUsageDescription": "We need access to your camera to capture workout-related photos or videos.",
-      "NSMicrophoneUsageDescription": "We need access to your microphone for audio input during workouts.",
-      "NSLocationWhenInUseUsageDescription": "We need access to your location to track your outdoor workouts.",
-      "NSBluetoothAlwaysUsageDescription": "We need access to Bluetooth to connect to fitness devices like heart rate monitors.",
-      "NSBluetoothPeripheralUsageDescription": "We need access to Bluetooth peripherals for fitness device connectivity."
+        "NSLocationWhenInUseUsageDescription": "We need access to your location to track your outdoor workouts.",
+        "NSBluetoothAlwaysUsageDescription": "We need access to Bluetooth to connect to fitness devices like heart rate monitors.",
+        "NSBluetoothPeripheralUsageDescription": "We need access to Bluetooth peripherals for fitness device connectivity.",
+        "NSCameraUsageDescription": "We need access to your camera to take profile pictures.",
+        "NSPhotoLibraryUsageDescription": "We need access to your photo library to select profile pictures.",
+        "NSPhotoLibraryAddUsageDescription": "We need permission to save photos to your photo library."
       }
     },
     "android": {
@@ -41,7 +41,10 @@
         "ACCESS_FINE_LOCATION",
         "BLUETOOTH_SCAN",
         "BLUETOOTH_CONNECT",
-        "BLUETOOTH_ADVERTISE"
+        "BLUETOOTH_ADVERTISE",
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
       ]
     },
     "plugins": [

@@ -1,25 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { 
-  View, 
-  Text, 
-  FlatList, 
-  ActivityIndicator, 
-  StyleSheet, 
-  TextInput, 
-  TouchableOpacity,
-  Image
-} from 'react-native';
+import { View, Text, FlatList, ActivityIndicator, TextInput, TouchableOpacity, Image } from 'react-native';
 import { db, auth } from '../../config/firebase-config';
-import { 
-  collection, 
-  query, 
-  where, 
-  onSnapshot, 
-  doc, 
-  getDocs, 
-  getDoc, 
-  orderBy 
-} from 'firebase/firestore';
+import { collection, query, where, onSnapshot, doc, getDocs, getDoc, orderBy } from 'firebase/firestore';
 import { MaterialIcons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
 import styles from './friends-workouts.style';

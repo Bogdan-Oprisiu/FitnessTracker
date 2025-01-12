@@ -1,17 +1,5 @@
-// src/components/date-workouts-modal/FriendsTab.jsx
-
 import React, { useState, useEffect, useCallback } from 'react';
-import { 
-  View, 
-  Text, 
-  TouchableOpacity, 
-  ActivityIndicator, 
-  FlatList, 
-  TextInput, 
-  Image, 
-  KeyboardAvoidingView, 
-  Platform 
-} from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator, FlatList, TextInput, Image, KeyboardAvoidingView, Platform } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { collection, query, where, getDocs, onSnapshot, doc, getDoc } from 'firebase/firestore';
 import { db, auth } from '../../config/firebase-config';
