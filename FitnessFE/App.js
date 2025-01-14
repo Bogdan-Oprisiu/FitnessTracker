@@ -22,6 +22,9 @@ import DifficultyFilteredExercises from './components/workouts-page/add-exercise
 import AddPersonalizedWorkout from './components/workouts-page/add-personalized-workout/add-personalized-workout';
 import Notifications from './components/profile/notifications/notifications';
 import SettingsScreen from './components/profile/settings-screen/settings-screen';
+import GymBuddyTabs from './components/gym-buddy/gym-buddy-navigator';
+import Chat from './components/gym-buddy/chat';
+import Generator from './components/gym-buddy/workout-generator';
 
 const Stack = createNativeStackNavigator();
 
@@ -110,6 +113,21 @@ export default function App() {
                 <Stack.Screen
                   name='SettingsScreen'
                   component={SettingsScreen}
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name='GymBuddyTabs'
+                  component={GymBuddyTabs}
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name='Chat'
+                  component={Chat}
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name='Generator'
+                  component={Generator}
                   options={{ headerShown: false }}
                 />
               </Stack.Navigator>

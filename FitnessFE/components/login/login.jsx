@@ -200,10 +200,6 @@ export default function Login() {
         }
     };
 
-    const loginWithApple = () => {
-
-    }
-
     const onSignupPress = () => {
         navigation.navigate('Signup');
     }
@@ -247,15 +243,7 @@ export default function Login() {
                             source={googleIcon}
                             style={styles.socialIcon}
                         />
-                        <Text style={styles.socialText}>Google</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity style={styles.socialButton} onPress={loginWithApple} >
-                        <Image
-                            source={appleIcon}
-                            style={styles.socialIcon}
-                        />
-                        <Text style={styles.socialText}>Apple</Text>
+                        <Text style={styles.socialText}>Continue with Google</Text>
                     </TouchableOpacity>
                 </View>
                 <TouchableOpacity style={styles.submitButton} onPress={loginWithCredentials}>

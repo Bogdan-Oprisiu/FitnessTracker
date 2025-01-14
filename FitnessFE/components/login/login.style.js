@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
         padding: 15,
         borderRadius: 25,
         marginBottom: 15,
-        width: '40%',
+        width: '80%',
         justifyContent: 'center',
     },
     socialIcon: {

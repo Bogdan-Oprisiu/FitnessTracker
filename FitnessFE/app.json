@@ -2,6 +2,10 @@
   "expo": {
     "name": "fitness-tracker",
     "slug": "fitness-tracker",
+    "androidStatusBar": {
+      "backgroundColor": "#00000000",
+      "translucent": true
+    },
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
